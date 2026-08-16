@@ -1,8 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { Interface, id } from "ethers";
 import { loadPublicSurface } from "../src/load-public-surface.mjs";
+import { auditRepositoryForSecrets } from "../scripts/repo-secret-audit.mjs";
 
 test("all mainnet deployments expose the same deterministic solver surface", async () => {
   const networks = await Promise.all(["base", "bsc", "hyperevm"].map(loadPublicSurface));
@@ -45,4 +48,16 @@ test("reservation polling backs off when idle and accelerates on activity", asyn
   assert.ok(polling.backlogIntervalMs >= 1_000 && polling.backlogIntervalMs <= 3_000);
   assert.ok(polling.idleIntervalMs > polling.activityIntervalMs);
   assert.ok(polling.idleIntervalMs > polling.backlogIntervalMs);
+});
+
+test("secret audit covers files outside src and examples", async (context) => {
+  const repository = await mkdtemp(join(tmpdir(), "nexa-public-audit-"));
+  context.after(() => rm(repository, { recursive: true, force: true }));
+  await mkdir(join(repository, "config"));
+  const syntheticToken = ["ghp", "_", "A".repeat(36)].join("");
+  await writeFile(join(repository, "config", "leak.txt"), "token=" + syntheticToken);
+  await assert.rejects(
+    auditRepositoryForSecrets(repository),
+    /Potential GitHub access token detected in config\/leak\.txt/,
+  );
 });

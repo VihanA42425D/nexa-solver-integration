@@ -1,0 +1,147 @@
+{
+  "manifest": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "schema": "nexa-solver-integration-manifest/v1",
+    "name": "Nexa Solver Integration",
+    "environment": "mainnet",
+    "deploymentVersion": 5,
+    "release": "NEXA_MAINNET_V5_R2",
+    "releaseId": "0x8ab20f09437e7da075d9480f461884c32adb2699c73354495139b40904ec6f0b",
+    "publicSurfaceOnly": true,
+    "networks": [
+      8453,
+      56,
+      999
+    ],
+    "addresses": "./addresses/mainnet.json",
+    "standards": "./standards/standard-ids.json",
+    "events": "./events/events.json",
+    "abis": {
+      "registry": "./abis/NexaMainnetRegistryV5.json",
+      "router": "./abis/NexaMainnetRouterV5.json",
+      "reservationCoordinator": "./abis/NexaReservationCoordinatorV5.json",
+      "oifAdapter": "./abis/NexaOIFAdapterV5.json",
+      "currentErc7683Resolver": "./abis/NexaERC7683ReadyFillResolverV5.json",
+      "resolverHubDelegate": "./abis/NexaResolverHubV5.json",
+      "legacy7683Adapter": "./abis/NexaLegacy7683AdapterV5.json",
+      "solverLaneFactory": "./abis/NexaSolverLaneFactoryV5.json"
+    },
+    "examples": {
+      "discoverRoutes": "./examples/discover-open-routes.mjs",
+      "watchReservationRequests": "./examples/watch-reservation-requests.mjs",
+      "oifAdapter": "./src/oif-adapter.mjs",
+      "config": "./config/example.config.json"
+    },
+    "excluded": [
+      "clearing",
+      "inventory",
+      "vault-management",
+      "kms",
+      "private-rpc",
+      "pricing-policy",
+      "business-logic"
+    ],
+    "releases": {
+      "core": {
+        "name": "NEXA_MAINNET_V5_R2",
+        "id": "0x8ab20f09437e7da075d9480f461884c32adb2699c73354495139b40904ec6f0b"
+      },
+      "solverCompletion": {
+        "name": "NEXA_MAINNET_V5_R3_SOLVER_COMPLETION",
+        "id": "0x8efd1a1bde923f8a4d8e1b5fb30a8c72a69cc848c8344f2f5b7dbfc411f391b1"
+      },
+      "currentErc7683Resolver": {
+        "name": "NEXA_MAINNET_V5_R3_ERC7683_READY_FILL",
+        "id": "0x29b3e2f383bd36b4d26ef8cbd59f96cee3f1989bf22066c5aef9120d6a063e66"
+      },
+      "parallelSolverLanes": {
+        "name": "NEXA_MAINNET_V5_R3_PARALLEL_SOLVER_LANES",
+        "id": "0x34678b9191235ba6e3f108d1412a1736a731b14f19f6b79925a5a25e5abfb3ea"
+      }
+    }
+  },
+  "addresses": {
+    "schema": "nexa-contract-addresses/v1",
+    "releaseId": "0x8ab20f09437e7da075d9480f461884c32adb2699c73354495139b40904ec6f0b",
+    "deploymentVersion": 5,
+    "deterministicDeployment": true,
+    "networks": {
+      "base": {
+        "chainId": 8453,
+        "explorer": "https://basescan.org",
+        "contracts": {
+          "registry": "0x9128032cbc5918258a643DD58AB101c63b891CE0",
+          "router": "0x89f9B48bCaC60c1e21678100B26Ff67971405E03",
+          "reservationCoordinator": "0x1739c5122206E50510D42Df96E84CB635afFB12c",
+          "legacy7683Adapter": "0x42C7376e79421de6d87C9F2E5832BAFc55f84934",
+          "oifAdapter": "0x4a98D8898f834AF5bEcA9Edf43b46eD08fDb58c7",
+          "resolverHubDelegate": "0x8FC4710251864be11A73b7e766c0d70825a6B168",
+          "currentErc7683Resolver": "0x09EB79539E736132B45f2e1B80d28279B6051170",
+          "solverLaneFactory": "0xF0fA4f8D6C517A18BC00B7777698d805afdE003f"
+        }
+      },
+      "bsc": {
+        "chainId": 56,
+        "explorer": "https://bscscan.com",
+        "contracts": {
+          "registry": "0x9128032cbc5918258a643DD58AB101c63b891CE0",
+          "router": "0x89f9B48bCaC60c1e21678100B26Ff67971405E03",
+          "reservationCoordinator": "0x1739c5122206E50510D42Df96E84CB635afFB12c",
+          "legacy7683Adapter": "0x42C7376e79421de6d87C9F2E5832BAFc55f84934",
+          "oifAdapter": "0x4a98D8898f834AF5bEcA9Edf43b46eD08fDb58c7",
+          "resolverHubDelegate": "0x8FC4710251864be11A73b7e766c0d70825a6B168",
+          "currentErc7683Resolver": "0x09EB79539E736132B45f2e1B80d28279B6051170",
+          "solverLaneFactory": "0xF0fA4f8D6C517A18BC00B7777698d805afdE003f"
+        }
+      },
+      "hyperevm": {
+        "chainId": 999,
+        "explorer": "https://hyperevmscan.io",
+        "contracts": {
+          "registry": "0x9128032cbc5918258a643DD58AB101c63b891CE0",
+          "router": "0x89f9B48bCaC60c1e21678100B26Ff67971405E03",
+          "reservationCoordinator": "0x1739c5122206E50510D42Df96E84CB635afFB12c",
+          "legacy7683Adapter": "0x42C7376e79421de6d87C9F2E5832BAFc55f84934",
+          "oifAdapter": "0x4a98D8898f834AF5bEcA9Edf43b46eD08fDb58c7",
+          "resolverHubDelegate": "0x8FC4710251864be11A73b7e766c0d70825a6B168",
+          "currentErc7683Resolver": "0x09EB79539E736132B45f2e1B80d28279B6051170",
+          "solverLaneFactory": "0xF0fA4f8D6C517A18BC00B7777698d805afdE003f"
+        }
+      }
+    },
+    "solverCompletionReleaseId": "0x8efd1a1bde923f8a4d8e1b5fb30a8c72a69cc848c8344f2f5b7dbfc411f391b1"
+  },
+  "standards": {
+    "schema": "nexa-solver-standard-ids/v1",
+    "derivation": "keccak256(utf8(name))",
+    "standards": {
+      "currentErc7683": {
+        "name": "NEXA_CURRENT_ERC7683_RESOLVER_V5",
+        "id": "0x8830b77b1af1908a1821ec5e59773d1318b892138d720ce31d62daad6d962e5f",
+        "contract": "currentErc7683Resolver"
+      },
+      "legacyErc7683": {
+        "name": "NEXA_LEGACY_ERC7683_ORDER_ADAPTER_V5",
+        "id": "0x920f4ab52c180b4af1f8fe38949e32bf5bc9071273a14667a66ec8373b4b2f27",
+        "contract": "legacy7683Adapter"
+      },
+      "oifMandateOutput": {
+        "name": "NEXA_OIF_MANDATE_OUTPUT_ADAPTER_V5",
+        "id": "0xddfe778263f830a021ad4c2a7f78b9a4944d08482df2b2c80b675d22274c66fd",
+        "contract": "oifAdapter"
+      },
+      "parallelSolverLanes": {
+        "name": "NEXA_PARALLEL_SOLVER_LANES_V5",
+        "id": "0xd0ebef5434f7099c537de0fe4b710a83192798073b283fe681e7559cc37dbf6a",
+        "contract": "solverLaneFactory"
+      }
+    }
+  },
+  "endpoints": {
+    "manifest": "https://solver.vsnexa.com/.well-known/nexa-solver.json",
+    "solverDiscovery": "https://solver.vsnexa.com/api/v5/solver-discovery",
+    "solverFeed": "https://solver.vsnexa.com/api/v5/solver-feed",
+    "solverFeedEvents": "https://solver.vsnexa.com/api/v5/solver-feed/events",
+    "solverFeedStatus": "https://solver.vsnexa.com/api/v5/solver-feed/status"
+  }
+}

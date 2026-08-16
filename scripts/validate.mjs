@@ -3,6 +3,11 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { getAddress, id, Interface } from "ethers";
 import { auditRepositoryForSecrets } from "./repo-secret-audit.mjs";
+import {
+  buildNexaSolverManifest,
+  serializeNexaSolverManifest,
+} from "./generate-nexa-solver-manifest.mjs";
+import { PUBLIC_ENDPOINTS } from "../src/public-endpoints.mjs";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const readJson = async (file) => JSON.parse(await readFile(resolve(root, file), "utf8"));
@@ -34,6 +39,53 @@ for (const directory of ["src", "examples"]) {
     }
   }
 }
+
+const expectedEndpointUrls = [
+  "https://solver.vsnexa.com/.well-known/nexa-solver.json",
+  "https://solver.vsnexa.com/api/v5/solver-discovery",
+  "https://solver.vsnexa.com/api/v5/solver-feed",
+  "https://solver.vsnexa.com/api/v5/solver-feed/events",
+  "https://solver.vsnexa.com/api/v5/solver-feed/status",
+];
+if (JSON.stringify(Object.values(PUBLIC_ENDPOINTS)) !== JSON.stringify(expectedEndpointUrls)) {
+  throw new Error("Public endpoint catalog mismatch");
+}
+
+const generatedManifest = serializeNexaSolverManifest(await buildNexaSolverManifest(root));
+const staticManifest = await readFile(
+  resolve(root, "public/.well-known/nexa-solver.json"),
+  "utf8",
+);
+if (staticManifest !== generatedManifest) {
+  throw new Error("Generated solver manifest is stale");
+}
+
+const publicEntries = (await readdir(resolve(root, "public"))).sort();
+const wellKnownEntries = (await readdir(resolve(root, "public/.well-known"))).sort();
+if (JSON.stringify(publicEntries) !== JSON.stringify([".well-known"])
+  || JSON.stringify(wellKnownEntries) !== JSON.stringify(["nexa-solver.json"])) {
+  throw new Error("Unexpected public static asset");
+}
+
+const wrangler = await readJson("wrangler.jsonc");
+if (wrangler.main !== "./src/worker.mjs" || wrangler.workers_dev !== false
+  || wrangler.assets?.directory !== "./public" || wrangler.assets?.binding !== "ASSETS"
+  || wrangler.assets?.run_worker_first !== true) {
+  throw new Error("Wrangler Worker or Static Assets configuration mismatch");
+}
+if (JSON.stringify(wrangler.routes) !== JSON.stringify([{
+  pattern: "solver.vsnexa.com",
+  custom_domain: true,
+}])) {
+  throw new Error("Wrangler custom domain mismatch");
+}
+if (Object.hasOwn(wrangler, "vars") || JSON.stringify(wrangler).includes("SOLVER_ORIGIN")) {
+  throw new Error("Origin configuration must not be committed to Wrangler");
+}
+
+const workerSource = await readFile(resolve(root, "src/worker.mjs"), "utf8");
+if (/https?:\/\//i.test(workerSource)) throw new Error("Worker must not hardcode an origin URL");
+
 const auditedFiles = await auditRepositoryForSecrets(root);
 console.log(
   "Nexa public solver integration surface validated ("

@@ -1,0 +1,1185 @@
+[
+    {
+        "type":  "function",
+        "name":  "DEPLOYMENT_VERSION",
+        "inputs":  [
+
+                   ],
+        "outputs":  [
+                        {
+                            "name":  "",
+                            "type":  "uint256",
+                            "internalType":  "uint256"
+                        }
+                    ],
+        "stateMutability":  "view"
+    },
+    {
+        "type":  "function",
+        "name":  "RELEASE_ID",
+        "inputs":  [
+
+                   ],
+        "outputs":  [
+                        {
+                            "name":  "",
+                            "type":  "bytes32",
+                            "internalType":  "bytes32"
+                        }
+                    ],
+        "stateMutability":  "view"
+    },
+    {
+        "type":  "function",
+        "name":  "SEMANTIC_LEAF_DOMAIN",
+        "inputs":  [
+
+                   ],
+        "outputs":  [
+                        {
+                            "name":  "",
+                            "type":  "bytes32",
+                            "internalType":  "bytes32"
+                        }
+                    ],
+        "stateMutability":  "view"
+    },
+    {
+        "type":  "function",
+        "name":  "computeSemanticRouteLeaf",
+        "inputs":  [
+                       {
+                           "name":  "sourceChainId",
+                           "type":  "uint256",
+                           "internalType":  "uint256"
+                       },
+                       {
+                           "name":  "terms",
+                           "type":  "tuple",
+                           "internalType":  "struct NexaMainnetV5Types.ActiveRouteTerms",
+                           "components":  [
+                                              {
+                                                  "name":  "routeId",
+                                                  "type":  "bytes32",
+                                                  "internalType":  "bytes32"
+                                              },
+                                              {
+                                                  "name":  "state",
+                                                  "type":  "uint8",
+                                                  "internalType":  "enum NexaMainnetV5Types.RouteState"
+                                              },
+                                              {
+                                                  "name":  "sourceFillDeadline",
+                                                  "type":  "uint64",
+                                                  "internalType":  "uint64"
+                                              },
+                                              {
+                                                  "name":  "settlementWindowSeconds",
+                                                  "type":  "uint32",
+                                                  "internalType":  "uint32"
+                                              },
+                                              {
+                                                  "name":  "estimatedSettlementSeconds",
+                                                  "type":  "uint32",
+                                                  "internalType":  "uint32"
+                                              },
+                                              {
+                                                  "name":  "sourceFinalityBlocks",
+                                                  "type":  "uint32",
+                                                  "internalType":  "uint32"
+                                              },
+                                              {
+                                                  "name":  "protocolFeeBps",
+                                                  "type":  "uint32",
+                                                  "internalType":  "uint32"
+                                              },
+                                              {
+                                                  "name":  "minFillRaw",
+                                                  "type":  "uint128",
+                                                  "internalType":  "uint128"
+                                              },
+                                              {
+                                                  "name":  "maxFillRaw",
+                                                  "type":  "uint128",
+                                                  "internalType":  "uint128"
+                                              },
+                                              {
+                                                  "name":  "capacityRaw",
+                                                  "type":  "uint128",
+                                                  "internalType":  "uint128"
+                                              },
+                                              {
+                                                  "name":  "outputNumerator",
+                                                  "type":  "uint128",
+                                                  "internalType":  "uint128"
+                                              },
+                                              {
+                                                  "name":  "outputDenominator",
+                                                  "type":  "uint128",
+                                                  "internalType":  "uint128"
+                                              },
+                                              {
+                                                  "name":  "assumptionsHash",
+                                                  "type":  "bytes32",
+                                                  "internalType":  "bytes32"
+                                              }
+                                          ]
+                       }
+                   ],
+        "outputs":  [
+                        {
+                            "name":  "",
+                            "type":  "bytes32",
+                            "internalType":  "bytes32"
+                        }
+                    ],
+        "stateMutability":  "pure"
+    },
+    {
+        "type":  "function",
+        "name":  "getActiveSemanticRouteCount",
+        "inputs":  [
+                       {
+                           "name":  "sourceChainId",
+                           "type":  "uint256",
+                           "internalType":  "uint256"
+                       }
+                   ],
+        "outputs":  [
+                        {
+                            "name":  "published",
+                            "type":  "uint256",
+                            "internalType":  "uint256"
+                        },
+                        {
+                            "name":  "expected",
+                            "type":  "uint256",
+                            "internalType":  "uint256"
+                        },
+                        {
+                            "name":  "fullyDiscoverable",
+                            "type":  "bool",
+                            "internalType":  "bool"
+                        }
+                    ],
+        "stateMutability":  "view"
+    },
+    {
+        "type":  "function",
+        "name":  "getActiveSemanticRouteWitness",
+        "inputs":  [
+                       {
+                           "name":  "sourceChainId",
+                           "type":  "uint256",
+                           "internalType":  "uint256"
+                       },
+                       {
+                           "name":  "routeId",
+                           "type":  "bytes32",
+                           "internalType":  "bytes32"
+                       }
+                   ],
+        "outputs":  [
+                        {
+                            "name":  "published",
+                            "type":  "bool",
+                            "internalType":  "bool"
+                        },
+                        {
+                            "name":  "witness",
+                            "type":  "tuple",
+                            "internalType":  "struct NexaMainnetV5Types.ActiveRouteWitness",
+                            "components":  [
+                                               {
+                                                   "name":  "terms",
+                                                   "type":  "tuple",
+                                                   "internalType":  "struct NexaMainnetV5Types.ActiveRouteTerms",
+                                                   "components":  [
+                                                                      {
+                                                                          "name":  "routeId",
+                                                                          "type":  "bytes32",
+                                                                          "internalType":  "bytes32"
+                                                                      },
+                                                                      {
+                                                                          "name":  "state",
+                                                                          "type":  "uint8",
+                                                                          "internalType":  "enum NexaMainnetV5Types.RouteState"
+                                                                      },
+                                                                      {
+                                                                          "name":  "sourceFillDeadline",
+                                                                          "type":  "uint64",
+                                                                          "internalType":  "uint64"
+                                                                      },
+                                                                      {
+                                                                          "name":  "settlementWindowSeconds",
+                                                                          "type":  "uint32",
+                                                                          "internalType":  "uint32"
+                                                                      },
+                                                                      {
+                                                                          "name":  "estimatedSettlementSeconds",
+                                                                          "type":  "uint32",
+                                                                          "internalType":  "uint32"
+                                                                      },
+                                                                      {
+                                                                          "name":  "sourceFinalityBlocks",
+                                                                          "type":  "uint32",
+                                                                          "internalType":  "uint32"
+                                                                      },
+                                                                      {
+                                                                          "name":  "protocolFeeBps",
+                                                                          "type":  "uint32",
+                                                                          "internalType":  "uint32"
+                                                                      },
+                                                                      {
+                                                                          "name":  "minFillRaw",
+                                                                          "type":  "uint128",
+                                                                          "internalType":  "uint128"
+                                                                      },
+                                                                      {
+                                                                          "name":  "maxFillRaw",
+                                                                          "type":  "uint128",
+                                                                          "internalType":  "uint128"
+                                                                      },
+                                                                      {
+                                                                          "name":  "capacityRaw",
+                                                                          "type":  "uint128",
+                                                                          "internalType":  "uint128"
+                                                                      },
+                                                                      {
+                                                                          "name":  "outputNumerator",
+                                                                          "type":  "uint128",
+                                                                          "internalType":  "uint128"
+                                                                      },
+                                                                      {
+                                                                          "name":  "outputDenominator",
+                                                                          "type":  "uint128",
+                                                                          "internalType":  "uint128"
+                                                                      },
+                                                                      {
+                                                                          "name":  "assumptionsHash",
+                                                                          "type":  "bytes32",
+                                                                          "internalType":  "bytes32"
+                                                                      }
+                                                                  ]
+                                               },
+                                               {
+                                                   "name":  "proof",
+                                                   "type":  "bytes32[]",
+                                                   "internalType":  "bytes32[]"
+                                               }
+                                           ]
+                        }
+                    ],
+        "stateMutability":  "view"
+    },
+    {
+        "type":  "function",
+        "name":  "getActiveSemanticRoutes",
+        "inputs":  [
+                       {
+                           "name":  "sourceChainId",
+                           "type":  "uint256",
+                           "internalType":  "uint256"
+                       },
+                       {
+                           "name":  "cursor",
+                           "type":  "uint256",
+                           "internalType":  "uint256"
+                       },
+                       {
+                           "name":  "limit",
+                           "type":  "uint256",
+                           "internalType":  "uint256"
+                       }
+                   ],
+        "outputs":  [
+                        {
+                            "name":  "page",
+                            "type":  "tuple[]",
+                            "internalType":  "struct NexaMainnetV5Types.ActiveRouteWitness[]",
+                            "components":  [
+                                               {
+                                                   "name":  "terms",
+                                                   "type":  "tuple",
+                                                   "internalType":  "struct NexaMainnetV5Types.ActiveRouteTerms",
+                                                   "components":  [
+                                                                      {
+                                                                          "name":  "routeId",
+                                                                          "type":  "bytes32",
+                                                                          "internalType":  "bytes32"
+                                                                      },
+                                                                      {
+                                                                          "name":  "state",
+                                                                          "type":  "uint8",
+                                                                          "internalType":  "enum NexaMainnetV5Types.RouteState"
+                                                                      },
+                                                                      {
+                                                                          "name":  "sourceFillDeadline",
+                                                                          "type":  "uint64",
+                                                                          "internalType":  "uint64"
+                                                                      },
+                                                                      {
+                                                                          "name":  "settlementWindowSeconds",
+                                                                          "type":  "uint32",
+                                                                          "internalType":  "uint32"
+                                                                      },
+                                                                      {
+                                                                          "name":  "estimatedSettlementSeconds",
+                                                                          "type":  "uint32",
+                                                                          "internalType":  "uint32"
+                                                                      },
+                                                                      {
+                                                                          "name":  "sourceFinalityBlocks",
+                                                                          "type":  "uint32",
+                                                                          "internalType":  "uint32"
+                                                                      },
+                                                                      {
+                                                                          "name":  "protocolFeeBps",
+                                                                          "type":  "uint32",
+                                                                          "internalType":  "uint32"
+                                                                      },
+                                                                      {
+                                                                          "name":  "minFillRaw",
+                                                                          "type":  "uint128",
+                                                                          "internalType":  "uint128"
+                                                                      },
+                                                                      {
+                                                                          "name":  "maxFillRaw",
+                                                                          "type":  "uint128",
+                                                                          "internalType":  "uint128"
+                                                                      },
+                                                                      {
+                                                                          "name":  "capacityRaw",
+                                                                          "type":  "uint128",
+                                                                          "internalType":  "uint128"
+                                                                      },
+                                                                      {
+                                                                          "name":  "outputNumerator",
+                                                                          "type":  "uint128",
+                                                                          "internalType":  "uint128"
+                                                                      },
+                                                                      {
+                                                                          "name":  "outputDenominator",
+                                                                          "type":  "uint128",
+                                                                          "internalType":  "uint128"
+                                                                      },
+                                                                      {
+                                                                          "name":  "assumptionsHash",
+                                                                          "type":  "bytes32",
+                                                                          "internalType":  "bytes32"
+                                                                      }
+                                                                  ]
+                                               },
+                                               {
+                                                   "name":  "proof",
+                                                   "type":  "bytes32[]",
+                                                   "internalType":  "bytes32[]"
+                                               }
+                                           ]
+                        },
+                        {
+                            "name":  "nextCursor",
+                            "type":  "uint256",
+                            "internalType":  "uint256"
+                        },
+                        {
+                            "name":  "fullyDiscoverable",
+                            "type":  "bool",
+                            "internalType":  "bool"
+                        }
+                    ],
+        "stateMutability":  "view"
+    },
+    {
+        "type":  "function",
+        "name":  "getActiveSetEpoch",
+        "inputs":  [
+                       {
+                           "name":  "sourceChainId",
+                           "type":  "uint256",
+                           "internalType":  "uint256"
+                       }
+                   ],
+        "outputs":  [
+                        {
+                            "name":  "",
+                            "type":  "tuple",
+                            "internalType":  "struct NexaMainnetV5Types.ActiveSetEpoch",
+                            "components":  [
+                                               {
+                                                   "name":  "currentEpoch",
+                                                   "type":  "uint64",
+                                                   "internalType":  "uint64"
+                                               },
+                                               {
+                                                   "name":  "epochValidUntil",
+                                                   "type":  "uint64",
+                                                   "internalType":  "uint64"
+                                               },
+                                               {
+                                                   "name":  "activeRouteCount",
+                                                   "type":  "uint32",
+                                                   "internalType":  "uint32"
+                                               },
+                                               {
+                                                   "name":  "batchHash",
+                                                   "type":  "bytes32",
+                                                   "internalType":  "bytes32"
+                                               }
+                                           ]
+                        }
+                    ],
+        "stateMutability":  "view"
+    },
+    {
+        "type":  "function",
+        "name":  "getRoute",
+        "inputs":  [
+                       {
+                           "name":  "routeId",
+                           "type":  "bytes32",
+                           "internalType":  "bytes32"
+                       }
+                   ],
+        "outputs":  [
+                        {
+                            "name":  "",
+                            "type":  "tuple",
+                            "internalType":  "struct NexaMainnetV5Types.Route",
+                            "components":  [
+                                               {
+                                                   "name":  "routeId",
+                                                   "type":  "bytes32",
+                                                   "internalType":  "bytes32"
+                                               },
+                                               {
+                                                   "name":  "version",
+                                                   "type":  "uint64",
+                                                   "internalType":  "uint64"
+                                               },
+                                               {
+                                                   "name":  "state",
+                                                   "type":  "uint8",
+                                                   "internalType":  "enum NexaMainnetV5Types.RouteState"
+                                               },
+                                               {
+                                                   "name":  "settlementWindowSeconds",
+                                                   "type":  "uint32",
+                                                   "internalType":  "uint32"
+                                               },
+                                               {
+                                                   "name":  "estimatedSettlementSeconds",
+                                                   "type":  "uint32",
+                                                   "internalType":  "uint32"
+                                               },
+                                               {
+                                                   "name":  "sourceFinalityBlocks",
+                                                   "type":  "uint32",
+                                                   "internalType":  "uint32"
+                                               },
+                                               {
+                                                   "name":  "protocolFeeBps",
+                                                   "type":  "uint32",
+                                                   "internalType":  "uint32"
+                                               },
+                                               {
+                                                   "name":  "sourceChainId",
+                                                   "type":  "uint256",
+                                                   "internalType":  "uint256"
+                                               },
+                                               {
+                                                   "name":  "destinationChainId",
+                                                   "type":  "uint256",
+                                                   "internalType":  "uint256"
+                                               },
+                                               {
+                                                   "name":  "sourceToken",
+                                                   "type":  "address",
+                                                   "internalType":  "address"
+                                               },
+                                               {
+                                                   "name":  "destinationToken",
+                                                   "type":  "address",
+                                                   "internalType":  "address"
+                                               },
+                                               {
+                                                   "name":  "sourceVault",
+                                                   "type":  "address",
+                                                   "internalType":  "address"
+                                               },
+                                               {
+                                                   "name":  "destinationVault",
+                                                   "type":  "address",
+                                                   "internalType":  "address"
+                                               },
+                                               {
+                                                   "name":  "sourceRouter",
+                                                   "type":  "address",
+                                                   "internalType":  "address"
+                                               },
+                                               {
+                                                   "name":  "destinationRouter",
+                                                   "type":  "address",
+                                                   "internalType":  "address"
+                                               },
+                                               {
+                                                   "name":  "minFillRaw",
+                                                   "type":  "uint128",
+                                                   "internalType":  "uint128"
+                                               },
+                                               {
+                                                   "name":  "maxFillRaw",
+                                                   "type":  "uint128",
+                                                   "internalType":  "uint128"
+                                               },
+                                               {
+                                                   "name":  "assumptionsHash",
+                                                   "type":  "bytes32",
+                                                   "internalType":  "bytes32"
+                                               }
+                                           ]
+                        }
+                    ],
+        "stateMutability":  "view"
+    },
+    {
+        "type":  "function",
+        "name":  "getRoutes",
+        "inputs":  [
+                       {
+                           "name":  "cursor",
+                           "type":  "uint256",
+                           "internalType":  "uint256"
+                       },
+                       {
+                           "name":  "limit",
+                           "type":  "uint256",
+                           "internalType":  "uint256"
+                       }
+                   ],
+        "outputs":  [
+                        {
+                            "name":  "page",
+                            "type":  "tuple[]",
+                            "internalType":  "struct NexaMainnetV5Types.Route[]",
+                            "components":  [
+                                               {
+                                                   "name":  "routeId",
+                                                   "type":  "bytes32",
+                                                   "internalType":  "bytes32"
+                                               },
+                                               {
+                                                   "name":  "version",
+                                                   "type":  "uint64",
+                                                   "internalType":  "uint64"
+                                               },
+                                               {
+                                                   "name":  "state",
+                                                   "type":  "uint8",
+                                                   "internalType":  "enum NexaMainnetV5Types.RouteState"
+                                               },
+                                               {
+                                                   "name":  "settlementWindowSeconds",
+                                                   "type":  "uint32",
+                                                   "internalType":  "uint32"
+                                               },
+                                               {
+                                                   "name":  "estimatedSettlementSeconds",
+                                                   "type":  "uint32",
+                                                   "internalType":  "uint32"
+                                               },
+                                               {
+                                                   "name":  "sourceFinalityBlocks",
+                                                   "type":  "uint32",
+                                                   "internalType":  "uint32"
+                                               },
+                                               {
+                                                   "name":  "protocolFeeBps",
+                                                   "type":  "uint32",
+                                                   "internalType":  "uint32"
+                                               },
+                                               {
+                                                   "name":  "sourceChainId",
+                                                   "type":  "uint256",
+                                                   "internalType":  "uint256"
+                                               },
+                                               {
+                                                   "name":  "destinationChainId",
+                                                   "type":  "uint256",
+                                                   "internalType":  "uint256"
+                                               },
+                                               {
+                                                   "name":  "sourceToken",
+                                                   "type":  "address",
+                                                   "internalType":  "address"
+                                               },
+                                               {
+                                                   "name":  "destinationToken",
+                                                   "type":  "address",
+                                                   "internalType":  "address"
+                                               },
+                                               {
+                                                   "name":  "sourceVault",
+                                                   "type":  "address",
+                                                   "internalType":  "address"
+                                               },
+                                               {
+                                                   "name":  "destinationVault",
+                                                   "type":  "address",
+                                                   "internalType":  "address"
+                                               },
+                                               {
+                                                   "name":  "sourceRouter",
+                                                   "type":  "address",
+                                                   "internalType":  "address"
+                                               },
+                                               {
+                                                   "name":  "destinationRouter",
+                                                   "type":  "address",
+                                                   "internalType":  "address"
+                                               },
+                                               {
+                                                   "name":  "minFillRaw",
+                                                   "type":  "uint128",
+                                                   "internalType":  "uint128"
+                                               },
+                                               {
+                                                   "name":  "maxFillRaw",
+                                                   "type":  "uint128",
+                                                   "internalType":  "uint128"
+                                               },
+                                               {
+                                                   "name":  "assumptionsHash",
+                                                   "type":  "bytes32",
+                                                   "internalType":  "bytes32"
+                                               }
+                                           ]
+                        },
+                        {
+                            "name":  "nextCursor",
+                            "type":  "uint256",
+                            "internalType":  "uint256"
+                        }
+                    ],
+        "stateMutability":  "view"
+    },
+    {
+        "type":  "function",
+        "name":  "previewRouteWithSemanticProof",
+        "inputs":  [
+                       {
+                           "name":  "terms",
+                           "type":  "tuple",
+                           "internalType":  "struct NexaMainnetV5Types.ActiveRouteTerms",
+                           "components":  [
+                                              {
+                                                  "name":  "routeId",
+                                                  "type":  "bytes32",
+                                                  "internalType":  "bytes32"
+                                              },
+                                              {
+                                                  "name":  "state",
+                                                  "type":  "uint8",
+                                                  "internalType":  "enum NexaMainnetV5Types.RouteState"
+                                              },
+                                              {
+                                                  "name":  "sourceFillDeadline",
+                                                  "type":  "uint64",
+                                                  "internalType":  "uint64"
+                                              },
+                                              {
+                                                  "name":  "settlementWindowSeconds",
+                                                  "type":  "uint32",
+                                                  "internalType":  "uint32"
+                                              },
+                                              {
+                                                  "name":  "estimatedSettlementSeconds",
+                                                  "type":  "uint32",
+                                                  "internalType":  "uint32"
+                                              },
+                                              {
+                                                  "name":  "sourceFinalityBlocks",
+                                                  "type":  "uint32",
+                                                  "internalType":  "uint32"
+                                              },
+                                              {
+                                                  "name":  "protocolFeeBps",
+                                                  "type":  "uint32",
+                                                  "internalType":  "uint32"
+                                              },
+                                              {
+                                                  "name":  "minFillRaw",
+                                                  "type":  "uint128",
+                                                  "internalType":  "uint128"
+                                              },
+                                              {
+                                                  "name":  "maxFillRaw",
+                                                  "type":  "uint128",
+                                                  "internalType":  "uint128"
+                                              },
+                                              {
+                                                  "name":  "capacityRaw",
+                                                  "type":  "uint128",
+                                                  "internalType":  "uint128"
+                                              },
+                                              {
+                                                  "name":  "outputNumerator",
+                                                  "type":  "uint128",
+                                                  "internalType":  "uint128"
+                                              },
+                                              {
+                                                  "name":  "outputDenominator",
+                                                  "type":  "uint128",
+                                                  "internalType":  "uint128"
+                                              },
+                                              {
+                                                  "name":  "assumptionsHash",
+                                                  "type":  "bytes32",
+                                                  "internalType":  "bytes32"
+                                              }
+                                          ]
+                       },
+                       {
+                           "name":  "proof",
+                           "type":  "bytes32[]",
+                           "internalType":  "bytes32[]"
+                       },
+                       {
+                           "name":  "amountInRaw",
+                           "type":  "uint128",
+                           "internalType":  "uint128"
+                       }
+                   ],
+        "outputs":  [
+                        {
+                            "name":  "quote",
+                            "type":  "tuple",
+                            "internalType":  "struct NexaMainnetV5Types.Quote",
+                            "components":  [
+                                               {
+                                                   "name":  "quoteId",
+                                                   "type":  "bytes32",
+                                                   "internalType":  "bytes32"
+                                               },
+                                               {
+                                                   "name":  "routeId",
+                                                   "type":  "bytes32",
+                                                   "internalType":  "bytes32"
+                                               },
+                                               {
+                                                   "name":  "routeVersion",
+                                                   "type":  "uint64",
+                                                   "internalType":  "uint64"
+                                               },
+                                               {
+                                                   "name":  "activeEpoch",
+                                                   "type":  "uint64",
+                                                   "internalType":  "uint64"
+                                               },
+                                               {
+                                                   "name":  "epochValidUntil",
+                                                   "type":  "uint64",
+                                                   "internalType":  "uint64"
+                                               },
+                                               {
+                                                   "name":  "routeTermsHash",
+                                                   "type":  "bytes32",
+                                                   "internalType":  "bytes32"
+                                               },
+                                               {
+                                                   "name":  "executable",
+                                                   "type":  "bool",
+                                                   "internalType":  "bool"
+                                               },
+                                               {
+                                                   "name":  "reason",
+                                                   "type":  "bytes32",
+                                                   "internalType":  "bytes32"
+                                               },
+                                               {
+                                                   "name":  "sourceFillDeadline",
+                                                   "type":  "uint64",
+                                                   "internalType":  "uint64"
+                                               },
+                                               {
+                                                   "name":  "settlementWindowSeconds",
+                                                   "type":  "uint32",
+                                                   "internalType":  "uint32"
+                                               },
+                                               {
+                                                   "name":  "estimatedSettlementSeconds",
+                                                   "type":  "uint32",
+                                                   "internalType":  "uint32"
+                                               },
+                                               {
+                                                   "name":  "sourceFinalityBlocks",
+                                                   "type":  "uint32",
+                                                   "internalType":  "uint32"
+                                               },
+                                               {
+                                                   "name":  "protocolFeeBps",
+                                                   "type":  "uint32",
+                                                   "internalType":  "uint32"
+                                               },
+                                               {
+                                                   "name":  "sourceChainId",
+                                                   "type":  "uint256",
+                                                   "internalType":  "uint256"
+                                               },
+                                               {
+                                                   "name":  "destinationChainId",
+                                                   "type":  "uint256",
+                                                   "internalType":  "uint256"
+                                               },
+                                               {
+                                                   "name":  "sourceToken",
+                                                   "type":  "address",
+                                                   "internalType":  "address"
+                                               },
+                                               {
+                                                   "name":  "destinationToken",
+                                                   "type":  "address",
+                                                   "internalType":  "address"
+                                               },
+                                               {
+                                                   "name":  "sourceVault",
+                                                   "type":  "address",
+                                                   "internalType":  "address"
+                                               },
+                                               {
+                                                   "name":  "destinationVault",
+                                                   "type":  "address",
+                                                   "internalType":  "address"
+                                               },
+                                               {
+                                                   "name":  "sourceRouter",
+                                                   "type":  "address",
+                                                   "internalType":  "address"
+                                               },
+                                               {
+                                                   "name":  "destinationRouter",
+                                                   "type":  "address",
+                                                   "internalType":  "address"
+                                               },
+                                               {
+                                                   "name":  "amountInRaw",
+                                                   "type":  "uint128",
+                                                   "internalType":  "uint128"
+                                               },
+                                               {
+                                                   "name":  "amountOutRaw",
+                                                   "type":  "uint128",
+                                                   "internalType":  "uint128"
+                                               },
+                                               {
+                                                   "name":  "remainingCapacityRaw",
+                                                   "type":  "uint128",
+                                                   "internalType":  "uint128"
+                                               },
+                                               {
+                                                   "name":  "assumptionsHash",
+                                                   "type":  "bytes32",
+                                                   "internalType":  "bytes32"
+                                               }
+                                           ]
+                        }
+                    ],
+        "stateMutability":  "view"
+    },
+    {
+        "type":  "function",
+        "name":  "routeCount",
+        "inputs":  [
+
+                   ],
+        "outputs":  [
+                        {
+                            "name":  "",
+                            "type":  "uint256",
+                            "internalType":  "uint256"
+                        }
+                    ],
+        "stateMutability":  "view"
+    },
+    {
+        "type":  "function",
+        "name":  "routeExecutabilityWithSemanticProof",
+        "inputs":  [
+                       {
+                           "name":  "terms",
+                           "type":  "tuple",
+                           "internalType":  "struct NexaMainnetV5Types.ActiveRouteTerms",
+                           "components":  [
+                                              {
+                                                  "name":  "routeId",
+                                                  "type":  "bytes32",
+                                                  "internalType":  "bytes32"
+                                              },
+                                              {
+                                                  "name":  "state",
+                                                  "type":  "uint8",
+                                                  "internalType":  "enum NexaMainnetV5Types.RouteState"
+                                              },
+                                              {
+                                                  "name":  "sourceFillDeadline",
+                                                  "type":  "uint64",
+                                                  "internalType":  "uint64"
+                                              },
+                                              {
+                                                  "name":  "settlementWindowSeconds",
+                                                  "type":  "uint32",
+                                                  "internalType":  "uint32"
+                                              },
+                                              {
+                                                  "name":  "estimatedSettlementSeconds",
+                                                  "type":  "uint32",
+                                                  "internalType":  "uint32"
+                                              },
+                                              {
+                                                  "name":  "sourceFinalityBlocks",
+                                                  "type":  "uint32",
+                                                  "internalType":  "uint32"
+                                              },
+                                              {
+                                                  "name":  "protocolFeeBps",
+                                                  "type":  "uint32",
+                                                  "internalType":  "uint32"
+                                              },
+                                              {
+                                                  "name":  "minFillRaw",
+                                                  "type":  "uint128",
+                                                  "internalType":  "uint128"
+                                              },
+                                              {
+                                                  "name":  "maxFillRaw",
+                                                  "type":  "uint128",
+                                                  "internalType":  "uint128"
+                                              },
+                                              {
+                                                  "name":  "capacityRaw",
+                                                  "type":  "uint128",
+                                                  "internalType":  "uint128"
+                                              },
+                                              {
+                                                  "name":  "outputNumerator",
+                                                  "type":  "uint128",
+                                                  "internalType":  "uint128"
+                                              },
+                                              {
+                                                  "name":  "outputDenominator",
+                                                  "type":  "uint128",
+                                                  "internalType":  "uint128"
+                                              },
+                                              {
+                                                  "name":  "assumptionsHash",
+                                                  "type":  "bytes32",
+                                                  "internalType":  "bytes32"
+                                              }
+                                          ]
+                       },
+                       {
+                           "name":  "proof",
+                           "type":  "bytes32[]",
+                           "internalType":  "bytes32[]"
+                       }
+                   ],
+        "outputs":  [
+                        {
+                            "name":  "executable",
+                            "type":  "bool",
+                            "internalType":  "bool"
+                        },
+                        {
+                            "name":  "reason",
+                            "type":  "bytes32",
+                            "internalType":  "bytes32"
+                        }
+                    ],
+        "stateMutability":  "view"
+    },
+    {
+        "type":  "function",
+        "name":  "supportsInterface",
+        "inputs":  [
+                       {
+                           "name":  "interfaceId",
+                           "type":  "bytes4",
+                           "internalType":  "bytes4"
+                       }
+                   ],
+        "outputs":  [
+                        {
+                            "name":  "",
+                            "type":  "bool",
+                            "internalType":  "bool"
+                        }
+                    ],
+        "stateMutability":  "pure"
+    },
+    {
+        "type":  "event",
+        "name":  "ActiveSetEpochPublishedV5",
+        "inputs":  [
+                       {
+                           "name":  "deploymentVersion",
+                           "type":  "uint256",
+                           "indexed":  false,
+                           "internalType":  "uint256"
+                       },
+                       {
+                           "name":  "sourceChainId",
+                           "type":  "uint256",
+                           "indexed":  true,
+                           "internalType":  "uint256"
+                       },
+                       {
+                           "name":  "epoch",
+                           "type":  "uint64",
+                           "indexed":  true,
+                           "internalType":  "uint64"
+                       },
+                       {
+                           "name":  "epochValidUntil",
+                           "type":  "uint64",
+                           "indexed":  false,
+                           "internalType":  "uint64"
+                       },
+                       {
+                           "name":  "activeRouteCount",
+                           "type":  "uint32",
+                           "indexed":  false,
+                           "internalType":  "uint32"
+                       },
+                       {
+                           "name":  "batchHash",
+                           "type":  "bytes32",
+                           "indexed":  false,
+                           "internalType":  "bytes32"
+                       }
+                   ],
+        "anonymous":  false
+    },
+    {
+        "type":  "event",
+        "name":  "ActiveSetFullyDiscoverableV5",
+        "inputs":  [
+                       {
+                           "name":  "sourceChainId",
+                           "type":  "uint256",
+                           "indexed":  true,
+                           "internalType":  "uint256"
+                       },
+                       {
+                           "name":  "epoch",
+                           "type":  "uint64",
+                           "indexed":  true,
+                           "internalType":  "uint64"
+                       },
+                       {
+                           "name":  "semanticRoot",
+                           "type":  "bytes32",
+                           "indexed":  true,
+                           "internalType":  "bytes32"
+                       },
+                       {
+                           "name":  "activeRouteCount",
+                           "type":  "uint32",
+                           "indexed":  false,
+                           "internalType":  "uint32"
+                       }
+                   ],
+        "anonymous":  false
+    },
+    {
+        "type":  "event",
+        "name":  "ActiveSetInvalidatedV5",
+        "inputs":  [
+                       {
+                           "name":  "deploymentVersion",
+                           "type":  "uint256",
+                           "indexed":  false,
+                           "internalType":  "uint256"
+                       },
+                       {
+                           "name":  "sourceChainId",
+                           "type":  "uint256",
+                           "indexed":  true,
+                           "internalType":  "uint256"
+                       },
+                       {
+                           "name":  "epoch",
+                           "type":  "uint64",
+                           "indexed":  true,
+                           "internalType":  "uint64"
+                       },
+                       {
+                           "name":  "reasonHash",
+                           "type":  "bytes32",
+                           "indexed":  true,
+                           "internalType":  "bytes32"
+                       },
+                       {
+                           "name":  "batchHash",
+                           "type":  "bytes32",
+                           "indexed":  false,
+                           "internalType":  "bytes32"
+                       }
+                   ],
+        "anonymous":  false
+    },
+    {
+        "type":  "event",
+        "name":  "SemanticRouteDeltaPublishedV5",
+        "inputs":  [
+                       {
+                           "name":  "sourceChainId",
+                           "type":  "uint256",
+                           "indexed":  true,
+                           "internalType":  "uint256"
+                       },
+                       {
+                           "name":  "epoch",
+                           "type":  "uint64",
+                           "indexed":  true,
+                           "internalType":  "uint64"
+                       },
+                       {
+                           "name":  "routeId",
+                           "type":  "bytes32",
+                           "indexed":  true,
+                           "internalType":  "bytes32"
+                       },
+                       {
+                           "name":  "active",
+                           "type":  "bool",
+                           "indexed":  false,
+                           "internalType":  "bool"
+                       },
+                       {
+                           "name":  "catalogIndex",
+                           "type":  "uint256",
+                           "indexed":  false,
+                           "internalType":  "uint256"
+                       },
+                       {
+                           "name":  "routeTermsHash",
+                           "type":  "bytes32",
+                           "indexed":  false,
+                           "internalType":  "bytes32"
+                       },
+                       {
+                           "name":  "leaf",
+                           "type":  "bytes32",
+                           "indexed":  false,
+                           "internalType":  "bytes32"
+                       },
+                       {
+                           "name":  "encodedTerms",
+                           "type":  "bytes",
+                           "indexed":  false,
+                           "internalType":  "bytes"
+                       }
+                   ],
+        "anonymous":  false
+    }
+]

@@ -1,0 +1,55 @@
+{
+  "name": "@nexa/solver-integration",
+  "version": "1.0.0",
+  "description": "Public, read-only integration surface and examples for Nexa solvers.",
+  "type": "module",
+  "private": false,
+  "license": "ISC",
+  "engines": {
+    "node": ">=20"
+  },
+  "files": [
+    "abis",
+    "addresses",
+    "config",
+    "events",
+    "examples",
+    "src",
+    "standards",
+    "manifest.json",
+    "scripts",
+    "test"
+  ],
+  "scripts": {
+    "discover": "node examples/discover-open-routes.mjs",
+    "watch:requests": "node examples/watch-reservation-requests.mjs",
+    "verify:onchain": "node scripts/verify-onchain.mjs",
+    "validate": "node scripts/validate.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "ethers": "^6.15.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VihanA42425D/nexa-solver-integration.git"
+  },
+  "homepage": "https://github.com/VihanA42425D/nexa-solver-integration#readme",
+  "bugs": {
+    "url": "https://github.com/VihanA42425D/nexa-solver-integration/issues"
+  },
+  "keywords": [
+    "nexa",
+    "solver",
+    "erc-7683",
+    "oif",
+    "cross-chain"
+  ],
+  "exports": {
+    ".": "./src/load-public-surface.mjs",
+    "./oif": "./src/oif-adapter.mjs",
+    "./manifest.json": "./manifest.json",
+    "./addresses/mainnet.json": "./addresses/mainnet.json",
+    "./standards/standard-ids.json": "./standards/standard-ids.json"
+  }
+}

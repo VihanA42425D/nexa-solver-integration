@@ -1,0 +1,14 @@
+{
+  "network": "base",
+  "rpcUrlEnv": "NEXA_RPC_URL",
+  "sourceChainId": 8453,
+  "pageSize": 100,
+  "lookbackBlocks": 5000,
+  "routeStates": [
+    "OPEN",
+    "THROTTLED"
+  ],
+  "optionalQuoteInput": {
+    "amountInRaw": "1000000"
+  }
+}

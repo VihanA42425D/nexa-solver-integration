@@ -1,0 +1,26 @@
+{
+  "schema": "nexa-solver-standard-ids/v1",
+  "derivation": "keccak256(utf8(name))",
+  "standards": {
+    "currentErc7683": {
+      "name": "NEXA_CURRENT_ERC7683_RESOLVER_V5",
+      "id": "0x8830b77b1af1908a1821ec5e59773d1318b892138d720ce31d62daad6d962e5f",
+      "contract": "currentErc7683Resolver"
+    },
+    "legacyErc7683": {
+      "name": "NEXA_LEGACY_ERC7683_ORDER_ADAPTER_V5",
+      "id": "0x920f4ab52c180b4af1f8fe38949e32bf5bc9071273a14667a66ec8373b4b2f27",
+      "contract": "legacy7683Adapter"
+    },
+    "oifMandateOutput": {
+      "name": "NEXA_OIF_MANDATE_OUTPUT_ADAPTER_V5",
+      "id": "0xddfe778263f830a021ad4c2a7f78b9a4944d08482df2b2c80b675d22274c66fd",
+      "contract": "oifAdapter"
+    },
+    "parallelSolverLanes": {
+      "name": "NEXA_PARALLEL_SOLVER_LANES_V5",
+      "id": "0xd0ebef5434f7099c537de0fe4b710a83192798073b283fe681e7559cc37dbf6a",
+      "contract": "solverLaneFactory"
+    }
+  }
+}

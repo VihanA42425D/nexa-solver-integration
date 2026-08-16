@@ -1,0 +1,51 @@
+{
+  "schema": "nexa-contract-addresses/v1",
+  "releaseId": "0x8ab20f09437e7da075d9480f461884c32adb2699c73354495139b40904ec6f0b",
+  "deploymentVersion": 5,
+  "deterministicDeployment": true,
+  "networks": {
+    "base": {
+      "chainId": 8453,
+      "explorer": "https://basescan.org",
+      "contracts": {
+        "registry": "0x9128032cbc5918258a643DD58AB101c63b891CE0",
+        "router": "0x89f9B48bCaC60c1e21678100B26Ff67971405E03",
+        "reservationCoordinator": "0x1739c5122206E50510D42Df96E84CB635afFB12c",
+        "legacy7683Adapter": "0x42C7376e79421de6d87C9F2E5832BAFc55f84934",
+        "oifAdapter": "0x4a98D8898f834AF5bEcA9Edf43b46eD08fDb58c7",
+        "resolverHubDelegate": "0x8FC4710251864be11A73b7e766c0d70825a6B168",
+        "currentErc7683Resolver": "0x09EB79539E736132B45f2e1B80d28279B6051170",
+        "solverLaneFactory": "0xF0fA4f8D6C517A18BC00B7777698d805afdE003f"
+      }
+    },
+    "bsc": {
+      "chainId": 56,
+      "explorer": "https://bscscan.com",
+      "contracts": {
+        "registry": "0x9128032cbc5918258a643DD58AB101c63b891CE0",
+        "router": "0x89f9B48bCaC60c1e21678100B26Ff67971405E03",
+        "reservationCoordinator": "0x1739c5122206E50510D42Df96E84CB635afFB12c",
+        "legacy7683Adapter": "0x42C7376e79421de6d87C9F2E5832BAFc55f84934",
+        "oifAdapter": "0x4a98D8898f834AF5bEcA9Edf43b46eD08fDb58c7",
+        "resolverHubDelegate": "0x8FC4710251864be11A73b7e766c0d70825a6B168",
+        "currentErc7683Resolver": "0x09EB79539E736132B45f2e1B80d28279B6051170",
+        "solverLaneFactory": "0xF0fA4f8D6C517A18BC00B7777698d805afdE003f"
+      }
+    },
+    "hyperevm": {
+      "chainId": 999,
+      "explorer": "https://hyperevmscan.io",
+      "contracts": {
+        "registry": "0x9128032cbc5918258a643DD58AB101c63b891CE0",
+        "router": "0x89f9B48bCaC60c1e21678100B26Ff67971405E03",
+        "reservationCoordinator": "0x1739c5122206E50510D42Df96E84CB635afFB12c",
+        "legacy7683Adapter": "0x42C7376e79421de6d87C9F2E5832BAFc55f84934",
+        "oifAdapter": "0x4a98D8898f834AF5bEcA9Edf43b46eD08fDb58c7",
+        "resolverHubDelegate": "0x8FC4710251864be11A73b7e766c0d70825a6B168",
+        "currentErc7683Resolver": "0x09EB79539E736132B45f2e1B80d28279B6051170",
+        "solverLaneFactory": "0xF0fA4f8D6C517A18BC00B7777698d805afdE003f"
+      }
+    }
+  },
+  "solverCompletionReleaseId": "0x8efd1a1bde923f8a4d8e1b5fb30a8c72a69cc848c8344f2f5b7dbfc411f391b1"
+}

@@ -70,7 +70,14 @@ npm run watch:requests
 
 This reads `ReservationRequestedV5` logs over the configured lookback. A
 production solver should persist a finalized block cursor, handle reorgs, and
-use its own rate-limited RPC provider.
+use its own rate-limited RPC provider. The example uses adaptive polling:
+
+- idle: 30 seconds;
+- recent activity: 3 seconds;
+- block backlog: 1 second.
+
+`maxBlockRange` only bounds each RPC log query. The cursor continues until the
+complete backlog is consumed; there is no per-session reservation-request cap.
 
 ## OIF adapter
 

@@ -4,6 +4,12 @@
   "sourceChainId": 8453,
   "pageSize": 100,
   "lookbackBlocks": 5000,
+  "reservationPolling": {
+    "idleIntervalMs": 30000,
+    "activityIntervalMs": 3000,
+    "backlogIntervalMs": 1000,
+    "maxBlockRange": 1000
+  },
   "routeStates": [
     "OPEN",
     "THROTTLED"

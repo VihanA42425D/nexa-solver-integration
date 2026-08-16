@@ -15,20 +15,29 @@
     "events",
     "examples",
     "src",
+    "public",
     "standards",
     "manifest.json",
+    "wrangler.jsonc",
     "scripts",
     "test"
   ],
   "scripts": {
     "discover": "node examples/discover-open-routes.mjs",
+    "generate:solver-manifest": "node scripts/generate-nexa-solver-manifest.mjs",
     "watch:requests": "node examples/watch-reservation-requests.mjs",
+    "worker:check": "wrangler deploy --dry-run --outdir .wrangler/dry-run",
+    "worker:deploy": "npm run validate && wrangler deploy",
+    "worker:dev": "npm run validate && wrangler dev",
     "verify:onchain": "node scripts/verify-onchain.mjs",
     "validate": "node scripts/validate.mjs",
     "test": "node --test test/*.test.mjs"
   },
   "dependencies": {
     "ethers": "^6.15.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.123.0"
   },
   "repository": {
     "type": "git",
@@ -48,6 +57,7 @@
   "exports": {
     ".": "./src/load-public-surface.mjs",
     "./oif": "./src/oif-adapter.mjs",
+    "./endpoints": "./src/public-endpoints.mjs",
     "./manifest.json": "./manifest.json",
     "./addresses/mainnet.json": "./addresses/mainnet.json",
     "./standards/standard-ids.json": "./standards/standard-ids.json"

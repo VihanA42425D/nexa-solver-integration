@@ -33,6 +33,29 @@ npm run verify:onchain
 
 The examples use `ethers` v6 and Node.js 20 or newer.
 
+## Cloudflare Worker
+
+Generate and validate the public well-known manifest before deployment:
+
+```bash
+npm run generate:solver-manifest
+npm run validate
+npm test
+npm run worker:check
+npx wrangler login
+npm run worker:deploy
+```
+
+Without an upstream binding, the four declared API endpoints return HTTP 503
+with `SOLVER_ORIGIN_NOT_CONFIGURED`. Configure the upstream later using Worker
+secrets only:
+
+```bash
+npx wrangler secret put SOLVER_ORIGIN_URL
+npx wrangler secret put CF_ACCESS_CLIENT_ID
+npx wrangler secret put CF_ACCESS_CLIENT_SECRET
+```
+
 ## Discover every published Route
 
 Copy the example environment file and provide an RPC endpoint:
@@ -109,6 +132,9 @@ standards/standard-ids.json    standard names and keccak256 IDs
 config/example.config.json     read-only example configuration
 examples/                      on-chain discovery and event reads
 src/oif-adapter.mjs            OIF calldata/read helpers
+src/worker.mjs                 Cloudflare Worker entrypoint
+public/.well-known/            generated solver manifest
+wrangler.jsonc                 Worker and Static Assets configuration
 scripts/validate.mjs           public-surface integrity checks
 ```
 

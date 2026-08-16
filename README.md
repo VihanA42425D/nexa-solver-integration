@@ -117,6 +117,10 @@ src/oif-adapter.mjs            OIF calldata/read helpers
 scripts/validate.mjs           public-surface integrity checks
 ```
 
+The validator recursively secret-scans the complete repository, excluding only
+`.git` metadata and installed `node_modules`. A detected credential or a
+symbolic link fails validation before publication.
+
 ## Trust and safety
 
 Treat this repository as a convenience index, not as a substitute for on-chain

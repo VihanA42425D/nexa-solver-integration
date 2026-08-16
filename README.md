@@ -2,13 +2,8 @@
 
 Public integration surface for independent solvers consuming Nexa's on-chain
 Route discovery, reservation, ERC-7683 resolution, and OIF MandateOutput adapter.
-
-This repository is intentionally narrow. It contains deployed contract
-addresses, minimal ABIs, event topics, standard IDs, read-only discovery
-examples, OIF calldata helpers, and sample configuration. It does **not**
-contain Nexa's private application code, operational policies, clearing,
-inventory accounting, Vault management, key management, privileged RPCs, or
-business logic.
+Includes deployed contract addresses, minimal ABIs, event topics, standard IDs,
+read-only discovery examples, OIF calldata helpers, and sample configuration.
 
 ## Mainnet deployments
 

@@ -37,6 +37,30 @@ test("standard IDs and minimal ABIs are self-consistent", async () => {
   assert.ok(new Interface(surface.abis.oif).getFunction("fill"));
 });
 
+test("manifest declares direct inventory settlement economics", async () => {
+  const manifest = JSON.parse(await readFile(
+    new URL("../manifest.json", import.meta.url),
+    "utf8",
+  ));
+  const execution = manifest.executionModel;
+  assert.equal(execution.type, "DIRECT_INVENTORY_SETTLEMENT");
+  assert.equal(execution.fixedRouteTerms, true);
+  assert.equal(execution.embeddedDexSwap, false);
+  assert.equal(execution.embeddedBridge, false);
+  assert.equal(execution.routeFees.dexSwapFee, 0);
+  assert.equal(execution.routeFees.lpAmmFee, 0);
+  assert.equal(execution.routeFees.bridgeFee, 0);
+  assert.deepEqual(execution.solverCostResponsibility, [
+    "SOURCE_ASSET_DELIVERY_TRANSACTION_GAS",
+    "SOLVER_PRIVATE_COSTS",
+  ]);
+  assert.deepEqual(execution.nexaCostResponsibility, [
+    "DESTINATION_ASSET_PAYOUT_TRANSACTION_GAS",
+  ]);
+  assert.equal(execution.solverPrivateCostsNotGuaranteed, true);
+  assert.equal(execution.netProfitNotGuaranteed, true);
+});
+
 test("reservation polling backs off when idle and accelerates on activity", async () => {
   const config = JSON.parse(await readFile(
     new URL("../config/example.config.json", import.meta.url),

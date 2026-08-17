@@ -5,6 +5,34 @@ Route discovery, reservation, ERC-7683 resolution, and OIF MandateOutput adapter
 Includes deployed contract addresses, minimal ABIs, event topics, standard IDs,
 read-only discovery examples, OIF calldata helpers, and sample configuration.
 
+## Execution model and solver-side friction
+
+Nexa Routes use **direct inventory settlement**. A Route fill does not execute a
+DEX swap or a bridge inside the fill path. The solver delivers the exact source
+asset amount to Nexa on the source network, and Nexa pays the fixed destination
+asset amount from destination-side inventory.
+
+At the Nexa Route execution layer:
+
+- DEX swap fee: `0`
+- LP / AMM fee: `0`
+- bridge fee: `0`
+- embedded DEX swap leg: `false`
+- embedded bridge leg: `false`
+- solver pays: source-asset delivery transaction gas
+- Nexa pays: destination-asset payout transaction gas
+
+Any asset-acquisition, rebalancing, capital, hedging, or other private solver
+cost remains solver-specific. Nexa publishes fixed Route terms; each solver
+independently determines whether those terms are profitable for its own state.
+The absence of embedded swap and bridge legs can reduce classical execution
+friction relative to multi-leg swap/bridge paths, but Nexa does not guarantee a
+solver's net profit.
+
+The same execution semantics are exposed machine-readably in
+[`manifest.json`](./manifest.json) and therefore in the generated
+`.well-known/nexa-solver.json` document.
+
 ## Mainnet deployments
 
 The V5 R2 core and V5 R3 solver-completion contracts use deterministic addresses

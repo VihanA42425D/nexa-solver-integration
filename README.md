@@ -2,6 +2,8 @@
 
 Public integration surface for independent solvers consuming Nexa's on-chain
 Route discovery, reservation, ERC-7683 resolution, and OIF MandateOutput adapter.
+Nexa Routes use direct inventory settlement: no DEX swap or bridge executes
+inside a Route fill, so Route-level DEX, LP/AMM, and bridge fees are zero.
 Includes deployed contract addresses, minimal ABIs, event topics, standard IDs,
 read-only discovery examples, OIF calldata helpers, and sample configuration.
 

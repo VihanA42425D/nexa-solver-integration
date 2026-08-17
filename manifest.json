@@ -12,6 +12,26 @@
     56,
     999
   ],
+  "executionModel": {
+    "type": "DIRECT_INVENTORY_SETTLEMENT",
+    "fixedRouteTerms": true,
+    "embeddedDexSwap": false,
+    "embeddedBridge": false,
+    "routeFees": {
+      "dexSwapFee": 0,
+      "lpAmmFee": 0,
+      "bridgeFee": 0
+    },
+    "solverCostResponsibility": [
+      "SOURCE_ASSET_DELIVERY_TRANSACTION_GAS",
+      "SOLVER_PRIVATE_COSTS"
+    ],
+    "nexaCostResponsibility": [
+      "DESTINATION_ASSET_PAYOUT_TRANSACTION_GAS"
+    ],
+    "solverPrivateCostsNotGuaranteed": true,
+    "netProfitNotGuaranteed": true
+  },
   "addresses": "./addresses/mainnet.json",
   "standards": "./standards/standard-ids.json",
   "events": "./events/events.json",

@@ -1,7 +1,7 @@
 {
   "name": "@nexa/solver-integration",
   "version": "1.0.0",
-  "description": "Public Nexa V6 Solver discovery, signed Feed, Permit, and exact 1+1 execution integration surface.",
+  "description": "Public Nexa V6 Solver discovery and execution integration surface for intra-chain and cross-chain opportunities.",
   "type": "module",
   "private": false,
   "license": "ISC",
@@ -51,6 +51,7 @@
     "solver",
     "erc-7683",
     "oif",
+    "intra-chain",
     "cross-chain"
   ],
   "exports": {

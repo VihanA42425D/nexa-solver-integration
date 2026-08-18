@@ -1,12 +1,30 @@
 {
-  "schema": "NEXA_MAINNET_V6_SOLVER_DISCOVERY_V1",
+  "schema": "NEXA_MAINNET_V6_SOLVER_DISCOVERY_V2",
   "deploymentVersion": 6,
   "deploymentStatus": "DEPLOYED_AWAITING_CUTOVER",
   "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
   "feedSigner": null,
-  "executionModel": "EXACTLY_ONE_BOT_SOURCE_TX_PLUS_ONE_NEXA_DESTINATION_TX",
-  "publication": "SIGNED_OFFCHAIN_FEED_ZERO_PERIODIC_GAS",
-  "authentication": "WALLET_SIGNATURE_NO_LOGIN_SESSION_OR_COOKIE",
+  "solverProfile": {
+    "executionScopes": [
+      "INTRA_CHAIN",
+      "CROSS_CHAIN"
+    ],
+    "automatedDiscovery": true,
+    "variableSizeExecution": true,
+    "amountBoundSignedTerms": true,
+    "executableCapacityPublished": true,
+    "machineVerifiableState": true,
+    "lowProtocolOverhead": true,
+    "periodicOnchainPublicationRequired": false,
+    "loginRequired": false,
+    "sessionRequired": false,
+    "cookieRequired": false,
+    "solverControlsCapital": true,
+    "solverControlsOpportunitySelection": true,
+    "solverControlsProfitabilityAssessment": true
+  },
+  "discoveryModel": "SIGNED_MACHINE_READABLE_FEED",
+  "authentication": "WALLET_OR_NATIVE_ACCOUNT_PROOF",
   "endpoints": {
     "manifest": "https://solver.vsnexa.com/.well-known/nexa-solver.json",
     "solverDiscovery": "https://solver.vsnexa.com/api/v6/solver-discovery",

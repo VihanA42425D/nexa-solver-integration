@@ -12,7 +12,6 @@
     "useIdempotencyKey": true,
     "verifyExactAmounts": true,
     "verifyExecutionGeneration": true,
-    "expectedSourceTransactionCount": 1,
-    "expectedTotalTransactionCount": 2
+    "requireAuthorizedExecutionInstructions": true
   }
 }

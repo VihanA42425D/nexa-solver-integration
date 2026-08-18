@@ -23,11 +23,30 @@ if (manifest.publicSurfaceOnly !== true || manifest.deploymentVersion !== 6) {
   throw new Error("Manifest must remain V6 public-surface-only");
 }
 if (manifest.releaseId !== integration.releaseId) throw new Error("V6 release ID mismatch");
-if (manifest.executionModel.successfulFillTransactionCount !== 2
-    || manifest.executionModel.sourceTransactionCount !== 1
-    || manifest.executionModel.destinationTransactionCount !== 1
-    || manifest.executionModel.periodicPublicationTransactions !== 0) {
-  throw new Error("V6 exact 1+1 / zero-publication invariant mismatch");
+
+const profile = manifest.solverProfile;
+if (!profile
+    || JSON.stringify(profile.executionScopes) !== JSON.stringify(["INTRA_CHAIN", "CROSS_CHAIN"])
+    || profile.automatedDiscovery !== true
+    || profile.variableSizeExecution !== true
+    || profile.amountBoundSignedTerms !== true
+    || profile.executableCapacityPublished !== true
+    || profile.machineVerifiableState !== true
+    || profile.lowProtocolOverhead !== true
+    || profile.periodicOnchainPublicationRequired !== false
+    || profile.loginRequired !== false
+    || profile.sessionRequired !== false
+    || profile.cookieRequired !== false
+    || profile.solverControlsCapital !== true
+    || profile.solverControlsOpportunitySelection !== true
+    || profile.solverControlsProfitabilityAssessment !== true) {
+  throw new Error("V6 public Solver capability profile mismatch");
+}
+if (Object.hasOwn(manifest, "executionModel") || Object.hasOwn(manifest, "deprecated")) {
+  throw new Error("Public manifest must describe Solver capabilities, not internal settlement history");
+}
+if (JSON.stringify(integration.solverProfile) !== JSON.stringify(profile)) {
+  throw new Error("V6 public Solver capability profile is not synchronized");
 }
 for (const standard of Object.values(standards.standards)) {
   if (id(standard.name) !== standard.id) throw new Error("Standard ID mismatch: " + standard.name);

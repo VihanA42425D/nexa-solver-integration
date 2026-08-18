@@ -1,19 +1,54 @@
 # Nexa Mainnet V6 Solver Integration
 
-> **Deployed, awaiting Cutover.** Nexa V6 contract deployment, configuration, Route registration, and pre-Cutover verification are complete. Source intake on the V6 Routers remains disabled on Base, BSC, and HyperEVM, so this repository must still be treated as non-executable Mainnet configuration. Do not use it for execution until Cutover enables V6 source intake and `nexa-mainnet-v6.json` is replaced by the activation-gated export containing the real contract addresses and ABIs.
+> **Deployed, awaiting Cutover.** Nexa V6 deployment, configuration, Route registration, and pre-Cutover verification are complete across Base, BSC, and HyperEVM. Public execution remains disabled until Cutover. The machine-readable deployment status in this repository remains fail-closed until activation.
 
-Nexa V6 is a direct inventory settlement protocol. A successful Route Fill has exactly **two onchain transactions** in the normal path:
+Nexa V6 is a solver-oriented execution layer for **intra-chain and cross-chain opportunities**. It is designed to make discovery and execution integration low-friction, predictable, and machine-verifiable while keeping Nexa's private pricing, risk, capital, and settlement policies outside the public integration surface.
 
-1. **TX #1 — Solver/Bot on Source:** the Solver submits the exact signed Fill to `RouterV6.fillDirect` on EVM, or one native Source Connector call on another VM.
-2. **TX #2 — Nexa on Destination:** after Source finality, Nexa pays the exact destination amount from the Destination Vault through `VaultV6.payoutAuthorized` on EVM, or one native Destination Connector payout on another VM.
+## Why Solvers may care
 
-There is no Reservation, Receipt, Coordinator, Solver Lane, `markFilled`, or periodic Route-publication transaction in V6.
+- Intra-chain and cross-chain opportunity coverage
+- Automated, machine-readable discovery
+- Variable-size executable opportunities
+- Signed amount-bound execution terms
+- Explicit executable capacity and availability
+- Machine-verifiable state, freshness, and expiry
+- Low protocol-side execution overhead
+- No mandatory periodic onchain publication
+- No account, Login, Session, or Cookie requirement for discovery
+- Solver-controlled opportunity selection, capital allocation, and profitability assessment
+
+The public surface describes **what a Solver can verify and execute**, not Nexa's internal decision, inventory, pricing, risk, or clearing logic.
+
+## Machine-readable capability profile
+
+The same advantages are exposed for automated Solver infrastructure:
+
+```json
+{
+  "executionScopes": ["INTRA_CHAIN", "CROSS_CHAIN"],
+  "automatedDiscovery": true,
+  "variableSizeExecution": true,
+  "amountBoundSignedTerms": true,
+  "executableCapacityPublished": true,
+  "machineVerifiableState": true,
+  "lowProtocolOverhead": true,
+  "periodicOnchainPublicationRequired": false,
+  "loginRequired": false,
+  "sessionRequired": false,
+  "cookieRequired": false,
+  "solverControlsCapital": true,
+  "solverControlsOpportunitySelection": true,
+  "solverControlsProfitabilityAssessment": true
+}
+```
+
+The authoritative machine-readable profile is published in `manifest.json` and `/.well-known/nexa-solver.json`.
 
 ## Route and Permit model
 
-A Route is a variable-size opportunity. The signed Feed exposes a minimum input and `maxAvailableInRaw`; the Solver chooses `requestedAmountInRaw` inside that range. The Feed price is indicative only. Nexa reprices the exact requested amount using fresh amount-bound market evidence and issues a short-lived Permit containing the exact `amountInRaw` and `amountOutRaw`.
+A Route is a variable-size executable opportunity. The public Feed exposes machine-readable availability, minimum size, executable capacity, freshness, and signed terms. The Solver chooses an amount inside the published executable range and receives amount-bound execution instructions.
 
-The Solver remains responsible for its own gas, acquisition, capital, hedging, and other private costs. Nexa does not guarantee Solver profitability.
+Solvers remain responsible for their own gas, acquisition, capital, hedging, and other private costs. Nexa does not make a profitability guarantee; each Solver independently evaluates whether an opportunity fits its own strategy and cost structure.
 
 ## Public endpoints
 
@@ -28,42 +63,36 @@ Base URL: `https://solver.vsnexa.com`
 - `POST /api/v6/execution-permits`
 - `GET /api/v6/execution-permits/{fillId}`
 
-Discovery and Feed reads require no account, Login, Session, or Cookie. Permit requests use Source-wallet/native-account proof plus an `Idempotency-Key`.
+Discovery and Feed reads require no account, Login, Session, or Cookie. Execution authorization uses wallet or native-account proof plus an `Idempotency-Key`.
 
 ## Solver flow
 
-1. Fetch `/.well-known/nexa-solver.json` and require an active V6 deployment.
-2. Fetch `/api/v6/solver-feed` and cryptographically verify its hash, signature, signer, and expiry.
+1. Fetch `/.well-known/nexa-solver.json` and require an active deployment before execution.
+2. Fetch `/api/v6/solver-feed` and verify its signature, signer, freshness, and expiry.
 3. Select a `DISCOVERABLE` Route with `executionStatus=OPEN` and `permitAvailable=true`.
-4. Choose `requestedAmountInRaw <= maxAvailableInRaw`.
-5. POST the request fields to `/api/v6/execution-permits/request-message`.
-6. Sign the returned message with the Source account and POST the same request plus proof to `/api/v6/execution-permits`.
-7. Verify the exact Permit fields, nonce, generation, expiry, canonical Network/Asset/Account IDs, and execution target.
-8. Submit exactly one Source transaction.
-9. Track `/api/v6/execution-permits/{fillId}` until the single Nexa Destination transaction is `PAID`.
+4. Choose `requestedAmountInRaw` inside the published executable range.
+5. Request the deterministic execution-authorization message.
+6. Sign it with the Source account and request the execution Permit.
+7. Verify the returned exact amounts, identities, generation, expiry, and execution instructions.
+8. Submit the returned execution instruction exactly as authorized.
+9. Track the Fill status until it reaches a terminal state.
+
+Do not infer private Nexa policy or settlement behavior from public Route data. Treat the signed response as the execution authority.
 
 ## Standards
 
-**ERC-7683:** executable resolver compatibility. `resolve(bytes) -> ResolvedOrder` is intended for offchain `eth_call` and resolves to exactly one execution step targeting the same `RouterV6.fillDirect` Source transaction.
+**ERC-7683:** executable compatibility is exposed for compatible Solver infrastructure.
 
-**OIF:** discovery/description compatibility only in the current V6 release. Nexa does not claim an executable OIF oracle/output-settler flow. `resolveExecution` is intentionally unsupported rather than adding a third transaction or publishing fake OIF semantics.
+**OIF:** discovery and description compatibility is exposed where applicable. Capability levels are machine-readable in `standards/standard-ids.json`.
 
-## Network model
+## Execution scopes
 
-Route identity uses canonical `bytes32` Network, Asset, and Account identifiers. EVM chain IDs/addresses and non-EVM native identifiers are local execution bindings, not the global Route identity. New EVM or non-EVM networks can be added through the Network Directory/Connector model without redeploying existing V6 Core contracts. Every supported direction must preserve exactly one Source transaction and one Destination transaction.
+Nexa V6 supports both:
 
-## Cloudflare Worker
+- **INTRA_CHAIN** — Source and Destination are on the same network.
+- **CROSS_CHAIN** — Source and Destination are on different networks.
 
-The public Worker proxies only the allowlisted V6 API surface to the private Origin. It supports GET/POST/OPTIONS as required, authenticates Worker-to-Origin traffic with Cloudflare Access service credentials, and attaches a rotating HMAC-authenticated Solver fingerprint for best-effort telemetry. Solvers do not need Cloudflare Login.
-
-Configure secrets outside source control:
-
-```bash
-npx wrangler secret put SOLVER_ORIGIN_URL
-npx wrangler secret put CF_ACCESS_CLIENT_ID
-npx wrangler secret put CF_ACCESS_CLIENT_SECRET
-npx wrangler secret put NEXA_V6_EDGE_TELEMETRY_HMAC_SECRET
-```
+Route identity and execution state are machine-verifiable independently of the Solver's strategy. Public integration data intentionally excludes Nexa's private business logic and internal policy.
 
 ## Install and validate
 
@@ -75,25 +104,24 @@ npm test
 npm run worker:check
 ```
 
-`npm run verify:onchain` remains intentionally fail-closed while the bundle reports `DEPLOYED_AWAITING_CUTOVER`. After Cutover, the activation-gated export publishes the real activated Mainnet addresses and ABIs and this check becomes executable.
+`npm run verify:onchain` remains fail-closed while the bundle reports `DEPLOYED_AWAITING_CUTOVER`. Activation data is published only after Cutover.
 
 ## Repository map
 
 ```text
-manifest.json                         public integration policy
+manifest.json                         machine-readable Solver capability profile
 nexa-mainnet-v6.json                  canonical deployment bundle; fail-closed until Cutover
-standards/standard-ids.json           V6 standard IDs and compatibility level
-events/events.json                    V6 execution event signatures/topic0
-src/public-endpoints.mjs              allowlisted public V6 endpoint catalog
+standards/standard-ids.json           supported standards and compatibility levels
+events/events.json                    public execution event signatures/topic0
+src/public-endpoints.mjs              public V6 endpoint catalog
 src/feed-verification.mjs             signed Feed verification helper
 src/load-public-surface.mjs           public bundle loader
-src/worker.mjs                        Cloudflare public edge proxy
-examples/discover-open-routes.mjs     signed Feed discovery example
-examples/request-execution-permit.mjs Permit request example without private-key custody
-public/.well-known/                   generated discovery document
+examples/discover-open-routes.mjs     discovery example
+examples/request-execution-permit.mjs execution authorization example
+public/.well-known/                   generated Solver discovery document
 scripts/validate.mjs                  public-surface integrity checks
 ```
 
-## Deprecated V5 execution surface
+## Public/private boundary
 
-Reservation-first V5 integration artifacts are intentionally removed from the V6 branch. Do not use Reservation Coordinator, ReservationReceipt, Solver Lane, legacy ERC-7683 adapter, V5 OIF fill adapter, or `markFilled` for new V6 execution.
+This repository intentionally exposes only the information required for independent Solver discovery, verification, and execution integration. Private pricing policy, risk policy, capital policy, clearing internals, operator infrastructure, and business logic are not part of the public interface.

@@ -1,24 +1,39 @@
 {
-  "schema": "NEXA_MAINNET_V6_PUBLIC_SOLVER_INTEGRATION_V1",
+  "schema": "NEXA_MAINNET_V6_PUBLIC_SOLVER_INTEGRATION_V2",
   "deploymentStatus": "DEPLOYED_AWAITING_CUTOVER",
   "activationRequired": true,
   "doNotUseForExecutionUntilActivated": true,
   "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
   "deploymentVersion": 6,
   "preparationHash": null,
-  "executionModel": {
-    "successfulFillTransactionCount": 2,
-    "source": "Bot submits one Source execution transaction",
-    "destination": "Nexa submits one Destination payout transaction",
-    "reservationFirstDeprecated": true,
-    "periodicPublicationTransactions": 0
+  "solverProfile": {
+    "executionScopes": [
+      "INTRA_CHAIN",
+      "CROSS_CHAIN"
+    ],
+    "automatedDiscovery": true,
+    "variableSizeExecution": true,
+    "amountBoundSignedTerms": true,
+    "executableCapacityPublished": true,
+    "machineVerifiableState": true,
+    "lowProtocolOverhead": true,
+    "periodicOnchainPublicationRequired": false,
+    "loginRequired": false,
+    "sessionRequired": false,
+    "cookieRequired": false,
+    "solverControlsCapital": true,
+    "solverControlsOpportunitySelection": true,
+    "solverControlsProfitabilityAssessment": true
   },
   "discovery": {
-    "schema": "NEXA_MAINNET_V6_SOLVER_DISCOVERY_V1",
+    "schema": "NEXA_MAINNET_V6_SOLVER_DISCOVERY_V2",
     "feedSigner": null,
-    "executionModel": "EXACTLY_ONE_BOT_SOURCE_TX_PLUS_ONE_NEXA_DESTINATION_TX",
-    "publication": "SIGNED_OFFCHAIN_FEED_ZERO_PERIODIC_GAS",
-    "authentication": "WALLET_SIGNATURE_NO_LOGIN_SESSION_OR_COOKIE",
+    "executionScopes": [
+      "INTRA_CHAIN",
+      "CROSS_CHAIN"
+    ],
+    "discoveryModel": "SIGNED_MACHINE_READABLE_FEED",
+    "authentication": "WALLET_OR_NATIVE_ACCOUNT_PROOF",
     "endpoints": {
       "feed": "/api/v6/solver-feed",
       "feedEvents": "/api/v6/solver-feed/events",
@@ -35,8 +50,7 @@
     "erc7683": {
       "standardId": "0x27ecffeeec898dbaf864fc095016ad6212d7a27e32a3069234a4a1da23f50993",
       "name": "ERC-7683",
-      "compatibilityLevel": "EXECUTABLE_RESOLVER",
-      "executionStepCount": 1
+      "compatibilityLevel": "EXECUTABLE_RESOLVER"
     },
     "oif": {
       "standardId": "0x3de00a2eccd5b86df839b3747bda483b2de2a855d640eb3d4938d6d43cb162c0",
@@ -44,13 +58,5 @@
       "compatibilityLevel": "DISCOVERY_DESCRIPTION_ONLY",
       "executable": false
     }
-  },
-  "deprecated": [
-    "Reservation",
-    "ReservationReceipt",
-    "DestinationCommitment",
-    "Coordinator",
-    "SolverLane",
-    "markFilled"
-  ]
+  }
 }

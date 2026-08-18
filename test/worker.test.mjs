@@ -22,7 +22,11 @@ test("static solver manifest is generated from V6 public inputs", async () => {
   assert.equal(generated.deploymentVersion, 6);
   assert.equal(generated.deploymentStatus, "DEPLOYED_AWAITING_CUTOVER");
   assert.equal(generated.activationRequired, true);
-  assert.equal(generated.executionModel, "EXACTLY_ONE_BOT_SOURCE_TX_PLUS_ONE_NEXA_DESTINATION_TX");
+  assert.deepEqual(generated.solverProfile.executionScopes, ["INTRA_CHAIN", "CROSS_CHAIN"]);
+  assert.equal(generated.solverProfile.variableSizeExecution, true);
+  assert.equal(generated.solverProfile.machineVerifiableState, true);
+  assert.equal(generated.solverProfile.periodicOnchainPublicationRequired, false);
+  assert.equal(Object.hasOwn(generated, "executionModel"), false);
   assert.deepEqual(generated.endpoints, PUBLIC_ENDPOINTS);
 });
 

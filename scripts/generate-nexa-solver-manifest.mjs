@@ -22,7 +22,7 @@ export const buildNexaSolverManifest = async (root = repositoryRoot) => {
     && Object.keys(integration.contracts ?? {}).length > 0
     && Object.keys(integration.networks ?? {}).length > 0;
   return {
-    schema: "NEXA_MAINNET_V6_SOLVER_DISCOVERY_V1",
+    schema: "NEXA_MAINNET_V6_SOLVER_DISCOVERY_V2",
     deploymentVersion: 6,
     deploymentStatus: active
       ? "ACTIVE"
@@ -31,9 +31,9 @@ export const buildNexaSolverManifest = async (root = repositoryRoot) => {
         : "AWAITING_POST_DEPLOY_EXPORT"),
     releaseId: manifest.releaseId,
     feedSigner: integration.discovery?.feedSigner ?? null,
-    executionModel: "EXACTLY_ONE_BOT_SOURCE_TX_PLUS_ONE_NEXA_DESTINATION_TX",
-    publication: "SIGNED_OFFCHAIN_FEED_ZERO_PERIODIC_GAS",
-    authentication: "WALLET_SIGNATURE_NO_LOGIN_SESSION_OR_COOKIE",
+    solverProfile: manifest.solverProfile,
+    discoveryModel: "SIGNED_MACHINE_READABLE_FEED",
+    authentication: "WALLET_OR_NATIVE_ACCOUNT_PROOF",
     endpoints: PUBLIC_ENDPOINTS,
     standards: [
       {

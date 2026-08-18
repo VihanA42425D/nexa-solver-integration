@@ -1,60 +1,52 @@
-import { readFile } from "node:fs/promises";
-import { Contract, JsonRpcProvider } from "ethers";
-import { loadPublicSurface } from "../src/load-public-surface.mjs";
+import { PUBLIC_ENDPOINTS } from "../src/public-endpoints.mjs";
+import { verifyV6RouteFeed } from "../src/feed-verification.mjs";
 
-const configPath = process.argv[2] ?? new URL("../config/example.config.json", import.meta.url);
-const config = JSON.parse(await readFile(configPath, "utf8"));
-const rpcUrl = process.env[config.rpcUrlEnv];
-if (!rpcUrl) throw new Error(`Set ${config.rpcUrlEnv} before running discovery`);
+const baseUrl = process.env.NEXA_SOLVER_BASE_URL ?? "https://solver.vsnexa.com";
+const sourceChainId = process.env.NEXA_SOURCE_CHAIN_ID ?? null;
+const sourceNetworkId = process.env.NEXA_SOURCE_NETWORK_ID ?? null;
 
-const surface = await loadPublicSurface(config.network);
-const provider = new JsonRpcProvider(rpcUrl, surface.network.chainId, { staticNetwork: true });
-const observed = await provider.getNetwork();
-if (observed.chainId !== BigInt(surface.network.chainId)) {
-  throw new Error(`RPC chain mismatch: expected ${surface.network.chainId}, got ${observed.chainId}`);
-}
-const registry = new Contract(surface.network.contracts.registry, surface.abis.registry, provider);
-const pageSize = Math.min(100, Math.max(1, Number(config.pageSize ?? 100)));
-const sourceChainId = BigInt(config.sourceChainId ?? surface.network.chainId);
-
-async function readAll(method, args = []) {
-  const rows = [];
-  let cursor = 0n;
-  while (true) {
-    const result = await registry[method](...args, cursor, pageSize);
-    rows.push(...result.page);
-    const next = BigInt(result.nextCursor);
-    if (next <= cursor || result.page.length === 0) return { rows, result };
-    cursor = next;
-  }
+async function readJson(url, init) {
+  const response = await fetch(url, init);
+  const body = await response.json();
+  if (!response.ok) throw new Error(`${response.status} ${body.error ?? response.statusText}`);
+  return body;
 }
 
-const [epoch, count, catalog, active] = await Promise.all([
-  registry.getActiveSetEpoch(sourceChainId),
-  registry.getActiveSemanticRouteCount(sourceChainId),
-  readAll("getRoutes"),
-  readAll("getActiveSemanticRoutes", [sourceChainId]),
-]);
-const hasActiveEpoch = BigInt(epoch.currentEpoch) > 0n;
-if (hasActiveEpoch && (!count.fullyDiscoverable || !active.result.fullyDiscoverable)) {
-  throw new Error("Active Route set is not fully discoverable");
+const discoveryUrl = new URL(PUBLIC_ENDPOINTS.manifest);
+discoveryUrl.host = new URL(baseUrl).host;
+discoveryUrl.protocol = new URL(baseUrl).protocol;
+const discovery = await readJson(discoveryUrl);
+if (discovery.deploymentStatus !== "ACTIVE" || !discovery.feedSigner) {
+  throw new Error("NEXA_V6_PUBLIC_SURFACE_NOT_ACTIVATED");
 }
-const toPlain = (value) => typeof value?.toObject === "function" ? value.toObject(true) : value;
-const routesById = new Map(catalog.rows.map((route) => [route.routeId.toLowerCase(), route]));
-const routes = (hasActiveEpoch ? active.rows : []).map((witness) => ({
-  route: toPlain(routesById.get(witness.terms.routeId.toLowerCase())),
-  terms: toPlain(witness.terms),
-  proof: [...witness.proof],
-}));
 
-const json = JSON.stringify({
-  network: config.network,
-  sourceChainId,
-  status: hasActiveEpoch ? "ACTIVE" : "NO_ACTIVE_EPOCH",
-  epoch: toPlain(epoch),
-  published: count.published,
-  expected: count.expected,
-  fullyDiscoverable: hasActiveEpoch && count.fullyDiscoverable,
-  routes,
-}, (_, value) => typeof value === "bigint" ? value.toString() : value, 2);
-console.log(json);
+const feedUrl = new URL("/api/v6/solver-feed", baseUrl);
+if (sourceChainId) feedUrl.searchParams.set("sourceChainId", sourceChainId);
+if (sourceNetworkId) feedUrl.searchParams.set("sourceNetworkId", sourceNetworkId);
+const { feed } = await readJson(feedUrl);
+verifyV6RouteFeed(feed, { expectedSigner: discovery.feedSigner, required: true });
+
+const discoverable = (feed.routes ?? []).filter((route) => route.discoveryStatus === "DISCOVERABLE");
+const executable = discoverable.filter((route) => (
+  route.executionStatus === "OPEN" && route.permitAvailable === true
+));
+
+console.log(JSON.stringify({
+  dataVersion: feed.dataVersion,
+  generatedAt: feed.generatedAt,
+  validUntil: feed.validUntil,
+  discoverableRouteCount: discoverable.length,
+  executableRouteCount: executable.length,
+  routes: executable.map((route) => ({
+    routeId: route.routeId,
+    quoteId: route.quoteId,
+    sourceNetworkId: route.sourceNetworkId,
+    sourceAssetId: route.sourceAssetId,
+    destinationNetworkId: route.destinationNetworkId,
+    destinationAssetId: route.destinationAssetId,
+    minimumFillInRaw: route.minimumFillInRaw,
+    maxAvailableInRaw: route.maxAvailableInRaw,
+    pricingMode: route.pricingMode,
+    validUntil: route.validUntil,
+  })),
+}, null, 2));

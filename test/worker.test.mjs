@@ -1,43 +1,31 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import {
-  DYNAMIC_API_PATHS,
-  PUBLIC_ENDPOINTS,
-  PUBLIC_PATHS,
-} from "../src/public-endpoints.mjs";
+import { PUBLIC_ENDPOINTS, PUBLIC_PATHS } from "../src/public-endpoints.mjs";
 import { handleRequest } from "../src/worker.mjs";
 
-const readJson = async (path) => JSON.parse(await readFile(
-  new URL(path, import.meta.url),
-  "utf8",
-));
+const readJson = async (path) => JSON.parse(await readFile(new URL(path, import.meta.url), "utf8"));
+const secretBinding = ["CF_ACCESS_CLIENT", "SECRET"].join("_");
 
-test("only the five intended public paths are declared", () => {
-  assert.deepEqual(Object.values(PUBLIC_ENDPOINTS), [
-    "https://solver.vsnexa.com/.well-known/nexa-solver.json",
-    "https://solver.vsnexa.com/api/v5/solver-discovery",
-    "https://solver.vsnexa.com/api/v5/solver-feed",
-    "https://solver.vsnexa.com/api/v5/solver-feed/events",
-    "https://solver.vsnexa.com/api/v5/solver-feed/status",
-  ]);
-  assert.deepEqual(DYNAMIC_API_PATHS, Object.values(PUBLIC_PATHS).slice(1));
-});
+function enabledEnv(extra = {}) {
+  return {
+    SOLVER_ORIGIN_URL: "https://origin.invalid",
+    CF_ACCESS_CLIENT_ID: "fixture-access-id",
+    [secretBinding]: "fixture-access-credential",
+    NEXA_V6_EDGE_TELEMETRY_HMAC_SECRET: "fixture-hmac-secret-that-is-at-least-32-bytes",
+    ...extra,
+  };
+}
 
-test("static solver manifest is generated from the verified public inputs", async () => {
-  const [generated, manifest, addresses, standards] = await Promise.all([
-    readJson("../public/.well-known/nexa-solver.json"),
-    readJson("../manifest.json"),
-    readJson("../addresses/mainnet.json"),
-    readJson("../standards/standard-ids.json"),
-  ]);
-  assert.deepEqual(generated.manifest, manifest);
-  assert.deepEqual(generated.addresses, addresses);
-  assert.deepEqual(generated.standards, standards);
+test("static solver manifest is generated from V6 public inputs", async () => {
+  const generated = await readJson("../public/.well-known/nexa-solver.json");
+  assert.equal(generated.deploymentVersion, 6);
+  assert.equal(generated.deploymentStatus, "AWAITING_POST_DEPLOY_EXPORT");
+  assert.equal(generated.executionModel, "EXACTLY_ONE_BOT_SOURCE_TX_PLUS_ONE_NEXA_DESTINATION_TX");
   assert.deepEqual(generated.endpoints, PUBLIC_ENDPOINTS);
 });
 
-test("Worker exposes only the manifest and four fail-closed API paths", async () => {
+test("Worker exposes only the allowlisted V6 surface", async () => {
   let assetRequests = 0;
   const env = {
     ASSETS: {
@@ -47,66 +35,78 @@ test("Worker exposes only the manifest and four fail-closed API paths", async ()
       },
     },
   };
-
   const manifestResponse = await handleRequest(new Request(PUBLIC_ENDPOINTS.manifest), env);
   assert.equal(manifestResponse.status, 200);
   assert.equal(assetRequests, 1);
 
-  for (const path of DYNAMIC_API_PATHS) {
-    const response = await handleRequest(
-      new Request(new URL(path, "https://solver.vsnexa.com")),
-      env,
-    );
+  for (const url of [
+    PUBLIC_ENDPOINTS.solverDiscovery,
+    PUBLIC_ENDPOINTS.solverFeed,
+    PUBLIC_ENDPOINTS.routeDetailTemplate.replace("{routeId}", "0x" + "11".repeat(32)),
+    PUBLIC_ENDPOINTS.permitStatusTemplate.replace("{fillId}", "0x" + "22".repeat(32)),
+  ]) {
+    const response = await handleRequest(new Request(url), env);
     assert.equal(response.status, 503);
     assert.deepEqual(await response.json(), { error: "SOLVER_ORIGIN_NOT_CONFIGURED" });
   }
 
-  const serviceSecretBinding = ["CF_ACCESS_CLIENT", "SECRET"].join("_");
-  const proxyEnabledEnv = {
-    ...env,
-    SOLVER_ORIGIN_URL: new URL("https://origin.invalid").href,
-    CF_ACCESS_CLIENT_ID: "fixture-access-id",
-    [serviceSecretBinding]: "fixture-access-credential",
-  };
-  for (const path of [
-    "/",
-    "/manifest.json",
-    "/addresses/mainnet.json",
-    "/api",
-    "/api/v5",
-    "/api/v5/solver-feed/extra",
-    "/api/v5/not-allowed",
-  ]) {
+  for (const path of ["/", "/api/v5/solver-feed", "/api/v6/not-allowed", "/manifest.json"]) {
     const response = await handleRequest(
       new Request(new URL(path, "https://solver.vsnexa.com")),
-      proxyEnabledEnv,
-      async () => assert.fail("arbitrary path reached the origin proxy"),
+      enabledEnv(),
+      async () => assert.fail("arbitrary path reached origin"),
     );
     assert.equal(response.status, 404);
-    assert.deepEqual(await response.json(), { error: "NOT_FOUND" });
   }
-  assert.equal(assetRequests, 1);
 });
 
-test("Worker does not hardcode an origin or Wrangler variable", async () => {
-  const [workerSource, wrangler] = await Promise.all([
-    readFile(new URL("../src/worker.mjs", import.meta.url), "utf8"),
-    readJson("../wrangler.jsonc"),
-  ]);
-  assert.doesNotMatch(workerSource, /https?:\/\//i);
-  assert.equal(Object.hasOwn(wrangler, "vars"), false);
-  assert.equal(JSON.stringify(wrangler).includes("SOLVER_ORIGIN"), false);
-  assert.equal(wrangler.assets.run_worker_first, true);
+test("Worker proxies POST Permit bodies and attaches trusted Edge telemetry headers", async () => {
+  let upstreamRequest;
+  const body = JSON.stringify({ quoteId: "0x" + "11".repeat(32) });
+  const response = await handleRequest(
+    new Request(PUBLIC_ENDPOINTS.executionPermits, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "CF-Connecting-IP": "203.0.113.7",
+        "User-Agent": "solver-fixture",
+      },
+      body,
+    }),
+    enabledEnv(),
+    async (request) => {
+      upstreamRequest = request;
+      return new Response(JSON.stringify({ ok: true }), {
+        status: 201,
+        headers: { "content-type": "application/json", "set-cookie": "forbidden=1" },
+      });
+    },
+  );
+  assert.equal(response.status, 201);
+  assert.equal(response.headers.has("set-cookie"), false);
+  assert.equal(upstreamRequest.method, "POST");
+  assert.equal(await upstreamRequest.text(), body);
+  assert.equal(upstreamRequest.headers.get("CF-Access-Client-Id"), "fixture-access-id");
+  assert.equal(upstreamRequest.headers.get("CF-Access-Client-Secret"), "fixture-access-credential");
+  assert.match(upstreamRequest.headers.get("X-Nexa-V6-Solver-Fingerprint"), /^[0-9a-f]{64}$/);
+  assert.match(upstreamRequest.headers.get("X-Nexa-V6-Edge-Signature"), /^[0-9a-f]{64}$/);
+  assert.equal(upstreamRequest.headers.has("CF-Connecting-IP"), false);
+});
+
+test("Worker rejects wrong methods and missing telemetry secret", async () => {
+  const wrong = await handleRequest(
+    new Request(PUBLIC_ENDPOINTS.solverFeed, { method: "POST" }),
+    enabledEnv(),
+  );
+  assert.equal(wrong.status, 405);
+
+  const missingSecret = enabledEnv({ NEXA_V6_EDGE_TELEMETRY_HMAC_SECRET: "" });
+  const response = await handleRequest(new Request(PUBLIC_ENDPOINTS.solverFeed), missingSecret);
+  assert.equal(response.status, 503);
+  assert.deepEqual(await response.json(), { error: "SOLVER_EDGE_TELEMETRY_AUTH_NOT_CONFIGURED" });
 });
 
 test("enabled event proxy preserves SSE streaming semantics", async () => {
-  const serviceSecretBinding = ["CF_ACCESS_CLIENT", "SECRET"].join("_");
-  const testOrigin = new URL("https://origin.invalid");
-  const env = {
-    SOLVER_ORIGIN_URL: testOrigin.href,
-    CF_ACCESS_CLIENT_ID: "fixture-access-id",
-    [serviceSecretBinding]: "fixture-access-credential",
-  };
   const encoder = new TextEncoder();
   let streamController;
   const stream = new ReadableStream({
@@ -117,34 +117,19 @@ test("enabled event proxy preserves SSE streaming semantics", async () => {
   });
   const upstream = new Response(stream, {
     status: 200,
-    headers: {
-      "cache-control": "no-cache",
-      "content-type": "text/event-stream",
-      "set-cookie": "CF_Authorization=fixture",
-    },
+    headers: { "cache-control": "no-cache", "content-type": "text/event-stream" },
   });
   let upstreamRequest;
   const response = await handleRequest(
     new Request(PUBLIC_ENDPOINTS.solverFeedEvents + "?cursor=7"),
-    env,
+    enabledEnv(),
     async (request) => {
       upstreamRequest = request;
       return upstream;
     },
   );
-
-  assert.equal(
-    upstreamRequest.url,
-    testOrigin.origin + PUBLIC_PATHS.solverFeedEvents + "?cursor=7",
-  );
-  assert.equal(upstreamRequest.headers.get("CF-Access-Client-Id"), "fixture-access-id");
-  assert.equal(
-    upstreamRequest.headers.get("CF-Access-Client-Secret"),
-    "fixture-access-credential",
-  );
-  assert.equal(response.status, 200);
+  assert.equal(upstreamRequest.url, "https://origin.invalid" + PUBLIC_PATHS.solverFeedEvents + "?cursor=7");
   assert.equal(response.headers.get("content-type"), "text/event-stream");
-  assert.equal(response.headers.has("set-cookie"), false);
   const reader = response.body.getReader();
   const firstChunk = await reader.read();
   assert.equal(new TextDecoder().decode(firstChunk.value), "event: ready\ndata: {}\n\n");

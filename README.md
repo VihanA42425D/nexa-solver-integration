@@ -1,188 +1,99 @@
-# Nexa Solver Integration
+# Nexa Mainnet V6 Solver Integration
 
-Public integration surface for independent solvers consuming Nexa's on-chain
-Route discovery, reservation, ERC-7683 resolution, and OIF MandateOutput adapter.
-Nexa Routes use direct inventory settlement: no DEX swap or bridge executes
-inside a Route fill, so Route-level DEX, LP/AMM, and bridge fees are zero.
-Includes deployed contract addresses, minimal ABIs, event topics, standard IDs,
-read-only discovery examples, OIF calldata helpers, and sample configuration.
+> **Pre-activation branch.** Nexa V6 deployment is in progress. This branch prepares the public Solver surface, but must not be treated as executable Mainnet configuration until `nexa-mainnet-v6.json` is replaced by the post-deployment export and reports an active deployment with real contract addresses and ABIs.
 
-## Execution model and solver-side friction
+Nexa V6 is a direct inventory settlement protocol. A successful Route Fill has exactly **two onchain transactions** in the normal path:
 
-Nexa Routes use **direct inventory settlement**. A Route fill does not execute a
-DEX swap or a bridge inside the fill path. The solver delivers the exact source
-asset amount to Nexa on the source network, and Nexa pays the fixed destination
-asset amount from destination-side inventory.
+1. **TX #1 — Solver/Bot on Source:** the Solver submits the exact signed Fill to `RouterV6.fillDirect` on EVM, or one native Source Connector call on another VM.
+2. **TX #2 — Nexa on Destination:** after Source finality, Nexa pays the exact destination amount from the Destination Vault through `VaultV6.payoutAuthorized` on EVM, or one native Destination Connector payout on another VM.
 
-At the Nexa Route execution layer:
+There is no Reservation, Receipt, Coordinator, Solver Lane, `markFilled`, or periodic Route-publication transaction in V6.
 
-- DEX swap fee: `0`
-- LP / AMM fee: `0`
-- bridge fee: `0`
-- embedded DEX swap leg: `false`
-- embedded bridge leg: `false`
-- solver pays: source-asset delivery transaction gas
-- Nexa pays: destination-asset payout transaction gas
+## Route and Permit model
 
-Any asset-acquisition, rebalancing, capital, hedging, or other private solver
-cost remains solver-specific. Nexa publishes fixed Route terms; each solver
-independently determines whether those terms are profitable for its own state.
-The absence of embedded swap and bridge legs can reduce classical execution
-friction relative to multi-leg swap/bridge paths, but Nexa does not guarantee a
-solver's net profit.
+A Route is a variable-size opportunity. The signed Feed exposes a minimum input and `maxAvailableInRaw`; the Solver chooses `requestedAmountInRaw` inside that range. The Feed price is indicative only. Nexa reprices the exact requested amount using fresh amount-bound market evidence and issues a short-lived Permit containing the exact `amountInRaw` and `amountOutRaw`.
 
-The same execution semantics are exposed machine-readably in
-[`manifest.json`](./manifest.json) and therefore in the generated
-`.well-known/nexa-solver.json` document.
+The Solver remains responsible for its own gas, acquisition, capital, hedging, and other private costs. Nexa does not guarantee Solver profitability.
 
-## Mainnet deployments
+## Public endpoints
 
-The V5 R2 core and V5 R3 solver-completion contracts use deterministic addresses
-on all three supported source networks. The standard catalog below is verified
-against the live coordinator on each chain.
+Base URL: `https://solver.vsnexa.com`
 
-| Network | Chain ID | Registry | Reservation coordinator | OIF adapter |
-| --- | ---: | --- | --- | --- |
-| Base | 8453 | `0x9128032cbc5918258a643DD58AB101c63b891CE0` | `0x1739c5122206E50510D42Df96E84CB635afFB12c` | `0x4a98D8898f834AF5bEcA9Edf43b46eD08fDb58c7` |
-| BNB Smart Chain | 56 | `0x9128032cbc5918258a643DD58AB101c63b891CE0` | `0x1739c5122206E50510D42Df96E84CB635afFB12c` | `0x4a98D8898f834AF5bEcA9Edf43b46eD08fDb58c7` |
-| HyperEVM | 999 | `0x9128032cbc5918258a643DD58AB101c63b891CE0` | `0x1739c5122206E50510D42Df96E84CB635afFB12c` | `0x4a98D8898f834AF5bEcA9Edf43b46eD08fDb58c7` |
+- `GET /.well-known/nexa-solver.json`
+- `GET /api/v6/solver-discovery`
+- `GET /api/v6/solver-feed`
+- `GET /api/v6/solver-feed/events`
+- `GET /api/v6/routes/{routeId}`
+- `POST /api/v6/execution-permits/request-message`
+- `POST /api/v6/execution-permits`
+- `GET /api/v6/execution-permits/{fillId}`
 
-The current ERC-7683 resolver is `0x09EB79539E736132B45f2e1B80d28279B6051170`
-and the parallel solver-lane factory is `0xF0fA4f8D6C517A18BC00B7777698d805afdE003f`.
-See [`addresses/mainnet.json`](./addresses/mainnet.json) for the complete public
-surface, including the Router, ResolverHub delegate, and legacy ERC-7683 adapter.
+Discovery and Feed reads require no account, Login, Session, or Cookie. Permit requests use Source-wallet/native-account proof plus an `Idempotency-Key`.
 
-## Install and validate
+## Solver flow
 
-```bash
-npm install
-npm run validate
-npm test
-npm run verify:onchain
-```
+1. Fetch `/.well-known/nexa-solver.json` and require an active V6 deployment.
+2. Fetch `/api/v6/solver-feed` and cryptographically verify its hash, signature, signer, and expiry.
+3. Select a `DISCOVERABLE` Route with `executionStatus=OPEN` and `permitAvailable=true`.
+4. Choose `requestedAmountInRaw <= maxAvailableInRaw`.
+5. POST the request fields to `/api/v6/execution-permits/request-message`.
+6. Sign the returned message with the Source account and POST the same request plus proof to `/api/v6/execution-permits`.
+7. Verify the exact Permit fields, nonce, generation, expiry, canonical Network/Asset/Account IDs, and execution target.
+8. Submit exactly one Source transaction.
+9. Track `/api/v6/execution-permits/{fillId}` until the single Nexa Destination transaction is `PAID`.
 
-The examples use `ethers` v6 and Node.js 20 or newer.
+## Standards
+
+**ERC-7683:** executable resolver compatibility. `resolve(bytes) -> ResolvedOrder` is intended for offchain `eth_call` and resolves to exactly one execution step targeting the same `RouterV6.fillDirect` Source transaction.
+
+**OIF:** discovery/description compatibility only in the current V6 release. Nexa does not claim an executable OIF oracle/output-settler flow. `resolveExecution` is intentionally unsupported rather than adding a third transaction or publishing fake OIF semantics.
+
+## Network model
+
+Route identity uses canonical `bytes32` Network, Asset, and Account identifiers. EVM chain IDs/addresses and non-EVM native identifiers are local execution bindings, not the global Route identity. New EVM or non-EVM networks can be added through the Network Directory/Connector model without redeploying existing V6 Core contracts. Every supported direction must preserve exactly one Source transaction and one Destination transaction.
 
 ## Cloudflare Worker
 
-Generate and validate the public well-known manifest before deployment:
+The public Worker proxies only the allowlisted V6 API surface to the private Origin. It supports GET/POST/OPTIONS as required, authenticates Worker-to-Origin traffic with Cloudflare Access service credentials, and attaches a rotating HMAC-authenticated Solver fingerprint for best-effort telemetry. Solvers do not need Cloudflare Login.
 
-```bash
-npm run generate:solver-manifest
-npm run validate
-npm test
-npm run worker:check
-npx wrangler login
-npm run worker:deploy
-```
-
-Without an upstream binding, the four declared API endpoints return HTTP 503
-with `SOLVER_ORIGIN_NOT_CONFIGURED`. Configure the upstream later using Worker
-secrets only:
+Configure secrets outside source control:
 
 ```bash
 npx wrangler secret put SOLVER_ORIGIN_URL
 npx wrangler secret put CF_ACCESS_CLIENT_ID
 npx wrangler secret put CF_ACCESS_CLIENT_SECRET
+npx wrangler secret put NEXA_V6_EDGE_TELEMETRY_HMAC_SECRET
 ```
 
-## Discover every published Route
-
-Copy the example environment file and provide an RPC endpoint:
+## Install and validate
 
 ```bash
-cp .env.example .env
-export NEXA_RPC_URL=https://mainnet.base.org
-npm run discover
+npm install
+npm run generate:solver-manifest
+npm run validate
+npm test
+npm run worker:check
 ```
 
-The discovery example:
-
-1. verifies the RPC chain ID;
-2. reads the active epoch and fully-discoverable count;
-3. paginates the complete static Route catalog;
-4. paginates every active semantic Route witness;
-5. joins terms and proofs to the public Route definition;
-6. reports `NO_ACTIVE_EPOCH` when publication has not started and otherwise
-   fails closed if the active set is not fully discoverable.
-
-There is no Top-N or Route-count truncation in the example. Contract pages are
-bounded to 100 records per call, and pagination continues until the on-chain set
-is exhausted.
-
-## Observe reservation demand
-
-```bash
-npm run watch:requests
-```
-
-This reads `ReservationRequestedV5` logs over the configured lookback. A
-production solver should persist a finalized block cursor, handle reorgs, and
-use its own rate-limited RPC provider. The example uses adaptive polling:
-
-- idle: 30 seconds;
-- recent activity: 3 seconds;
-- block backlog: 1 second.
-
-`maxBlockRange` only bounds each RPC log query. The cursor continues until the
-complete backlog is consumed; there is no per-session reservation-request cap.
-
-## OIF adapter
-
-[`src/oif-adapter.mjs`](./src/oif-adapter.mjs) exposes four public helpers:
-
-- `connectOifAdapter(network, runner)`
-- `readOifMandate(network, provider, orderId)`
-- `encodeOifReservation(network, request)`
-- `encodeOifFill(network, fill)`
-
-The encoding helpers return calldata only. They do not select Routes, price a
-fill, manage funds, sign transactions, or hide any operational policy.
-
-The OIF standard ID is:
-
-```text
-keccak256("NEXA_OIF_MANDATE_OUTPUT_ADAPTER_V5")
-= 0xddfe778263f830a021ad4c2a7f78b9a4944d08482df2b2c80b675d22274c66fd
-```
-
-All four live identifiers (current ERC-7683, legacy ERC-7683, OIF MandateOutput,
-and parallel solver lanes) are in
-[`standards/standard-ids.json`](./standards/standard-ids.json). A solver can
-verify each resolver on-chain through `resolverForStandard(bytes32)`.
+`npm run verify:onchain` is intentionally fail-closed until the post-deployment V6 bundle contains the real activated Mainnet addresses and ABIs.
 
 ## Repository map
 
 ```text
-manifest.json                  machine-readable entrypoint
-addresses/mainnet.json         deployed public addresses
-abis/                          allowlisted solver-facing ABIs
-events/events.json             canonical signatures and topic0 values
-standards/standard-ids.json    standard names and keccak256 IDs
-config/example.config.json     read-only example configuration
-examples/                      on-chain discovery and event reads
-src/oif-adapter.mjs            OIF calldata/read helpers
-src/worker.mjs                 Cloudflare Worker entrypoint
-public/.well-known/            generated solver manifest
-wrangler.jsonc                 Worker and Static Assets configuration
-scripts/validate.mjs           public-surface integrity checks
+manifest.json                         public integration policy
+nexa-mainnet-v6.json                  canonical deployment bundle; placeholder until activation
+standards/standard-ids.json           V6 standard IDs and compatibility level
+events/events.json                    V6 execution event signatures/topic0
+src/public-endpoints.mjs              allowlisted public V6 endpoint catalog
+src/feed-verification.mjs             signed Feed verification helper
+src/load-public-surface.mjs           public bundle loader
+src/worker.mjs                        Cloudflare public edge proxy
+examples/discover-open-routes.mjs     signed Feed discovery example
+examples/request-execution-permit.mjs Permit request example without private-key custody
+public/.well-known/                   generated discovery document
+scripts/validate.mjs                  public-surface integrity checks
 ```
 
-The validator recursively secret-scans the complete repository, excluding only
-`.git` metadata and installed `node_modules`. A detected credential or a
-symbolic link fails validation before publication.
+## Deprecated V5 execution surface
 
-## Trust and safety
-
-Treat this repository as a convenience index, not as a substitute for on-chain
-verification. Confirm the chain ID, contract bytecode, release ID, standard
-resolver, active epoch, witness, quote, token addresses, recipient, deadline,
-and transaction value before acting.
-
-Public RPC examples are rate-limited. Use a provider appropriate for production
-traffic and keep authenticated endpoint URLs outside source control.
-
-The optional on-chain verifier defaults to the official public RPC endpoints
-documented by [Base](https://docs.base.org/base-chain/api-reference/rpc-overview),
-[BNB Smart Chain](https://docs.bnbchain.org/bnb-smart-chain/developers/json_rpc/json-rpc-endpoint/),
-and [HyperEVM](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/hyperevm).
+Reservation-first V5 integration artifacts are intentionally removed from the V6 branch. Do not use Reservation Coordinator, ReservationReceipt, Solver Lane, legacy ERC-7683 adapter, V5 OIF fill adapter, or `markFilled` for new V6 execution.

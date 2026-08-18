@@ -1,7 +1,7 @@
 {
   "name": "@nexa/solver-integration",
   "version": "1.0.0",
-  "description": "Public, read-only integration surface and examples for Nexa solvers.",
+  "description": "Public Nexa V6 Solver discovery, signed Feed, Permit, and exact 1+1 execution integration surface.",
   "type": "module",
   "private": false,
   "license": "ISC",
@@ -9,8 +9,6 @@
     "node": ">=20"
   },
   "files": [
-    "abis",
-    "addresses",
     "config",
     "events",
     "examples",
@@ -18,14 +16,15 @@
     "public",
     "standards",
     "manifest.json",
+    "nexa-mainnet-v6.json",
     "wrangler.jsonc",
     "scripts",
     "test"
   ],
   "scripts": {
     "discover": "node examples/discover-open-routes.mjs",
+    "permit:request": "node examples/request-execution-permit.mjs",
     "generate:solver-manifest": "node scripts/generate-nexa-solver-manifest.mjs",
-    "watch:requests": "node examples/watch-reservation-requests.mjs",
     "worker:check": "wrangler deploy --dry-run --outdir .wrangler/dry-run",
     "worker:deploy": "npm run validate && wrangler deploy",
     "worker:dev": "npm run validate && wrangler dev",
@@ -56,10 +55,10 @@
   ],
   "exports": {
     ".": "./src/load-public-surface.mjs",
-    "./oif": "./src/oif-adapter.mjs",
+    "./feed": "./src/feed-verification.mjs",
     "./endpoints": "./src/public-endpoints.mjs",
     "./manifest.json": "./manifest.json",
-    "./addresses/mainnet.json": "./addresses/mainnet.json",
+    "./nexa-mainnet-v6.json": "./nexa-mainnet-v6.json",
     "./standards/standard-ids.json": "./standards/standard-ids.json"
   }
 }

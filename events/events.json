@@ -1,129 +1,16 @@
 {
-  "schema": "nexa-public-events/v1",
-  "contracts": {
-    "NexaERC7683ReadyFillResolverV5": [],
-    "NexaLegacy7683AdapterV5": [
-      {
-        "name": "AdapterBondWithdrawn",
-        "signature": "AdapterBondWithdrawn(address,address,uint256)",
-        "topic0": "0x2f7639d16577c32e1c341b5e95e77262fde7b5d7aee5937540548738f2e4b856"
-      },
-      {
-        "name": "AdapterReservationCancelled",
-        "signature": "AdapterReservationCancelled(bytes32,address)",
-        "topic0": "0xc59ed9f17fe86114e50b14f7bf1e860a6de0a0d131bb6e21d29355143fc9c4a3"
-      },
-      {
-        "name": "AdapterReservationFilled",
-        "signature": "AdapterReservationFilled(bytes32,bytes32,address,address,uint128)",
-        "topic0": "0x4877a6047c28db9e7653d7ad2465e977e11727ef06fa29f0903725ad4caf9645"
-      },
-      {
-        "name": "AdapterReservationRequested",
-        "signature": "AdapterReservationRequested(bytes32,address,bytes32,address)",
-        "topic0": "0x5cea1abb4e6f66f5d4d31b795402785efa7259a76ef4b496b035a8a87924a6d0"
-      },
-      {
-        "name": "Filled",
-        "signature": "Filled(bytes32,bytes,bytes)",
-        "topic0": "0x57f1f65270c1c2c1771948825ee86f8d23d11ab44b16eb9c213056e042d06e59"
-      },
-      {
-        "name": "Open",
-        "signature": "Open(bytes32,(address,uint256,uint32,uint32,bytes32,(bytes32,uint256,bytes32,uint256)[],(bytes32,uint256,bytes32,uint256)[],(uint64,bytes32,bytes)[]))",
-        "topic0": "0xa576d0af275d0c6207ef43ceee8c498a5d7a26b8157a32d3fdf361e64371628c"
-      }
-    ],
-    "NexaMainnetRegistryV5": [
-      {
-        "name": "ActiveSetEpochPublishedV5",
-        "signature": "ActiveSetEpochPublishedV5(uint256,uint256,uint64,uint64,uint32,bytes32)",
-        "topic0": "0x886a1da4f788a0393426a8c5a6f4c7544996ba15acf3d2335591f2b555886eaa"
-      },
-      {
-        "name": "ActiveSetFullyDiscoverableV5",
-        "signature": "ActiveSetFullyDiscoverableV5(uint256,uint64,bytes32,uint32)",
-        "topic0": "0x444926ccc5de6701c87feae19b43c9d20790128c69fa9e6d79b51759cfd22a68"
-      },
-      {
-        "name": "ActiveSetInvalidatedV5",
-        "signature": "ActiveSetInvalidatedV5(uint256,uint256,uint64,bytes32,bytes32)",
-        "topic0": "0xd32b607d93ade1e7a177249cdf405077118933222b9795688faf74a42e8af6bd"
-      },
-      {
-        "name": "SemanticRouteDeltaPublishedV5",
-        "signature": "SemanticRouteDeltaPublishedV5(uint256,uint64,bytes32,bool,uint256,bytes32,bytes32,bytes)",
-        "topic0": "0xab8192a9739bdbff74ecb2bb930c3a726ad4febe377ad4c4da61eed40cf8c43d"
-      }
-    ],
-    "NexaMainnetRouterV5": [
-      {
-        "name": "SourceFillAcceptedV5",
-        "signature": "SourceFillAcceptedV5(bytes32,bytes32,bytes32,address,address,address,address,uint128,uint128,uint64,bytes32,uint64)",
-        "topic0": "0x77d961aaa53831b1dc78e4650f1c44d90990f486c7b11d1e14e0c31a0460ba9b"
-      }
-    ],
-    "NexaOIFAdapterV5": [
-      {
-        "name": "AdapterBondWithdrawn",
-        "signature": "AdapterBondWithdrawn(address,address,uint256)",
-        "topic0": "0x2f7639d16577c32e1c341b5e95e77262fde7b5d7aee5937540548738f2e4b856"
-      },
-      {
-        "name": "AdapterReservationCancelled",
-        "signature": "AdapterReservationCancelled(bytes32,address)",
-        "topic0": "0xc59ed9f17fe86114e50b14f7bf1e860a6de0a0d131bb6e21d29355143fc9c4a3"
-      },
-      {
-        "name": "AdapterReservationFilled",
-        "signature": "AdapterReservationFilled(bytes32,bytes32,address,address,uint128)",
-        "topic0": "0x4877a6047c28db9e7653d7ad2465e977e11727ef06fa29f0903725ad4caf9645"
-      },
-      {
-        "name": "AdapterReservationRequested",
-        "signature": "AdapterReservationRequested(bytes32,address,bytes32,address)",
-        "topic0": "0x5cea1abb4e6f66f5d4d31b795402785efa7259a76ef4b496b035a8a87924a6d0"
-      },
-      {
-        "name": "OutputFilled",
-        "signature": "OutputFilled(bytes32,bytes32,uint32,(bytes32,bytes32,uint256,bytes32,uint256,bytes32,bytes,bytes),uint256)",
-        "topic0": "0xfef24569acf839f2b5cb23fd59d8a9bcc21650ff711ac1961ca3c5d4681ffe12"
-      }
-    ],
-    "NexaReservationCoordinatorV5": [
-      {
-        "name": "CreditWithdrawn",
-        "signature": "CreditWithdrawn(address,address,uint256)",
-        "topic0": "0x52fc0f9d902f33823a83590d3549f63f5492a0df5c6b6db8dee20deb94456b26"
-      },
-      {
-        "name": "ReservationReceiptPublishedV5",
-        "signature": "ReservationReceiptPublishedV5(bytes32,bytes32,bytes32,address,uint64)",
-        "topic0": "0xd6337e297e1e6d38a91e254210a4ed1d2f5f71a7b0f8883098738e8da2f86cbd"
-      },
-      {
-        "name": "ReservationRequestStateChangedV5",
-        "signature": "ReservationRequestStateChangedV5(bytes32,bytes32,uint8)",
-        "topic0": "0x9cace16f67cc1bb29326273976ccb5e041b4ec57256ec5573c7e3f134bca0139"
-      },
-      {
-        "name": "ReservationRequestedV5",
-        "signature": "ReservationRequestedV5(bytes32,bytes32,bytes32,address,address,uint256,uint256,uint128,uint128,uint128,uint64,uint64)",
-        "topic0": "0x881bce137a5e9c5107f676ecbcab51487e454648d3274e29d8fba8f5da68b92d"
-      },
-      {
-        "name": "StandardResolverConfigured",
-        "signature": "StandardResolverConfigured(bytes32,address,address,bool)",
-        "topic0": "0x0a2f13ab2e9edcd26bb56d02ffe422a2e2d818a5a36614614623bc08cccc447d"
-      }
-    ],
-    "NexaResolverHubV5": [],
-    "NexaSolverLaneFactoryV5": [
-      {
-        "name": "SolverLaneCreated",
-        "signature": "SolverLaneCreated(address,uint256,address)",
-        "topic0": "0x7e7afc2532d2215cbe86a28ff257196273724ed6142b3c7b07a878f36881b2fa"
-      }
-    ]
+  "schema": "nexa-solver-events/v2",
+  "deploymentVersion": 6,
+  "events": {
+    "SourceFillV6": {
+      "contract": "NexaMainnetRouterV6",
+      "signature": "SourceFillV6(bytes32,bytes32,bytes32,address,address,address,address,uint256,uint128,uint128,uint32,uint64,bytes32,bytes32)",
+      "topic0": "0x77d880254b141dedc64867f6d2d253eedfc609837b892c4ddfe154a43ea80561"
+    },
+    "DestinationPayoutV6": {
+      "contract": "NexaMainnetVaultV6",
+      "signature": "DestinationPayoutV6(bytes32,bytes32,bytes32,address,address,uint128,uint64)",
+      "topic0": "0xc1988c0c244b9d1682ea8d059adb42feb663678212456c0efabaf08a9ca882f4"
+    }
   }
 }

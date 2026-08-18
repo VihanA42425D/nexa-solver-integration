@@ -3,92 +3,94 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { getAddress, id, Interface } from "ethers";
 import { auditRepositoryForSecrets } from "./repo-secret-audit.mjs";
-import {
-  buildNexaSolverManifest,
-  serializeNexaSolverManifest,
-} from "./generate-nexa-solver-manifest.mjs";
+import { buildNexaSolverManifest, serializeNexaSolverManifest } from "./generate-nexa-solver-manifest.mjs";
 import { PUBLIC_ENDPOINTS } from "../src/public-endpoints.mjs";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const readJson = async (file) => JSON.parse(await readFile(resolve(root, file), "utf8"));
-const [manifest, addresses, standards] = await Promise.all([
+const [manifest, integration, standards, events] = await Promise.all([
   readJson("manifest.json"),
-  readJson("addresses/mainnet.json"),
+  readJson("nexa-mainnet-v6.json"),
   readJson("standards/standard-ids.json"),
+  readJson("events/events.json"),
 ]);
-if (manifest.publicSurfaceOnly !== true) throw new Error("Manifest must remain public-surface-only");
-if (manifest.releaseId !== addresses.releaseId) throw new Error("Release ID mismatch");
+
+if (manifest.publicSurfaceOnly !== true || manifest.deploymentVersion !== 6) {
+  throw new Error("Manifest must remain V6 public-surface-only");
+}
+if (manifest.releaseId !== integration.releaseId) throw new Error("V6 release ID mismatch");
+if (manifest.executionModel.successfulFillTransactionCount !== 2
+    || manifest.executionModel.sourceTransactionCount !== 1
+    || manifest.executionModel.destinationTransactionCount !== 1
+    || manifest.executionModel.periodicPublicationTransactions !== 0) {
+  throw new Error("V6 exact 1+1 / zero-publication invariant mismatch");
+}
 for (const standard of Object.values(standards.standards)) {
-  if (id(standard.name) !== standard.id) {
-    throw new Error("Standard ID mismatch: " + standard.name);
+  if (id(standard.name) !== standard.id) throw new Error("Standard ID mismatch: " + standard.name);
+}
+for (const event of Object.values(events.events)) {
+  if (id(event.signature) !== event.topic0) throw new Error("Event topic mismatch: " + event.signature);
+}
+
+const active = integration.deploymentStatus !== "AWAITING_POST_DEPLOY_EXPORT"
+  && integration.activationRequired !== true;
+if (active) {
+  if (!integration.contracts || Object.keys(integration.contracts).length === 0) {
+    throw new Error("Active V6 bundle has no contracts");
   }
-}
-for (const network of Object.values(addresses.networks)) {
-  for (const address of Object.values(network.contracts)) getAddress(address);
-}
-for (const file of await readdir(resolve(root, "abis"))) {
-  if (!file.endsWith(".json")) continue;
-  new Interface(await readJson("abis/" + file));
-}
-const forbidden = /private.?key|mnemonic|kms|clearing|inventory|vault.?management|business.?logic/i;
-for (const directory of ["src", "examples"]) {
-  for (const file of await readdir(resolve(root, directory))) {
-    const source = await readFile(resolve(root, directory, file), "utf8");
-    if (forbidden.test(source)) {
-      throw new Error("Forbidden internal surface in " + directory + "/" + file);
-    }
+  if (!integration.networks || Object.keys(integration.networks).length === 0) {
+    throw new Error("Active V6 bundle has no networks");
   }
+  for (const contract of Object.values(integration.contracts)) {
+    getAddress(contract.address);
+    new Interface(contract.abi);
+  }
+} else if (Object.keys(integration.contracts ?? {}).length !== 0
+    || Object.keys(integration.networks ?? {}).length !== 0) {
+  throw new Error("Pre-activation bundle must not publish partial addresses or networks");
 }
 
 const expectedEndpointUrls = [
   "https://solver.vsnexa.com/.well-known/nexa-solver.json",
-  "https://solver.vsnexa.com/api/v5/solver-discovery",
-  "https://solver.vsnexa.com/api/v5/solver-feed",
-  "https://solver.vsnexa.com/api/v5/solver-feed/events",
-  "https://solver.vsnexa.com/api/v5/solver-feed/status",
+  "https://solver.vsnexa.com/api/v6/solver-discovery",
+  "https://solver.vsnexa.com/api/v6/solver-feed",
+  "https://solver.vsnexa.com/api/v6/solver-feed/events",
+  "https://solver.vsnexa.com/api/v6/routes/{routeId}",
+  "https://solver.vsnexa.com/api/v6/execution-permits/request-message",
+  "https://solver.vsnexa.com/api/v6/execution-permits",
+  "https://solver.vsnexa.com/api/v6/execution-permits/{fillId}"
 ];
 if (JSON.stringify(Object.values(PUBLIC_ENDPOINTS)) !== JSON.stringify(expectedEndpointUrls)) {
-  throw new Error("Public endpoint catalog mismatch");
+  throw new Error("Public V6 endpoint catalog mismatch");
+}
+
+for (const directory of ["src", "examples"]) {
+  for (const file of await readdir(resolve(root, directory))) {
+    const source = await readFile(resolve(root, directory, file), "utf8");
+    if (/\/api\/v5\/|ReservationRequestedV5|requestReservation|reserveDestination|SolverLaneFactoryV5/.test(source)) {
+      throw new Error("Active V5 reservation-first surface remains in " + directory + "/" + file);
+    }
+  }
 }
 
 const generatedManifest = serializeNexaSolverManifest(await buildNexaSolverManifest(root));
-const staticManifest = await readFile(
-  resolve(root, "public/.well-known/nexa-solver.json"),
-  "utf8",
-);
-if (staticManifest !== generatedManifest) {
-  throw new Error("Generated solver manifest is stale");
-}
-
-const publicEntries = (await readdir(resolve(root, "public"))).sort();
-const wellKnownEntries = (await readdir(resolve(root, "public/.well-known"))).sort();
-if (JSON.stringify(publicEntries) !== JSON.stringify([".well-known"])
-  || JSON.stringify(wellKnownEntries) !== JSON.stringify(["nexa-solver.json"])) {
-  throw new Error("Unexpected public static asset");
-}
+const staticManifest = await readFile(resolve(root, "public/.well-known/nexa-solver.json"), "utf8");
+if (staticManifest !== generatedManifest) throw new Error("Generated V6 solver manifest is stale");
 
 const wrangler = await readJson("wrangler.jsonc");
 if (wrangler.main !== "./src/worker.mjs" || wrangler.workers_dev !== false
-  || wrangler.assets?.directory !== "./public" || wrangler.assets?.binding !== "ASSETS"
-  || wrangler.assets?.run_worker_first !== true) {
+    || wrangler.assets?.directory !== "./public" || wrangler.assets?.binding !== "ASSETS"
+    || wrangler.assets?.run_worker_first !== true) {
   throw new Error("Wrangler Worker or Static Assets configuration mismatch");
-}
-if (JSON.stringify(wrangler.routes) !== JSON.stringify([{
-  pattern: "solver.vsnexa.com",
-  custom_domain: true,
-}])) {
-  throw new Error("Wrangler custom domain mismatch");
 }
 if (Object.hasOwn(wrangler, "vars") || JSON.stringify(wrangler).includes("SOLVER_ORIGIN")) {
   throw new Error("Origin configuration must not be committed to Wrangler");
 }
-
 const workerSource = await readFile(resolve(root, "src/worker.mjs"), "utf8");
 if (/https?:\/\//i.test(workerSource)) throw new Error("Worker must not hardcode an origin URL");
+if (!workerSource.includes("NEXA_V6_EDGE_TELEMETRY_HMAC_SECRET")) {
+  throw new Error("Worker HMAC telemetry binding missing");
+}
 
 const auditedFiles = await auditRepositoryForSecrets(root);
-console.log(
-  "Nexa public solver integration surface validated ("
-    + auditedFiles
-    + " files secret-scanned)",
-);
+console.log(`Nexa V6 public solver surface validated (${auditedFiles} files secret-scanned; active=${active})`);

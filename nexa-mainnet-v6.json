@@ -1,0 +1,56 @@
+{
+  "schema": "NEXA_MAINNET_V6_PUBLIC_SOLVER_INTEGRATION_V1",
+  "deploymentStatus": "AWAITING_POST_DEPLOY_EXPORT",
+  "activationRequired": true,
+  "doNotUseForExecutionUntilActivated": true,
+  "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
+  "deploymentVersion": 6,
+  "preparationHash": null,
+  "executionModel": {
+    "successfulFillTransactionCount": 2,
+    "source": "Bot submits one Source execution transaction",
+    "destination": "Nexa submits one Destination payout transaction",
+    "reservationFirstDeprecated": true,
+    "periodicPublicationTransactions": 0
+  },
+  "discovery": {
+    "schema": "NEXA_MAINNET_V6_SOLVER_DISCOVERY_V1",
+    "feedSigner": null,
+    "executionModel": "EXACTLY_ONE_BOT_SOURCE_TX_PLUS_ONE_NEXA_DESTINATION_TX",
+    "publication": "SIGNED_OFFCHAIN_FEED_ZERO_PERIODIC_GAS",
+    "authentication": "WALLET_SIGNATURE_NO_LOGIN_SESSION_OR_COOKIE",
+    "endpoints": {
+      "feed": "/api/v6/solver-feed",
+      "feedEvents": "/api/v6/solver-feed/events",
+      "routeDetail": "/api/v6/routes/{routeId}",
+      "permitRequestMessage": "/api/v6/execution-permits/request-message",
+      "executionPermits": "/api/v6/execution-permits",
+      "permitStatus": "/api/v6/execution-permits/{fillId}",
+      "wellKnown": "/.well-known/nexa-solver.json"
+    }
+  },
+  "contracts": {},
+  "networks": {},
+  "standards": {
+    "erc7683": {
+      "standardId": "0x27ecffeeec898dbaf864fc095016ad6212d7a27e32a3069234a4a1da23f50993",
+      "name": "ERC-7683",
+      "compatibilityLevel": "EXECUTABLE_RESOLVER",
+      "executionStepCount": 1
+    },
+    "oif": {
+      "standardId": "0x3de00a2eccd5b86df839b3747bda483b2de2a855d640eb3d4938d6d43cb162c0",
+      "name": "OIF",
+      "compatibilityLevel": "DISCOVERY_DESCRIPTION_ONLY",
+      "executable": false
+    }
+  },
+  "deprecated": [
+    "Reservation",
+    "ReservationReceipt",
+    "DestinationCommitment",
+    "Coordinator",
+    "SolverLane",
+    "markFilled"
+  ]
+}

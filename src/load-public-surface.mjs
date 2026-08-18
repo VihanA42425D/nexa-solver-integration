@@ -8,28 +8,31 @@ async function readJson(relativePath) {
   return JSON.parse(await readFile(resolve(root, relativePath), "utf8"));
 }
 
-const abiFiles = Object.freeze({
-  registry: "NexaMainnetRegistryV5.json",
-  router: "NexaMainnetRouterV5.json",
-  coordinator: "NexaReservationCoordinatorV5.json",
-  currentResolver: "NexaERC7683ReadyFillResolverV5.json",
-  resolverHubDelegate: "NexaResolverHubV5.json",
-  legacy7683: "NexaLegacy7683AdapterV5.json",
-  solverLaneFactory: "NexaSolverLaneFactoryV5.json",
-  oif: "NexaOIFAdapterV5.json",
-});
+export function isActiveV6Bundle(bundle) {
+  return bundle?.deploymentVersion === 6
+    && bundle?.releaseId
+    && bundle?.deploymentStatus !== "AWAITING_POST_DEPLOY_EXPORT"
+    && bundle?.activationRequired !== true
+    && bundle?.contracts
+    && Object.keys(bundle.contracts).length > 0
+    && bundle?.networks
+    && Object.keys(bundle.networks).length > 0;
+}
 
-export async function loadPublicSurface(networkName) {
-  const [manifest, addresses, standards, abiEntries] = await Promise.all([
+export async function loadPublicSurface(networkName = null, options = {}) {
+  const [manifest, integration, standards, events] = await Promise.all([
     readJson("manifest.json"),
-    readJson("addresses/mainnet.json"),
+    readJson("nexa-mainnet-v6.json"),
     readJson("standards/standard-ids.json"),
-    Promise.all(Object.entries(abiFiles).map(async ([name, file]) => [
-      name,
-      await readJson(`abis/${file}`),
-    ])),
+    readJson("events/events.json"),
   ]);
-  const network = addresses.networks[networkName];
-  if (!network) throw new Error(`Unsupported Nexa network: ${networkName}`);
-  return Object.freeze({ manifest, standards, network, abis: Object.fromEntries(abiEntries) });
+  const active = isActiveV6Bundle(integration);
+  if (options.requireActive !== false && !active) {
+    throw new Error("NEXA_V6_PUBLIC_BUNDLE_NOT_ACTIVATED");
+  }
+  const network = networkName == null ? null : integration.networks?.[networkName] ?? null;
+  if (networkName != null && active && !network) {
+    throw new Error(`Unsupported Nexa network: ${networkName}`);
+  }
+  return Object.freeze({ manifest, integration, standards, events, active, network });
 }

@@ -1,20 +1,18 @@
 {
-  "network": "base",
-  "rpcUrlEnv": "NEXA_RPC_URL",
+  "baseUrl": "https://solver.vsnexa.com",
   "sourceChainId": 8453,
-  "pageSize": 100,
-  "lookbackBlocks": 5000,
-  "reservationPolling": {
-    "idleIntervalMs": 30000,
-    "activityIntervalMs": 3000,
-    "backlogIntervalMs": 1000,
-    "maxBlockRange": 1000
+  "sourceNetworkId": null,
+  "standard": "DIRECT",
+  "feed": {
+    "refreshIntervalMs": 2000,
+    "requireSignatureVerification": true,
+    "requireUnexpiredSnapshot": true
   },
-  "routeStates": [
-    "OPEN",
-    "THROTTLED"
-  ],
-  "optionalQuoteInput": {
-    "amountInRaw": "1000000"
+  "permit": {
+    "useIdempotencyKey": true,
+    "verifyExactAmounts": true,
+    "verifyExecutionGeneration": true,
+    "expectedSourceTransactionCount": 1,
+    "expectedTotalTransactionCount": 2
   }
 }

@@ -1,81 +1,59 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "schema": "nexa-solver-integration-manifest/v1",
+  "schema": "nexa-solver-integration-manifest/v2",
   "name": "Nexa Solver Integration",
   "environment": "mainnet",
-  "deploymentVersion": 5,
-  "release": "NEXA_MAINNET_V5_R2",
-  "releaseId": "0x8ab20f09437e7da075d9480f461884c32adb2699c73354495139b40904ec6f0b",
+  "deploymentVersion": 6,
+  "release": "NEXA_MAINNET_V6",
+  "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
+  "deploymentStatus": "AWAITING_POST_DEPLOY_EXPORT",
   "publicSurfaceOnly": true,
-  "networks": [
-    8453,
-    56,
-    999
-  ],
+  "canonicalBundle": "./nexa-mainnet-v6.json",
   "executionModel": {
     "type": "DIRECT_INVENTORY_SETTLEMENT",
-    "fixedRouteTerms": true,
+    "successfulFillTransactionCount": 2,
+    "sourceTransactionCount": 1,
+    "destinationTransactionCount": 1,
+    "variableSizeRoute": true,
+    "exactAmountPermit": true,
+    "feedPricing": "INDICATIVE_ENVELOPE_REPRICE_AT_PERMIT",
+    "periodicPublicationTransactions": 0,
     "embeddedDexSwap": false,
     "embeddedBridge": false,
-    "routeFees": {
-      "dexSwapFee": 0,
-      "lpAmmFee": 0,
-      "bridgeFee": 0
-    },
-    "solverCostResponsibility": [
-      "SOURCE_ASSET_DELIVERY_TRANSACTION_GAS",
-      "SOLVER_PRIVATE_COSTS"
-    ],
-    "nexaCostResponsibility": [
-      "DESTINATION_ASSET_PAYOUT_TRANSACTION_GAS"
-    ],
     "solverPrivateCostsNotGuaranteed": true,
     "netProfitNotGuaranteed": true
   },
-  "addresses": "./addresses/mainnet.json",
+  "discovery": {
+    "routeCatalog": "ONCHAIN_REGISTRY_V6",
+    "liveTerms": "SIGNED_OFFCHAIN_FEED",
+    "allDiscoverableRoutesMayBeReturned": true,
+    "discoverableIsDistinctFromExecutable": true
+  },
+  "authentication": "WALLET_OR_NATIVE_ACCOUNT_PROOF_NO_LOGIN_SESSION_OR_COOKIE",
   "standards": "./standards/standard-ids.json",
   "events": "./events/events.json",
-  "abis": {
-    "registry": "./abis/NexaMainnetRegistryV5.json",
-    "router": "./abis/NexaMainnetRouterV5.json",
-    "reservationCoordinator": "./abis/NexaReservationCoordinatorV5.json",
-    "oifAdapter": "./abis/NexaOIFAdapterV5.json",
-    "currentErc7683Resolver": "./abis/NexaERC7683ReadyFillResolverV5.json",
-    "resolverHubDelegate": "./abis/NexaResolverHubV5.json",
-    "legacy7683Adapter": "./abis/NexaLegacy7683AdapterV5.json",
-    "solverLaneFactory": "./abis/NexaSolverLaneFactoryV5.json"
-  },
   "examples": {
     "discoverRoutes": "./examples/discover-open-routes.mjs",
-    "watchReservationRequests": "./examples/watch-reservation-requests.mjs",
-    "oifAdapter": "./src/oif-adapter.mjs",
+    "requestPermit": "./examples/request-execution-permit.mjs",
     "config": "./config/example.config.json"
   },
-  "excluded": [
-    "clearing",
-    "inventory",
-    "vault-management",
-    "kms",
-    "private-rpc",
-    "pricing-policy",
-    "business-logic"
+  "deprecated": [
+    "Reservation",
+    "ReservationReceipt",
+    "DestinationCommitment",
+    "Coordinator",
+    "SolverLane",
+    "markFilled",
+    "fixed 24-hour rotation",
+    "V5 reservation-first adapters"
   ],
-  "releases": {
-    "core": {
-      "name": "NEXA_MAINNET_V5_R2",
-      "id": "0x8ab20f09437e7da075d9480f461884c32adb2699c73354495139b40904ec6f0b"
-    },
-    "solverCompletion": {
-      "name": "NEXA_MAINNET_V5_R3_SOLVER_COMPLETION",
-      "id": "0x8efd1a1bde923f8a4d8e1b5fb30a8c72a69cc848c8344f2f5b7dbfc411f391b1"
-    },
-    "currentErc7683Resolver": {
-      "name": "NEXA_MAINNET_V5_R3_ERC7683_READY_FILL",
-      "id": "0x29b3e2f383bd36b4d26ef8cbd59f96cee3f1989bf22066c5aef9120d6a063e66"
-    },
-    "parallelSolverLanes": {
-      "name": "NEXA_MAINNET_V5_R3_PARALLEL_SOLVER_LANES",
-      "id": "0x34678b9191235ba6e3f108d1412a1736a731b14f19f6b79925a5a25e5abfb3ea"
-    }
-  }
+  "excluded": [
+    "private-rpc",
+    "private-pricing-policy",
+    "private-risk-policy",
+    "private-capital-policy",
+    "kms",
+    "clearing-internals",
+    "business-logic"
+  ]
 }

@@ -4,22 +4,42 @@ import { fileURLToPath } from "node:url";
 import { PUBLIC_ENDPOINTS } from "../src/public-endpoints.mjs";
 
 const repositoryRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
-
-const readJson = async (root, file) => JSON.parse(
-  await readFile(resolve(root, file), "utf8"),
-);
+const readJson = async (root, file) => JSON.parse(await readFile(resolve(root, file), "utf8"));
 
 export const buildNexaSolverManifest = async (root = repositoryRoot) => {
-  const [manifest, addresses, standards] = await Promise.all([
+  const [manifest, integration, standards] = await Promise.all([
     readJson(root, "manifest.json"),
-    readJson(root, "addresses/mainnet.json"),
+    readJson(root, "nexa-mainnet-v6.json"),
     readJson(root, "standards/standard-ids.json"),
   ]);
+  const active = integration.deploymentStatus !== "AWAITING_POST_DEPLOY_EXPORT"
+    && integration.activationRequired !== true
+    && Object.keys(integration.contracts ?? {}).length > 0;
   return {
-    manifest,
-    addresses,
-    standards,
+    schema: "NEXA_MAINNET_V6_SOLVER_DISCOVERY_V1",
+    deploymentVersion: 6,
+    deploymentStatus: active ? "ACTIVE" : "AWAITING_POST_DEPLOY_EXPORT",
+    releaseId: manifest.releaseId,
+    feedSigner: integration.discovery?.feedSigner ?? null,
+    executionModel: "EXACTLY_ONE_BOT_SOURCE_TX_PLUS_ONE_NEXA_DESTINATION_TX",
+    publication: "SIGNED_OFFCHAIN_FEED_ZERO_PERIODIC_GAS",
+    authentication: "WALLET_SIGNATURE_NO_LOGIN_SESSION_OR_COOKIE",
     endpoints: PUBLIC_ENDPOINTS,
+    standards: [
+      {
+        standardId: standards.standards.erc7683.id,
+        name: "ERC-7683",
+        compatibilityLevel: standards.standards.erc7683.compatibilityLevel,
+        executable: true
+      },
+      {
+        standardId: standards.standards.oif.id,
+        name: "OIF",
+        compatibilityLevel: standards.standards.oif.compatibilityLevel,
+        executable: false
+      }
+    ],
+    activationRequired: !active
   };
 };
 
@@ -28,15 +48,10 @@ export const serializeNexaSolverManifest = (value) => JSON.stringify(value, null
 export const generateNexaSolverManifest = async (root = repositoryRoot) => {
   const output = resolve(root, "public/.well-known/nexa-solver.json");
   await mkdir(dirname(output), { recursive: true });
-  await writeFile(
-    output,
-    serializeNexaSolverManifest(await buildNexaSolverManifest(root)),
-    "utf8",
-  );
+  await writeFile(output, serializeNexaSolverManifest(await buildNexaSolverManifest(root)), "utf8");
   return output;
 };
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const output = await generateNexaSolverManifest();
-  console.log("Generated " + output);
+  console.log("Generated " + await generateNexaSolverManifest());
 }

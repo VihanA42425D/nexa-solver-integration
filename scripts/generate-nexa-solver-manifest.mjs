@@ -5,6 +5,10 @@ import { PUBLIC_ENDPOINTS } from "../src/public-endpoints.mjs";
 
 const repositoryRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const readJson = async (root, file) => JSON.parse(await readFile(resolve(root, file), "utf8"));
+const PRE_ACTIVATION_DEPLOYMENT_STATUSES = new Set([
+  "AWAITING_POST_DEPLOY_EXPORT",
+  "DEPLOYED_AWAITING_CUTOVER",
+]);
 
 export const buildNexaSolverManifest = async (root = repositoryRoot) => {
   const [manifest, integration, standards] = await Promise.all([
@@ -12,13 +16,19 @@ export const buildNexaSolverManifest = async (root = repositoryRoot) => {
     readJson(root, "nexa-mainnet-v6.json"),
     readJson(root, "standards/standard-ids.json"),
   ]);
-  const active = integration.deploymentStatus !== "AWAITING_POST_DEPLOY_EXPORT"
+  const active = !PRE_ACTIVATION_DEPLOYMENT_STATUSES.has(integration.deploymentStatus)
     && integration.activationRequired !== true
-    && Object.keys(integration.contracts ?? {}).length > 0;
+    && integration.doNotUseForExecutionUntilActivated !== true
+    && Object.keys(integration.contracts ?? {}).length > 0
+    && Object.keys(integration.networks ?? {}).length > 0;
   return {
     schema: "NEXA_MAINNET_V6_SOLVER_DISCOVERY_V1",
     deploymentVersion: 6,
-    deploymentStatus: active ? "ACTIVE" : "AWAITING_POST_DEPLOY_EXPORT",
+    deploymentStatus: active
+      ? "ACTIVE"
+      : (PRE_ACTIVATION_DEPLOYMENT_STATUSES.has(integration.deploymentStatus)
+        ? integration.deploymentStatus
+        : "AWAITING_POST_DEPLOY_EXPORT"),
     releaseId: manifest.releaseId,
     feedSigner: integration.discovery?.feedSigner ?? null,
     executionModel: "EXACTLY_ONE_BOT_SOURCE_TX_PLUS_ONE_NEXA_DESTINATION_TX",

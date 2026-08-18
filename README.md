@@ -1,6 +1,6 @@
 # Nexa Mainnet V6 Solver Integration
 
-> **Pre-activation branch.** Nexa V6 deployment is in progress. This branch prepares the public Solver surface, but must not be treated as executable Mainnet configuration until `nexa-mainnet-v6.json` is replaced by the post-deployment export and reports an active deployment with real contract addresses and ABIs.
+> **Deployed, awaiting Cutover.** Nexa V6 contract deployment, configuration, Route registration, and pre-Cutover verification are complete. Source intake on the V6 Routers remains disabled on Base, BSC, and HyperEVM, so this repository must still be treated as non-executable Mainnet configuration. Do not use it for execution until Cutover enables V6 source intake and `nexa-mainnet-v6.json` is replaced by the activation-gated export containing the real contract addresses and ABIs.
 
 Nexa V6 is a direct inventory settlement protocol. A successful Route Fill has exactly **two onchain transactions** in the normal path:
 
@@ -75,13 +75,13 @@ npm test
 npm run worker:check
 ```
 
-`npm run verify:onchain` is intentionally fail-closed until the post-deployment V6 bundle contains the real activated Mainnet addresses and ABIs.
+`npm run verify:onchain` remains intentionally fail-closed while the bundle reports `DEPLOYED_AWAITING_CUTOVER`. After Cutover, the activation-gated export publishes the real activated Mainnet addresses and ABIs and this check becomes executable.
 
 ## Repository map
 
 ```text
 manifest.json                         public integration policy
-nexa-mainnet-v6.json                  canonical deployment bundle; placeholder until activation
+nexa-mainnet-v6.json                  canonical deployment bundle; fail-closed until Cutover
 standards/standard-ids.json           V6 standard IDs and compatibility level
 events/events.json                    V6 execution event signatures/topic0
 src/public-endpoints.mjs              allowlisted public V6 endpoint catalog

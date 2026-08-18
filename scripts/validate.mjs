@@ -8,6 +8,10 @@ import { PUBLIC_ENDPOINTS } from "../src/public-endpoints.mjs";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const readJson = async (file) => JSON.parse(await readFile(resolve(root, file), "utf8"));
+const PRE_ACTIVATION_DEPLOYMENT_STATUSES = new Set([
+  "AWAITING_POST_DEPLOY_EXPORT",
+  "DEPLOYED_AWAITING_CUTOVER",
+]);
 const [manifest, integration, standards, events] = await Promise.all([
   readJson("manifest.json"),
   readJson("nexa-mainnet-v6.json"),
@@ -32,8 +36,9 @@ for (const event of Object.values(events.events)) {
   if (id(event.signature) !== event.topic0) throw new Error("Event topic mismatch: " + event.signature);
 }
 
-const active = integration.deploymentStatus !== "AWAITING_POST_DEPLOY_EXPORT"
-  && integration.activationRequired !== true;
+const active = !PRE_ACTIVATION_DEPLOYMENT_STATUSES.has(integration.deploymentStatus)
+  && integration.activationRequired !== true
+  && integration.doNotUseForExecutionUntilActivated !== true;
 if (active) {
   if (!integration.contracts || Object.keys(integration.contracts).length === 0) {
     throw new Error("Active V6 bundle has no contracts");
@@ -45,9 +50,21 @@ if (active) {
     getAddress(contract.address);
     new Interface(contract.abi);
   }
-} else if (Object.keys(integration.contracts ?? {}).length !== 0
-    || Object.keys(integration.networks ?? {}).length !== 0) {
-  throw new Error("Pre-activation bundle must not publish partial addresses or networks");
+} else {
+  if (!PRE_ACTIVATION_DEPLOYMENT_STATUSES.has(integration.deploymentStatus)) {
+    throw new Error("Inactive V6 bundle has an invalid deployment status");
+  }
+  if (manifest.deploymentStatus !== integration.deploymentStatus) {
+    throw new Error("Pre-activation V6 deployment status mismatch");
+  }
+  if (integration.activationRequired !== true
+      || integration.doNotUseForExecutionUntilActivated !== true) {
+    throw new Error("Pre-activation V6 bundle must remain explicitly fail-closed");
+  }
+  if (Object.keys(integration.contracts ?? {}).length !== 0
+      || Object.keys(integration.networks ?? {}).length !== 0) {
+    throw new Error("Pre-activation bundle must not publish partial addresses or networks");
+  }
 }
 
 const expectedEndpointUrls = [

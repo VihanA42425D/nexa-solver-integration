@@ -3,6 +3,10 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const PRE_ACTIVATION_DEPLOYMENT_STATUSES = new Set([
+  "AWAITING_POST_DEPLOY_EXPORT",
+  "DEPLOYED_AWAITING_CUTOVER",
+]);
 
 async function readJson(relativePath) {
   return JSON.parse(await readFile(resolve(root, relativePath), "utf8"));
@@ -11,8 +15,9 @@ async function readJson(relativePath) {
 export function isActiveV6Bundle(bundle) {
   return bundle?.deploymentVersion === 6
     && bundle?.releaseId
-    && bundle?.deploymentStatus !== "AWAITING_POST_DEPLOY_EXPORT"
+    && !PRE_ACTIVATION_DEPLOYMENT_STATUSES.has(bundle?.deploymentStatus)
     && bundle?.activationRequired !== true
+    && bundle?.doNotUseForExecutionUntilActivated !== true
     && bundle?.contracts
     && Object.keys(bundle.contracts).length > 0
     && bundle?.networks

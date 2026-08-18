@@ -4,18 +4,32 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { id } from "ethers";
-import { loadPublicSurface } from "../src/load-public-surface.mjs";
+import { isActiveV6Bundle, loadPublicSurface } from "../src/load-public-surface.mjs";
 import { PUBLIC_ENDPOINTS } from "../src/public-endpoints.mjs";
 import { auditRepositoryForSecrets } from "../scripts/repo-secret-audit.mjs";
 
-test("pre-activation V6 bundle is fail-closed and publishes no partial addresses", async () => {
+test("deployed-awaiting-cutover V6 bundle is fail-closed and publishes no partial addresses", async () => {
   const surface = await loadPublicSurface(null, { requireActive: false });
   assert.equal(surface.active, false);
   assert.equal(surface.manifest.deploymentVersion, 6);
-  assert.equal(surface.integration.deploymentStatus, "AWAITING_POST_DEPLOY_EXPORT");
+  assert.equal(surface.integration.deploymentStatus, "DEPLOYED_AWAITING_CUTOVER");
+  assert.equal(surface.integration.activationRequired, true);
+  assert.equal(surface.integration.doNotUseForExecutionUntilActivated, true);
   assert.deepEqual(surface.integration.contracts, {});
   assert.deepEqual(surface.integration.networks, {});
   await assert.rejects(loadPublicSurface(), /NEXA_V6_PUBLIC_BUNDLE_NOT_ACTIVATED/);
+});
+
+test("deployed-awaiting-cutover status cannot be promoted by partial activation fields", () => {
+  assert.equal(isActiveV6Bundle({
+    deploymentVersion: 6,
+    releaseId: "0x" + "11".repeat(32),
+    deploymentStatus: "DEPLOYED_AWAITING_CUTOVER",
+    activationRequired: false,
+    doNotUseForExecutionUntilActivated: false,
+    contracts: { RouterV6: {} },
+    networks: { base: {} },
+  }), false);
 });
 
 test("V6 execution model is exact 1+1 with variable-size exact Permits", async () => {

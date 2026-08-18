@@ -6,7 +6,7 @@
   "deploymentVersion": 6,
   "release": "NEXA_MAINNET_V6",
   "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
-  "deploymentStatus": "AWAITING_POST_DEPLOY_EXPORT",
+  "deploymentStatus": "DEPLOYED_AWAITING_CUTOVER",
   "publicSurfaceOnly": true,
   "canonicalBundle": "./nexa-mainnet-v6.json",
   "executionModel": {

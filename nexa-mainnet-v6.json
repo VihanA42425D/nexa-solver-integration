@@ -1,6 +1,6 @@
 {
   "schema": "NEXA_MAINNET_V6_PUBLIC_SOLVER_INTEGRATION_V1",
-  "deploymentStatus": "AWAITING_POST_DEPLOY_EXPORT",
+  "deploymentStatus": "DEPLOYED_AWAITING_CUTOVER",
   "activationRequired": true,
   "doNotUseForExecutionUntilActivated": true,
   "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",

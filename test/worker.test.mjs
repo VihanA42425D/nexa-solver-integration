@@ -20,7 +20,8 @@ function enabledEnv(extra = {}) {
 test("static solver manifest is generated from V6 public inputs", async () => {
   const generated = await readJson("../public/.well-known/nexa-solver.json");
   assert.equal(generated.deploymentVersion, 6);
-  assert.equal(generated.deploymentStatus, "AWAITING_POST_DEPLOY_EXPORT");
+  assert.equal(generated.deploymentStatus, "DEPLOYED_AWAITING_CUTOVER");
+  assert.equal(generated.activationRequired, true);
   assert.equal(generated.executionModel, "EXACTLY_ONE_BOT_SOURCE_TX_PLUS_ONE_NEXA_DESTINATION_TX");
   assert.deepEqual(generated.endpoints, PUBLIC_ENDPOINTS);
 });

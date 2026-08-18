@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "schema": "nexa-solver-integration-manifest/v2",
+  "schema": "nexa-solver-integration-manifest/v3",
   "name": "Nexa Solver Integration",
   "environment": "mainnet",
   "deploymentVersion": 6,
@@ -9,27 +9,32 @@
   "deploymentStatus": "DEPLOYED_AWAITING_CUTOVER",
   "publicSurfaceOnly": true,
   "canonicalBundle": "./nexa-mainnet-v6.json",
-  "executionModel": {
-    "type": "DIRECT_INVENTORY_SETTLEMENT",
-    "successfulFillTransactionCount": 2,
-    "sourceTransactionCount": 1,
-    "destinationTransactionCount": 1,
-    "variableSizeRoute": true,
-    "exactAmountPermit": true,
-    "feedPricing": "INDICATIVE_ENVELOPE_REPRICE_AT_PERMIT",
-    "periodicPublicationTransactions": 0,
-    "embeddedDexSwap": false,
-    "embeddedBridge": false,
-    "solverPrivateCostsNotGuaranteed": true,
-    "netProfitNotGuaranteed": true
+  "solverProfile": {
+    "executionScopes": [
+      "INTRA_CHAIN",
+      "CROSS_CHAIN"
+    ],
+    "automatedDiscovery": true,
+    "variableSizeExecution": true,
+    "amountBoundSignedTerms": true,
+    "executableCapacityPublished": true,
+    "machineVerifiableState": true,
+    "lowProtocolOverhead": true,
+    "periodicOnchainPublicationRequired": false,
+    "loginRequired": false,
+    "sessionRequired": false,
+    "cookieRequired": false,
+    "solverControlsCapital": true,
+    "solverControlsOpportunitySelection": true,
+    "solverControlsProfitabilityAssessment": true
   },
   "discovery": {
-    "routeCatalog": "ONCHAIN_REGISTRY_V6",
-    "liveTerms": "SIGNED_OFFCHAIN_FEED",
+    "routeCatalog": "MACHINE_READABLE_V6_ROUTE_CATALOG",
+    "liveTerms": "SIGNED_EXECUTION_FEED",
     "allDiscoverableRoutesMayBeReturned": true,
     "discoverableIsDistinctFromExecutable": true
   },
-  "authentication": "WALLET_OR_NATIVE_ACCOUNT_PROOF_NO_LOGIN_SESSION_OR_COOKIE",
+  "authentication": "WALLET_OR_NATIVE_ACCOUNT_PROOF",
   "standards": "./standards/standard-ids.json",
   "events": "./events/events.json",
   "examples": {
@@ -37,23 +42,12 @@
     "requestPermit": "./examples/request-execution-permit.mjs",
     "config": "./config/example.config.json"
   },
-  "deprecated": [
-    "Reservation",
-    "ReservationReceipt",
-    "DestinationCommitment",
-    "Coordinator",
-    "SolverLane",
-    "markFilled",
-    "fixed 24-hour rotation",
-    "V5 reservation-first adapters"
-  ],
-  "excluded": [
-    "private-rpc",
-    "private-pricing-policy",
-    "private-risk-policy",
-    "private-capital-policy",
-    "kms",
+  "privateDetailsExcluded": [
+    "pricing-policy",
+    "risk-policy",
+    "capital-policy",
     "clearing-internals",
+    "operator-infrastructure",
     "business-logic"
   ]
 }

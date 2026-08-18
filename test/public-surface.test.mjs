@@ -32,14 +32,21 @@ test("deployed-awaiting-cutover status cannot be promoted by partial activation 
   }), false);
 });
 
-test("V6 execution model is exact 1+1 with variable-size exact Permits", async () => {
+test("public Solver profile advertises both execution scopes without exposing an internal settlement model", async () => {
   const manifest = JSON.parse(await readFile(new URL("../manifest.json", import.meta.url), "utf8"));
-  assert.equal(manifest.executionModel.successfulFillTransactionCount, 2);
-  assert.equal(manifest.executionModel.sourceTransactionCount, 1);
-  assert.equal(manifest.executionModel.destinationTransactionCount, 1);
-  assert.equal(manifest.executionModel.variableSizeRoute, true);
-  assert.equal(manifest.executionModel.exactAmountPermit, true);
-  assert.equal(manifest.executionModel.periodicPublicationTransactions, 0);
+  assert.deepEqual(manifest.solverProfile.executionScopes, ["INTRA_CHAIN", "CROSS_CHAIN"]);
+  assert.equal(manifest.solverProfile.automatedDiscovery, true);
+  assert.equal(manifest.solverProfile.variableSizeExecution, true);
+  assert.equal(manifest.solverProfile.amountBoundSignedTerms, true);
+  assert.equal(manifest.solverProfile.executableCapacityPublished, true);
+  assert.equal(manifest.solverProfile.machineVerifiableState, true);
+  assert.equal(manifest.solverProfile.lowProtocolOverhead, true);
+  assert.equal(manifest.solverProfile.periodicOnchainPublicationRequired, false);
+  assert.equal(manifest.solverProfile.loginRequired, false);
+  assert.equal(manifest.solverProfile.sessionRequired, false);
+  assert.equal(manifest.solverProfile.cookieRequired, false);
+  assert.equal(Object.hasOwn(manifest, "executionModel"), false);
+  assert.equal(Object.hasOwn(manifest, "deprecated"), false);
 });
 
 test("standard IDs and V6 event topics are self-consistent", async () => {

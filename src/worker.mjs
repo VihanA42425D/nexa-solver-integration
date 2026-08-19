@@ -111,15 +111,23 @@ const proxySolverRequest = async (request, env, fetcher) => {
   }
 };
 
+const staticDiscoveryResponse = async (request, env) => {
+  if (!env?.ASSETS?.fetch) return jsonError(503, "STATIC_ASSETS_NOT_CONFIGURED");
+  const assetUrl = new URL(request.url);
+  assetUrl.pathname = PUBLIC_PATHS.manifest;
+  assetUrl.search = "";
+  return env.ASSETS.fetch(new Request(assetUrl, { method: request.method === "HEAD" ? "HEAD" : "GET" }));
+};
+
 export const handleRequest = async (request, env, fetcher = fetch) => {
   const { pathname } = new URL(request.url);
   const isManifest = pathname === PUBLIC_PATHS.manifest;
+  const isSolverDiscovery = pathname === PUBLIC_PATHS.solverDiscovery;
   const isDynamic = isDynamicApiPath(pathname);
   if (!isManifest && !isDynamic) return jsonError(404, "NOT_FOUND");
   if (!allowedMethodsForPath(pathname).has(request.method)) return jsonError(405, "METHOD_NOT_ALLOWED");
-  if (isManifest) {
-    if (!env?.ASSETS?.fetch) return jsonError(503, "STATIC_ASSETS_NOT_CONFIGURED");
-    return env.ASSETS.fetch(request);
+  if (isManifest || (isSolverDiscovery && request.method === "GET")) {
+    return staticDiscoveryResponse(request, env);
   }
   return proxySolverRequest(request, env, fetcher);
 };

@@ -1,11 +1,10 @@
 {
-  "schema": "NEXA_MAINNET_V6_PUBLIC_SOLVER_INTEGRATION_V2",
-  "deploymentStatus": "DEPLOYED_AWAITING_CUTOVER",
-  "activationRequired": true,
-  "doNotUseForExecutionUntilActivated": true,
+  "schema": "NEXA_MAINNET_V6_PUBLIC_SOLVER_INTEGRATION_V3",
+  "deploymentStatus": "ACTIVE",
+  "activationRequired": false,
+  "doNotUseForExecutionUntilActivated": false,
   "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
   "deploymentVersion": 6,
-  "preparationHash": null,
   "solverProfile": {
     "executionScopes": [
       "INTRA_CHAIN",
@@ -13,21 +12,11 @@
     ],
     "automatedDiscovery": true,
     "variableSizeExecution": true,
-    "amountBoundSignedTerms": true,
-    "executableCapacityPublished": true,
     "machineVerifiableState": true,
-    "lowProtocolOverhead": true,
-    "periodicOnchainPublicationRequired": false,
-    "loginRequired": false,
-    "sessionRequired": false,
-    "cookieRequired": false,
-    "solverControlsCapital": true,
-    "solverControlsOpportunitySelection": true,
-    "solverControlsProfitabilityAssessment": true
+    "accountlessDiscovery": true
   },
   "discovery": {
     "schema": "NEXA_MAINNET_V6_SOLVER_DISCOVERY_V2",
-    "feedSigner": null,
     "executionScopes": [
       "INTRA_CHAIN",
       "CROSS_CHAIN"
@@ -44,19 +33,60 @@
       "wellKnown": "/.well-known/nexa-solver.json"
     }
   },
-  "contracts": {},
-  "networks": {},
+  "contracts": {
+    "NexaMainnetRegistryV6": {
+      "address": "0x3db7752f052ACFECB3DA99BeE7c6a34D22367141",
+      "abi": [
+        "function releaseId() pure returns (bytes32)",
+        "function getRoute(bytes32 routeId) view returns (tuple(bytes32 routeId,bytes32 sourceNetworkId,bytes32 sourceAssetId,bytes32 destinationNetworkId,bytes32 destinationAssetId))",
+        "function executionGeneration(bytes32 routeId) view returns (bytes32)",
+        "function localAssetAddress(bytes32 networkId,bytes32 assetId) view returns (address localAddress,bool configured)",
+        "function isRouteExecutable(bytes32 routeId) view returns (bool)",
+        "function routeStatus(bytes32 routeId) view returns (uint8)",
+        "function routeCount() view returns (uint256)",
+        "function routeAt(uint256 index) view returns (bytes32)"
+      ]
+    },
+    "NexaMainnetRouterV6": {
+      "address": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+      "abi": [
+        "function releaseId() pure returns (bytes32)",
+        "function sourceIntakeEnabled() view returns (bool)",
+        "function previewFillDirect(tuple(bytes32 releaseId,bytes32 fillId,bytes32 routeId,bytes32 quoteId,bytes32 policyHash,bytes32 permitNonce,bytes32 sourceNetworkId,bytes32 sourceAssetId,bytes32 destinationNetworkId,bytes32 destinationAssetId,bytes32 sourceVaultAccountId,bytes32 destinationVaultAccountId,bytes32 payerAccountId,bytes32 recipientAccountId,uint64 dataVersion,bytes32 executionGeneration,uint64 validAfter,uint64 validUntil,uint32 sourceFinalityBlocks,uint32 settlementWindowSeconds,uint256 sourceChainId,uint256 destinationChainId,address sourceAsset,address destinationAsset,address sourceVault,address destinationVault,address sourceRouter,address payer,address recipient,uint128 amountInRaw,uint128 amountOutRaw) permit,bytes signature) view returns (bool valid,bytes32 reason)",
+        "function fillDirect(tuple(bytes32 releaseId,bytes32 fillId,bytes32 routeId,bytes32 quoteId,bytes32 policyHash,bytes32 permitNonce,bytes32 sourceNetworkId,bytes32 sourceAssetId,bytes32 destinationNetworkId,bytes32 destinationAssetId,bytes32 sourceVaultAccountId,bytes32 destinationVaultAccountId,bytes32 payerAccountId,bytes32 recipientAccountId,uint64 dataVersion,bytes32 executionGeneration,uint64 validAfter,uint64 validUntil,uint32 sourceFinalityBlocks,uint32 settlementWindowSeconds,uint256 sourceChainId,uint256 destinationChainId,address sourceAsset,address destinationAsset,address sourceVault,address destinationVault,address sourceRouter,address payer,address recipient,uint128 amountInRaw,uint128 amountOutRaw) permit,bytes signature) payable returns (bytes32 fillId)"
+      ]
+    }
+  },
+  "networks": {
+    "base": {
+      "chainId": 8453,
+      "registry": "0x3db7752f052ACFECB3DA99BeE7c6a34D22367141",
+      "router": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938"
+    },
+    "bsc": {
+      "chainId": 56,
+      "registry": "0x3db7752f052ACFECB3DA99BeE7c6a34D22367141",
+      "router": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938"
+    },
+    "hyperevm": {
+      "chainId": 999,
+      "registry": "0x3db7752f052ACFECB3DA99BeE7c6a34D22367141",
+      "router": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938"
+    }
+  },
   "standards": {
     "erc7683": {
       "standardId": "0x27ecffeeec898dbaf864fc095016ad6212d7a27e32a3069234a4a1da23f50993",
       "name": "ERC-7683",
-      "compatibilityLevel": "EXECUTABLE_RESOLVER"
+      "compatibilityLevel": "EXECUTABLE_RESOLVER",
+      "moduleAddress": "0x534A0f500A7270b9b19d2AFa18DE24DCE93eb522"
     },
     "oif": {
       "standardId": "0x3de00a2eccd5b86df839b3747bda483b2de2a855d640eb3d4938d6d43cb162c0",
       "name": "OIF",
       "compatibilityLevel": "DISCOVERY_DESCRIPTION_ONLY",
-      "executable": false
+      "executable": false,
+      "moduleAddress": "0x4f81426fE8999E982aE6b771536a4093879F6A20"
     }
   }
 }

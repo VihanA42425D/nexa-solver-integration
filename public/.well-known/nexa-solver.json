@@ -1,9 +1,8 @@
 {
   "schema": "NEXA_MAINNET_V6_SOLVER_DISCOVERY_V2",
   "deploymentVersion": 6,
-  "deploymentStatus": "DEPLOYED_AWAITING_CUTOVER",
+  "deploymentStatus": "ACTIVE",
   "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
-  "feedSigner": null,
   "solverProfile": {
     "executionScopes": [
       "INTRA_CHAIN",
@@ -11,17 +10,8 @@
     ],
     "automatedDiscovery": true,
     "variableSizeExecution": true,
-    "amountBoundSignedTerms": true,
-    "executableCapacityPublished": true,
     "machineVerifiableState": true,
-    "lowProtocolOverhead": true,
-    "periodicOnchainPublicationRequired": false,
-    "loginRequired": false,
-    "sessionRequired": false,
-    "cookieRequired": false,
-    "solverControlsCapital": true,
-    "solverControlsOpportunitySelection": true,
-    "solverControlsProfitabilityAssessment": true
+    "accountlessDiscovery": true
   },
   "discoveryModel": "SIGNED_MACHINE_READABLE_FEED",
   "authentication": "WALLET_OR_NATIVE_ACCOUNT_PROOF",
@@ -40,14 +30,16 @@
       "standardId": "0x27ecffeeec898dbaf864fc095016ad6212d7a27e32a3069234a4a1da23f50993",
       "name": "ERC-7683",
       "compatibilityLevel": "EXECUTABLE_RESOLVER",
+      "moduleAddress": "0x534A0f500A7270b9b19d2AFa18DE24DCE93eb522",
       "executable": true
     },
     {
       "standardId": "0x3de00a2eccd5b86df839b3747bda483b2de2a855d640eb3d4938d6d43cb162c0",
       "name": "OIF",
       "compatibilityLevel": "DISCOVERY_DESCRIPTION_ONLY",
+      "moduleAddress": "0x4f81426fE8999E982aE6b771536a4093879F6A20",
       "executable": false
     }
   ],
-  "activationRequired": true
+  "activationRequired": false
 }

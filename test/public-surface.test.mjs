@@ -8,16 +8,36 @@ import { isActiveV6Bundle, loadPublicSurface } from "../src/load-public-surface.
 import { PUBLIC_ENDPOINTS } from "../src/public-endpoints.mjs";
 import { auditRepositoryForSecrets } from "../scripts/repo-secret-audit.mjs";
 
-test("deployed-awaiting-cutover V6 bundle is fail-closed and publishes no partial addresses", async () => {
-  const surface = await loadPublicSurface(null, { requireActive: false });
-  assert.equal(surface.active, false);
+test("active V6 bundle exposes only the Solver-facing contract surface", async () => {
+  const surface = await loadPublicSurface();
+  assert.equal(surface.active, true);
   assert.equal(surface.manifest.deploymentVersion, 6);
-  assert.equal(surface.integration.deploymentStatus, "DEPLOYED_AWAITING_CUTOVER");
-  assert.equal(surface.integration.activationRequired, true);
-  assert.equal(surface.integration.doNotUseForExecutionUntilActivated, true);
-  assert.deepEqual(surface.integration.contracts, {});
-  assert.deepEqual(surface.integration.networks, {});
-  await assert.rejects(loadPublicSurface(), /NEXA_V6_PUBLIC_BUNDLE_NOT_ACTIVATED/);
+  assert.equal(surface.manifest.deploymentStatus, "ACTIVE");
+  assert.equal(surface.integration.deploymentStatus, "ACTIVE");
+  assert.equal(surface.integration.activationRequired, false);
+  assert.equal(surface.integration.doNotUseForExecutionUntilActivated, false);
+  assert.deepEqual(Object.keys(surface.integration.contracts).sort(), [
+    "NexaMainnetRegistryV6",
+    "NexaMainnetRouterV6",
+  ]);
+  assert.equal(
+    surface.integration.contracts.NexaMainnetRegistryV6.address,
+    "0x3db7752f052ACFECB3DA99BeE7c6a34D22367141",
+  );
+  assert.equal(
+    surface.integration.contracts.NexaMainnetRouterV6.address,
+    "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+  );
+  for (const [slug, chainId] of Object.entries({ base: 8453, bsc: 56, hyperevm: 999 })) {
+    assert.deepEqual(surface.integration.networks[slug], {
+      chainId,
+      registry: "0x3db7752f052ACFECB3DA99BeE7c6a34D22367141",
+      router: "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+    });
+  }
+  assert.equal(Object.hasOwn(surface.integration, "preparationHash"), false);
+  assert.equal(Object.hasOwn(surface.integration, "deploymentSource"), false);
+  assert.equal(Object.hasOwn(surface.integration.discovery, "feedSigner"), false);
 });
 
 test("deployed-awaiting-cutover status cannot be promoted by partial activation fields", () => {
@@ -32,33 +52,65 @@ test("deployed-awaiting-cutover status cannot be promoted by partial activation 
   }), false);
 });
 
-test("public Solver profile advertises both execution scopes without exposing an internal settlement model", async () => {
+test("public Solver profile remains capability-only", async () => {
   const manifest = JSON.parse(await readFile(new URL("../manifest.json", import.meta.url), "utf8"));
-  assert.deepEqual(manifest.solverProfile.executionScopes, ["INTRA_CHAIN", "CROSS_CHAIN"]);
-  assert.equal(manifest.solverProfile.automatedDiscovery, true);
-  assert.equal(manifest.solverProfile.variableSizeExecution, true);
-  assert.equal(manifest.solverProfile.amountBoundSignedTerms, true);
-  assert.equal(manifest.solverProfile.executableCapacityPublished, true);
-  assert.equal(manifest.solverProfile.machineVerifiableState, true);
-  assert.equal(manifest.solverProfile.lowProtocolOverhead, true);
-  assert.equal(manifest.solverProfile.periodicOnchainPublicationRequired, false);
-  assert.equal(manifest.solverProfile.loginRequired, false);
-  assert.equal(manifest.solverProfile.sessionRequired, false);
-  assert.equal(manifest.solverProfile.cookieRequired, false);
+  assert.deepEqual(manifest.solverProfile, {
+    executionScopes: ["INTRA_CHAIN", "CROSS_CHAIN"],
+    automatedDiscovery: true,
+    variableSizeExecution: true,
+    machineVerifiableState: true,
+    accountlessDiscovery: true,
+  });
+  assert.equal(Object.hasOwn(manifest, "preparationHash"), false);
+  assert.equal(Object.hasOwn(manifest, "deploymentSourceCommit"), false);
   assert.equal(Object.hasOwn(manifest, "executionModel"), false);
   assert.equal(Object.hasOwn(manifest, "deprecated"), false);
 });
 
-test("standard IDs and V6 event topics are self-consistent", async () => {
-  const surface = await loadPublicSurface(null, { requireActive: false });
+test("standard IDs, public modules and Solver event topics are self-consistent", async () => {
+  const surface = await loadPublicSurface();
   for (const standard of Object.values(surface.standards.standards)) {
     assert.equal(id(standard.name), standard.id);
   }
   for (const event of Object.values(surface.events.events)) {
     assert.equal(id(event.signature), event.topic0);
   }
-  assert.equal(surface.standards.standards.erc7683.executionStepCount, 1);
+  assert.deepEqual(Object.keys(surface.events.events), ["SourceFillV6"]);
+  assert.equal(
+    surface.standards.standards.erc7683.moduleAddress,
+    "0x534A0f500A7270b9b19d2AFa18DE24DCE93eb522",
+  );
+  assert.equal(
+    surface.standards.standards.oif.moduleAddress,
+    "0x4f81426fE8999E982aE6b771536a4093879F6A20",
+  );
   assert.equal(surface.standards.standards.oif.executable, false);
+});
+
+test("static public files contain no forbidden internal deployment details", async () => {
+  const files = [
+    "../.env.example",
+    "../README.md",
+    "../manifest.json",
+    "../nexa-mainnet-v6.json",
+    "../standards/standard-ids.json",
+    "../events/events.json",
+    "../public/.well-known/nexa-solver.json",
+  ];
+  const forbidden = [
+    "0x13D8881F30985A0CeE8c24F897CE8B37F4299255",
+    "0x16e4012ce6E87b024cAD55689B7836Dc98738438",
+    "0xB247B7Aa76d9Af4C69524b1B48840050E3976896",
+    "0xA149C756E611D0315bCB2d469aA642d6Be32F765",
+    "0x7fF3D7F41B5C3b53F1242a0bE5a683B95e09FFB4",
+    "0xA767213615Bb6f8BE5C82DD41d029572E6944E7C",
+    "0xF2009b45f521A8b4E62b0B68386aB6Fc5C5F6d5b",
+    "0xCbeC1dDeEA1f4317ce6eF6F33Ad46d1fFD81c163",
+  ];
+  for (const file of files) {
+    const text = await readFile(new URL(file, import.meta.url), "utf8");
+    for (const token of forbidden) assert.equal(text.toLowerCase().includes(token.toLowerCase()), false);
+  }
 });
 
 test("only V6 public endpoint catalog is exported", () => {

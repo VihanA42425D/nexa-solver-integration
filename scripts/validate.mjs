@@ -29,60 +29,53 @@ if (!profile
     || JSON.stringify(profile.executionScopes) !== JSON.stringify(["INTRA_CHAIN", "CROSS_CHAIN"])
     || profile.automatedDiscovery !== true
     || profile.variableSizeExecution !== true
-    || profile.amountBoundSignedTerms !== true
-    || profile.executableCapacityPublished !== true
     || profile.machineVerifiableState !== true
-    || profile.lowProtocolOverhead !== true
-    || profile.periodicOnchainPublicationRequired !== false
-    || profile.loginRequired !== false
-    || profile.sessionRequired !== false
-    || profile.cookieRequired !== false
-    || profile.solverControlsCapital !== true
-    || profile.solverControlsOpportunitySelection !== true
-    || profile.solverControlsProfitabilityAssessment !== true) {
+    || profile.accountlessDiscovery !== true) {
   throw new Error("V6 public Solver capability profile mismatch");
-}
-if (Object.hasOwn(manifest, "executionModel") || Object.hasOwn(manifest, "deprecated")) {
-  throw new Error("Public manifest must describe Solver capabilities, not internal settlement history");
 }
 if (JSON.stringify(integration.solverProfile) !== JSON.stringify(profile)) {
   throw new Error("V6 public Solver capability profile is not synchronized");
 }
+
 for (const standard of Object.values(standards.standards)) {
   if (id(standard.name) !== standard.id) throw new Error("Standard ID mismatch: " + standard.name);
+  getAddress(standard.moduleAddress);
 }
 for (const event of Object.values(events.events)) {
   if (id(event.signature) !== event.topic0) throw new Error("Event topic mismatch: " + event.signature);
+}
+if (Object.keys(events.events).some((name) => name !== "SourceFillV6")) {
+  throw new Error("Only Solver-facing source execution events may be published");
 }
 
 const active = !PRE_ACTIVATION_DEPLOYMENT_STATUSES.has(integration.deploymentStatus)
   && integration.activationRequired !== true
   && integration.doNotUseForExecutionUntilActivated !== true;
 if (active) {
-  if (!integration.contracts || Object.keys(integration.contracts).length === 0) {
-    throw new Error("Active V6 bundle has no contracts");
-  }
-  if (!integration.networks || Object.keys(integration.networks).length === 0) {
-    throw new Error("Active V6 bundle has no networks");
+  const publicContractNames = Object.keys(integration.contracts ?? {}).sort();
+  if (JSON.stringify(publicContractNames) !== JSON.stringify([
+    "NexaMainnetRegistryV6",
+    "NexaMainnetRouterV6",
+  ])) {
+    throw new Error("Active V6 bundle must expose only RegistryV6 and RouterV6 contracts");
   }
   for (const contract of Object.values(integration.contracts)) {
     getAddress(contract.address);
     new Interface(contract.abi);
   }
+  const expectedNetworks = { base: 8453, bsc: 56, hyperevm: 999 };
+  for (const [slug, chainId] of Object.entries(expectedNetworks)) {
+    const network = integration.networks?.[slug];
+    if (!network || network.chainId !== chainId
+        || getAddress(network.registry) !== getAddress(integration.contracts.NexaMainnetRegistryV6.address)
+        || getAddress(network.router) !== getAddress(integration.contracts.NexaMainnetRouterV6.address)
+        || Object.keys(network).some((key) => !["chainId", "registry", "router"].includes(key))) {
+      throw new Error("Public V6 network surface mismatch: " + slug);
+    }
+  }
 } else {
   if (!PRE_ACTIVATION_DEPLOYMENT_STATUSES.has(integration.deploymentStatus)) {
     throw new Error("Inactive V6 bundle has an invalid deployment status");
-  }
-  if (manifest.deploymentStatus !== integration.deploymentStatus) {
-    throw new Error("Pre-activation V6 deployment status mismatch");
-  }
-  if (integration.activationRequired !== true
-      || integration.doNotUseForExecutionUntilActivated !== true) {
-    throw new Error("Pre-activation V6 bundle must remain explicitly fail-closed");
-  }
-  if (Object.keys(integration.contracts ?? {}).length !== 0
-      || Object.keys(integration.networks ?? {}).length !== 0) {
-    throw new Error("Pre-activation bundle must not publish partial addresses or networks");
   }
 }
 
@@ -98,6 +91,43 @@ const expectedEndpointUrls = [
 ];
 if (JSON.stringify(Object.values(PUBLIC_ENDPOINTS)) !== JSON.stringify(expectedEndpointUrls)) {
   throw new Error("Public V6 endpoint catalog mismatch");
+}
+
+const staticPublicFiles = [
+  ".env.example",
+  "README.md",
+  "manifest.json",
+  "nexa-mainnet-v6.json",
+  "standards/standard-ids.json",
+  "events/events.json",
+  "public/.well-known/nexa-solver.json",
+];
+const forbiddenPublicTokens = [
+  "0x13D8881F30985A0CeE8c24F897CE8B37F4299255",
+  "0x16e4012ce6E87b024cAD55689B7836Dc98738438",
+  "0xB247B7Aa76d9Af4C69524b1B48840050E3976896",
+  "0xA149C756E611D0315bCB2d469aA642d6Be32F765",
+  "0x7fF3D7F41B5C3b53F1242a0bE5a683B95e09FFB4",
+  "0xA767213615Bb6f8BE5C82DD41d029572E6944E7C",
+  "0xF2009b45f521A8b4E62b0B68386aB6Fc5C5F6d5b",
+  "0xCbeC1dDeEA1f4317ce6eF6F33Ad46d1fFD81c163",
+  "NexaMainnetVaultV6",
+  "NexaMainnetAuthorizationVerifierV6",
+  "NexaMainnetEntryPointV6",
+  "NexaStandardModuleRegistryV6",
+  "NexaClearingBatchExecutorV5",
+  "NexaStargateV2AdapterV5",
+  "\"feedSigner\"",
+  "\"preparationHash\"",
+  "\"deploymentSource\"",
+];
+for (const file of staticPublicFiles) {
+  const source = await readFile(resolve(root, file), "utf8");
+  for (const token of forbiddenPublicTokens) {
+    if (source.toLowerCase().includes(token.toLowerCase())) {
+      throw new Error(`Forbidden non-Solver public detail in ${file}: ${token}`);
+    }
+  }
 }
 
 for (const directory of ["src", "examples"]) {
@@ -129,4 +159,4 @@ if (!workerSource.includes("NEXA_V6_EDGE_TELEMETRY_HMAC_SECRET")) {
 }
 
 const auditedFiles = await auditRepositoryForSecrets(root);
-console.log(`Nexa V6 public solver surface validated (${auditedFiles} files secret-scanned; active=${active})`);
+console.log(`Nexa V6 minimal public solver surface validated (${auditedFiles} files secret-scanned; active=${active})`);

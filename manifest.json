@@ -6,7 +6,7 @@
   "deploymentVersion": 6,
   "release": "NEXA_MAINNET_V6",
   "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
-  "deploymentStatus": "DEPLOYED_AWAITING_CUTOVER",
+  "deploymentStatus": "ACTIVE",
   "publicSurfaceOnly": true,
   "canonicalBundle": "./nexa-mainnet-v6.json",
   "solverProfile": {
@@ -16,23 +16,12 @@
     ],
     "automatedDiscovery": true,
     "variableSizeExecution": true,
-    "amountBoundSignedTerms": true,
-    "executableCapacityPublished": true,
     "machineVerifiableState": true,
-    "lowProtocolOverhead": true,
-    "periodicOnchainPublicationRequired": false,
-    "loginRequired": false,
-    "sessionRequired": false,
-    "cookieRequired": false,
-    "solverControlsCapital": true,
-    "solverControlsOpportunitySelection": true,
-    "solverControlsProfitabilityAssessment": true
+    "accountlessDiscovery": true
   },
   "discovery": {
     "routeCatalog": "MACHINE_READABLE_V6_ROUTE_CATALOG",
-    "liveTerms": "SIGNED_EXECUTION_FEED",
-    "allDiscoverableRoutesMayBeReturned": true,
-    "discoverableIsDistinctFromExecutable": true
+    "liveTerms": "SIGNED_EXECUTION_FEED"
   },
   "authentication": "WALLET_OR_NATIVE_ACCOUNT_PROOF",
   "standards": "./standards/standard-ids.json",
@@ -43,11 +32,14 @@
     "config": "./config/example.config.json"
   },
   "privateDetailsExcluded": [
+    "internal-contract-addresses",
+    "custody-infrastructure",
+    "authorization-infrastructure",
+    "clearing-infrastructure",
+    "operator-infrastructure",
     "pricing-policy",
     "risk-policy",
     "capital-policy",
-    "clearing-internals",
-    "operator-infrastructure",
     "business-logic"
   ]
 }

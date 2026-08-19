@@ -1,23 +1,22 @@
 {
-  "schema": "nexa-solver-standard-ids/v2",
+  "schema": "nexa-solver-standard-ids/v3",
   "derivation": "keccak256(utf8(name))",
-  "deploymentStatus": "AWAITING_POST_DEPLOY_EXPORT",
+  "deploymentStatus": "ACTIVE",
   "standards": {
     "erc7683": {
       "name": "ERC-7683",
       "id": "0x27ecffeeec898dbaf864fc095016ad6212d7a27e32a3069234a4a1da23f50993",
       "compatibilityLevel": "EXECUTABLE_RESOLVER",
+      "moduleAddress": "0x534A0f500A7270b9b19d2AFa18DE24DCE93eb522",
       "resolverInterface": "resolve(bytes)->ResolvedOrder",
-      "resolutionTransport": "eth_call",
-      "executionStepCount": 1,
-      "executionTarget": "NexaMainnetRouterV6.fillDirect"
+      "resolutionTransport": "eth_call"
     },
     "oif": {
       "name": "OIF",
       "id": "0x3de00a2eccd5b86df839b3747bda483b2de2a855d640eb3d4938d6d43cb162c0",
       "compatibilityLevel": "DISCOVERY_DESCRIPTION_ONLY",
       "executable": false,
-      "reason": "NEXA_DIRECT_V6_DOES_NOT_IMPLEMENT_OIF_ORACLE_OUTPUT_SETTLER_ATTESTATION"
+      "moduleAddress": "0x4f81426fE8999E982aE6b771536a4093879F6A20"
     }
   }
 }

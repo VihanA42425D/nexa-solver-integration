@@ -30,7 +30,6 @@ export const buildNexaSolverManifest = async (root = repositoryRoot) => {
         ? integration.deploymentStatus
         : "AWAITING_POST_DEPLOY_EXPORT"),
     releaseId: manifest.releaseId,
-    feedSigner: integration.discovery?.feedSigner ?? null,
     solverProfile: manifest.solverProfile,
     discoveryModel: "SIGNED_MACHINE_READABLE_FEED",
     authentication: "WALLET_OR_NATIVE_ACCOUNT_PROOF",
@@ -40,12 +39,14 @@ export const buildNexaSolverManifest = async (root = repositoryRoot) => {
         standardId: standards.standards.erc7683.id,
         name: "ERC-7683",
         compatibilityLevel: standards.standards.erc7683.compatibilityLevel,
+        moduleAddress: standards.standards.erc7683.moduleAddress,
         executable: true
       },
       {
         standardId: standards.standards.oif.id,
         name: "OIF",
         compatibilityLevel: standards.standards.oif.compatibilityLevel,
+        moduleAddress: standards.standards.oif.moduleAddress,
         executable: false
       }
     ],

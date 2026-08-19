@@ -17,35 +17,39 @@ function enabledEnv(extra = {}) {
   };
 }
 
-test("static solver manifest is generated from V6 public inputs", async () => {
+test("static solver manifest is generated from minimal active V6 public inputs", async () => {
   const generated = await readJson("../public/.well-known/nexa-solver.json");
   assert.equal(generated.deploymentVersion, 6);
-  assert.equal(generated.deploymentStatus, "DEPLOYED_AWAITING_CUTOVER");
-  assert.equal(generated.activationRequired, true);
+  assert.equal(generated.deploymentStatus, "ACTIVE");
+  assert.equal(generated.activationRequired, false);
+  assert.equal(Object.hasOwn(generated, "feedSigner"), false);
   assert.deepEqual(generated.solverProfile.executionScopes, ["INTRA_CHAIN", "CROSS_CHAIN"]);
   assert.equal(generated.solverProfile.variableSizeExecution, true);
   assert.equal(generated.solverProfile.machineVerifiableState, true);
-  assert.equal(generated.solverProfile.periodicOnchainPublicationRequired, false);
+  assert.equal(generated.solverProfile.accountlessDiscovery, true);
   assert.equal(Object.hasOwn(generated, "executionModel"), false);
   assert.deepEqual(generated.endpoints, PUBLIC_ENDPOINTS);
 });
 
-test("Worker exposes only the allowlisted V6 surface", async () => {
-  let assetRequests = 0;
+test("Worker serves the sanitized static discovery surface and proxies only operational endpoints", async () => {
+  const assetUrls = [];
   const env = {
     ASSETS: {
-      async fetch() {
-        assetRequests += 1;
+      async fetch(request) {
+        assetUrls.push(request.url);
         return new Response("{}", { status: 200 });
       },
     },
   };
   const manifestResponse = await handleRequest(new Request(PUBLIC_ENDPOINTS.manifest), env);
   assert.equal(manifestResponse.status, 200);
-  assert.equal(assetRequests, 1);
+  const discoveryResponse = await handleRequest(new Request(PUBLIC_ENDPOINTS.solverDiscovery), env);
+  assert.equal(discoveryResponse.status, 200);
+  assert.equal(assetUrls.length, 2);
+  assert.equal(new URL(assetUrls[0]).pathname, PUBLIC_PATHS.manifest);
+  assert.equal(new URL(assetUrls[1]).pathname, PUBLIC_PATHS.manifest);
 
   for (const url of [
-    PUBLIC_ENDPOINTS.solverDiscovery,
     PUBLIC_ENDPOINTS.solverFeed,
     PUBLIC_ENDPOINTS.routeDetailTemplate.replace("{routeId}", "0x" + "11".repeat(32)),
     PUBLIC_ENDPOINTS.permitStatusTemplate.replace("{fillId}", "0x" + "22".repeat(32)),

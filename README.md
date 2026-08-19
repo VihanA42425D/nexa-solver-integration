@@ -70,6 +70,8 @@ npm run worker:check
 npm run verify:onchain
 ```
 
+`verify:onchain` independently checks the published Registry, Router, route catalog, active Router state, Router-to-Registry binding, standard module identity, and deterministic cross-network runtime bytecode equality. The observed runtime code hashes are printed in its verification report.
+
 ## Repository map
 
 ```text

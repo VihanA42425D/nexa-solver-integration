@@ -1,4 +1,4 @@
-import { Contract, JsonRpcProvider } from "ethers";
+import { Contract, JsonRpcProvider, keccak256 } from "ethers";
 import { loadPublicSurface } from "../src/load-public-surface.mjs";
 
 const rpcByNetwork = {
@@ -7,29 +7,115 @@ const rpcByNetwork = {
   hyperevm: process.env.NEXA_HYPEREVM_RPC_URL ?? "https://rpc.hyperliquid.xyz/evm",
 };
 
+const retry = async (operation, attempts = 3) => {
+  let lastError;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error;
+      if (attempt === attempts) throw error;
+      await new Promise((resolve) => setTimeout(resolve, 500 * attempt));
+    }
+  }
+  throw lastError;
+};
+
 const surface = await loadPublicSurface(null, { requireActive: true });
+const registryDefinition = surface.integration.contracts.NexaMainnetRegistryV6;
+const routerDefinition = surface.integration.contracts.NexaMainnetRouterV6;
+if (!registryDefinition || !routerDefinition) throw new Error("V6 public Registry/Router surface missing");
+
+const expectedHashes = new Map();
+const expectedModuleHashes = new Map();
+const report = {
+  releaseId: surface.integration.releaseId,
+  deploymentVersion: surface.integration.deploymentVersion,
+  networks: {},
+};
 
 for (const [networkName, rpcUrl] of Object.entries(rpcByNetwork)) {
   const network = surface.integration.networks[networkName];
   if (!network) throw new Error(`V6 bundle missing network ${networkName}`);
   const provider = new JsonRpcProvider(rpcUrl, network.chainId, { staticNetwork: true });
   try {
-    const observed = await provider.getNetwork();
+    const observed = await retry(() => provider.getNetwork());
     if (observed.chainId !== BigInt(network.chainId)) throw new Error(`${networkName}: RPC chain mismatch`);
+
+    const contracts = {};
     for (const [name, publicContract] of Object.entries(surface.integration.contracts)) {
-      if (await provider.getCode(publicContract.address) === "0x") {
-        throw new Error(`${networkName}: no code at ${name}`);
+      const code = await retry(() => provider.getCode(publicContract.address));
+      if (code === "0x") throw new Error(`${networkName}: no code at ${name}`);
+      const runtimeCodeHash = keccak256(code);
+      if (publicContract.runtimeCodeHash
+          && String(publicContract.runtimeCodeHash).toLowerCase() !== runtimeCodeHash.toLowerCase()) {
+        throw new Error(`${networkName}: pinned runtime hash mismatch at ${name}`);
       }
+      const priorHash = expectedHashes.get(name);
+      if (priorHash && priorHash !== runtimeCodeHash) {
+        throw new Error(`${networkName}: cross-network runtime hash mismatch at ${name}`);
+      }
+      expectedHashes.set(name, runtimeCodeHash);
+
       const iface = new Contract(publicContract.address, publicContract.abi, provider);
       if (iface.interface.hasFunction("releaseId")) {
-        const releaseId = await iface.releaseId();
+        const releaseId = await retry(() => iface.releaseId());
         if (String(releaseId).toLowerCase() !== String(surface.integration.releaseId).toLowerCase()) {
           throw new Error(`${networkName}: release mismatch at ${name}`);
         }
       }
+      contracts[name] = { address: publicContract.address, runtimeCodeHash };
     }
-    console.log(`${networkName}: V6 public solver contracts verified on-chain`);
+
+    const registry = new Contract(registryDefinition.address, registryDefinition.abi, provider);
+    const routeCount = BigInt(await retry(() => registry.routeCount()));
+    if (routeCount <= 0n) throw new Error(`${networkName}: Registry has no discoverable route catalog`);
+
+    const router = new Contract(routerDefinition.address, routerDefinition.abi, provider);
+    if (await retry(() => router.sourceIntakeEnabled()) !== true) {
+      throw new Error(`${networkName}: Router source intake is not active`);
+    }
+    if (!router.interface.hasFunction("registry")) {
+      throw new Error("Public Router ABI must expose registry() for independent binding verification");
+    }
+    const boundRegistry = await retry(() => router.registry());
+    if (String(boundRegistry).toLowerCase() !== String(registryDefinition.address).toLowerCase()) {
+      throw new Error(`${networkName}: Router is not bound to the published Registry`);
+    }
+
+    const modules = {};
+    for (const [standardName, standard] of Object.entries(surface.standards.standards)) {
+      const code = await retry(() => provider.getCode(standard.moduleAddress));
+      if (code === "0x") throw new Error(`${networkName}: no code at ${standardName} module`);
+      const runtimeCodeHash = keccak256(code);
+      if (standard.runtimeCodeHash
+          && String(standard.runtimeCodeHash).toLowerCase() !== runtimeCodeHash.toLowerCase()) {
+        throw new Error(`${networkName}: pinned runtime hash mismatch at ${standardName} module`);
+      }
+      const priorHash = expectedModuleHashes.get(standardName);
+      if (priorHash && priorHash !== runtimeCodeHash) {
+        throw new Error(`${networkName}: cross-network module runtime hash mismatch at ${standardName}`);
+      }
+      expectedModuleHashes.set(standardName, runtimeCodeHash);
+      const module = new Contract(standard.moduleAddress, ["function standardId() view returns (bytes32)"], provider);
+      const standardId = await retry(() => module.standardId());
+      if (String(standardId).toLowerCase() !== String(standard.id).toLowerCase()) {
+        throw new Error(`${networkName}: standard ID mismatch at ${standardName} module`);
+      }
+      modules[standardName] = { address: standard.moduleAddress, runtimeCodeHash };
+    }
+
+    report.networks[networkName] = {
+      chainId: network.chainId,
+      routeCount: routeCount.toString(),
+      routerActive: true,
+      routerRegistry: boundRegistry,
+      contracts,
+      modules,
+    };
   } finally {
     provider.destroy();
   }
 }
+
+console.log(JSON.stringify(report, null, 2));

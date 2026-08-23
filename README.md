@@ -120,7 +120,7 @@ npm run worker:check
 npm run verify:onchain
 ```
 
-The production Edge remains owned by the private Nexa operations repository. This public package exposes no deploy command or production secret.
+This public package exposes no deploy command or production secret.
 
 ## Security boundary
 

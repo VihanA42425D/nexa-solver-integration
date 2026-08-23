@@ -34,6 +34,15 @@ if (!spec.canonicalization.feedSignature.includes("no EIP-191 prefix")
 }
 
 const packageVersion = spec.compatibility.allSdkPackages;
+const contractVersion = packageVersion.split(".").map(Number);
+function implementsFrozenContract(version) {
+  const parsed = String(version).split(".").map(Number);
+  return parsed.length === 3
+    && parsed.every(Number.isInteger)
+    && parsed[0] === contractVersion[0]
+    && parsed[1] === contractVersion[1]
+    && parsed[2] >= contractVersion[2];
+}
 const sources = {
   typescript: await read("sdks/typescript/src/index.js"),
   python: await read("sdks/python/src/nexa_v6_sdk/client.py"),
@@ -50,7 +59,9 @@ for (const [language, methods] of Object.entries(spec.languageBindings)) {
 }
 
 const typeScript = await json("sdks/typescript/package.json");
-if (typeScript.version !== packageVersion) throw new Error("TypeScript SDK version drifted");
+if (!implementsFrozenContract(typeScript.version)) {
+  throw new Error("TypeScript SDK no longer implements the frozen contract version");
+}
 const versionFiles = {
   python: await read("sdks/python/pyproject.toml"),
   rust: await read("sdks/rust/Cargo.toml"),

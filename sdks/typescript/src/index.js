@@ -13,6 +13,7 @@ export const DEFAULT_BASE_URL = "https://solver.vsnexa.com";
 export const DEFAULT_DISCOVERY_URI =
   "https://solver.vsnexa.com/.well-known/nexa-solver.json";
 export const DEFAULT_RESOLVER = "0x534A0f500A7270b9b19d2AFa18DE24DCE93eb522";
+export const SDK_HEADER_VALUE = "typescript/1.0.1";
 
 const BYTES32 = /^0x[0-9a-fA-F]{64}$/;
 const SIGNATURE = /^0x[0-9a-fA-F]{130}$/;
@@ -169,11 +170,14 @@ export class NexaV6Client {
     if (typeof this.fetch !== "function") throw new NexaSdkError("NEXA_SDK_HTTP_ERROR");
   }
 
-  async json(url, init = {}) {
+  async json(url, init = {}, sdkTelemetry = true) {
+    const headers = new Headers(init.headers ?? {});
+    if (!headers.has("accept")) headers.set("accept", "application/json");
+    if (sdkTelemetry) headers.set("x-nexa-sdk", SDK_HEADER_VALUE);
     const response = await this.fetch(url, {
       redirect: "manual",
-      headers: { accept: "application/json", ...(init.headers ?? {}) },
       ...init,
+      headers,
     });
     let body;
     try { body = await response.json(); } catch { body = null; }
@@ -252,7 +256,7 @@ export class NexaV6Client {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
-    });
+    }, false);
     if (body?.error || typeof body?.result !== "string") {
       throw new NexaSdkError("NEXA_SDK_RPC_ERROR", body?.error ?? body);
     }

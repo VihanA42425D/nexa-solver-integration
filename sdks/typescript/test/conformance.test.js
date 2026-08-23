@@ -6,6 +6,7 @@ import {
   canonicalJson,
   computeFeedHash,
   requestPermitMessage,
+  SDK_HEADER_VALUE,
   verifyFeed,
 } from "../src/index.js";
 
@@ -61,4 +62,28 @@ test("all frozen behavioral operations are present", () => {
   ]) {
     assert.equal(typeof client[name], "function", name);
   }
+});
+
+test("public Nexa requests declare the SDK but RPC requests do not", async () => {
+  const requests = [];
+  const client = new NexaV6Client({
+    fetch: async (_url, init) => {
+      requests.push(init);
+      return new Response(JSON.stringify({
+        schema: "NEXA_MAINNET_V6_SOLVER_DISCOVERY_V2",
+        deploymentVersion: 6,
+        deploymentStatus: "ACTIVE",
+        releaseId: `0x${"11".repeat(32)}`,
+        feedSigner: "0x0000000000000000000000000000000000000001",
+        endpoints: { solverFeed: "https://solver.vsnexa.com/api/v6/solver-feed" },
+      }), { headers: { "content-type": "application/json" } });
+    },
+  });
+  await client.discover();
+  await assert.rejects(
+    () => client.rpc("https://rpc.example", "eth_call", []),
+    /NEXA_SDK_RPC_ERROR/,
+  );
+  assert.equal(new Headers(requests[0].headers).get("x-nexa-sdk"), SDK_HEADER_VALUE);
+  assert.equal(new Headers(requests[1].headers).get("x-nexa-sdk"), null);
 });

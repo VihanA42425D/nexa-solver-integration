@@ -1,6 +1,6 @@
 {
   "name": "nexa-v6-sdk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Canonical Node.js and TypeScript SDK for Nexa V6 Solver discovery and execution",
   "type": "module",
   "license": "ISC",
@@ -27,4 +27,3 @@
   },
   "keywords": ["nexa", "erc-7683", "solver", "bridge", "intent"]
 }
-

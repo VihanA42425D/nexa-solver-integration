@@ -1,4 +1,5 @@
 export type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
+export const SDK_HEADER_VALUE: "typescript/1.0.1";
 export interface ClientOptions {
   baseUrl?: string;
   discoveryUri?: string;

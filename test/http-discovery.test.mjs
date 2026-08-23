@@ -17,6 +17,8 @@ const PERMIT_TUPLE = "tuple(bytes32 releaseId,bytes32 fillId,bytes32 routeId,byt
 
 test("OpenAPI is the complete generated runtime projection with concrete critical schemas", () => {
   const openapi = buildOpenApi();
+  assert.strictEqual(openapi, buildOpenApi());
+  assert.equal(Object.isFrozen(openapi), true);
   assert.equal(openapi.openapi, "3.1.0");
   assert.deepEqual(Object.keys(openapi.paths), Object.values(PUBLIC_PATHS));
   for (const name of [

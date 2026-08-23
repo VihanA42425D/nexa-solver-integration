@@ -16,6 +16,7 @@ const V6_HTTP_PATHS = Object.freeze({
   executionPermits: "/api/v6/execution-permits",
   permitStatusTemplate: "/api/v6/execution-permits/{fillId}",
 });
+const V6_PUBLIC_SOLVER_BASE_URL = "https://solver.vsnexa.com";
 function deepFreeze(value) {
   if (!value || typeof value !== "object" || Object.isFrozen(value)) return value;
   for (const child of Object.values(value)) deepFreeze(child);
@@ -845,7 +846,7 @@ function routeDetailSchemas() {
   };
 }
 
-function v6OpenApiSchemas() {
+function buildV6OpenApiSchemas() {
   return {
     ErrorResponse: {
       type: "object", additionalProperties: false, required: ["ok", "error"],
@@ -869,8 +870,13 @@ function v6OpenApiSchemas() {
   };
 }
 
-function v6OpenApiDocument(options = {}) {
-  const baseUrl = String(options.publicBaseUrl ?? "https://solver.vsnexa.com").replace(/\/+$/, "");
+const CANONICAL_V6_OPENAPI_SCHEMAS = deepFreeze(buildV6OpenApiSchemas());
+
+function v6OpenApiSchemas() {
+  return CANONICAL_V6_OPENAPI_SCHEMAS;
+}
+
+function buildV6OpenApiDocument(baseUrl) {
   const schemas = v6OpenApiSchemas();
   const routeIdParameter = {
     name: "routeId", in: "path", required: true,
@@ -1064,6 +1070,25 @@ function v6OpenApiDocument(options = {}) {
     },
     components: { schemas },
   });
+}
+
+const CANONICAL_V6_OPENAPI_DOCUMENT = buildV6OpenApiDocument(V6_PUBLIC_SOLVER_BASE_URL);
+const CUSTOM_V6_OPENAPI_DOCUMENTS = new Map();
+const CUSTOM_V6_OPENAPI_DOCUMENT_LIMIT = 8;
+
+function v6OpenApiDocument(options = {}) {
+  const baseUrl = String(
+    options.publicBaseUrl ?? V6_PUBLIC_SOLVER_BASE_URL,
+  ).replace(/\/+$/, "");
+  if (baseUrl === V6_PUBLIC_SOLVER_BASE_URL) return CANONICAL_V6_OPENAPI_DOCUMENT;
+  const cached = CUSTOM_V6_OPENAPI_DOCUMENTS.get(baseUrl);
+  if (cached) return cached;
+  const document = buildV6OpenApiDocument(baseUrl);
+  if (CUSTOM_V6_OPENAPI_DOCUMENTS.size >= CUSTOM_V6_OPENAPI_DOCUMENT_LIMIT) {
+    CUSTOM_V6_OPENAPI_DOCUMENTS.delete(CUSTOM_V6_OPENAPI_DOCUMENTS.keys().next().value);
+  }
+  CUSTOM_V6_OPENAPI_DOCUMENTS.set(baseUrl, document);
+  return document;
 }
 
 module.exports = {

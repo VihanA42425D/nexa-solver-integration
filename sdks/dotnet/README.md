@@ -3,7 +3,7 @@
 Canonical .NET implementation of the frozen Nexa V6 SDK contract.
 
 ```shell
-dotnet add package Nexa.Solver.V6.Sdk --version 1.0.0
+dotnet add package VihanA.Nexa.V6.Sdk --version 1.0.0
 ```
 
 ```csharp

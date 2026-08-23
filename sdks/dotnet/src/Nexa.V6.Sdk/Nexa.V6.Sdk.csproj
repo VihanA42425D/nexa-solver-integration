@@ -3,7 +3,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PackageId>Nexa.Solver.V6.Sdk</PackageId>
+    <PackageId>VihanA.Nexa.V6.Sdk</PackageId>
     <Version>1.0.0</Version>
     <Authors>Nexa</Authors>
     <Description>Canonical .NET SDK for Nexa V6 solver integrations</Description>

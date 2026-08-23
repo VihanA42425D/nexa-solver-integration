@@ -162,7 +162,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: sdks/dotnet/v1.0.0
+          ref: sdks/dotnet/nuget/v1.0.0
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: "8.0.x"
@@ -170,8 +170,8 @@ jobs:
       - run: dotnet pack sdks/dotnet/src/Nexa.V6.Sdk/Nexa.V6.Sdk.csproj --configuration Release --output artifacts/nuget
       - uses: actions/upload-artifact@v4
         with:
-          name: Nexa.Solver.V6.Sdk-1.0.0
-          path: artifacts/nuget/Nexa.Solver.V6.Sdk.1.0.0.nupkg
+          name: VihanA.Nexa.V6.Sdk-1.0.0
+          path: artifacts/nuget/VihanA.Nexa.V6.Sdk.1.0.0.nupkg
           if-no-files-found: error
       - uses: NuGet/login@v1
         id: login

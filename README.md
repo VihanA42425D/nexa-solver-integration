@@ -91,7 +91,7 @@ The same ten behavioral operations are implemented for:
 | Rust | [nexa-v6-sdk 1.0.0 on crates.io](https://crates.io/crates/nexa-v6-sdk/1.0.0) |
 | Go | github.com/VihanA42425D/nexa-solver-integration/sdks/go |
 | Java / Kotlin | [io.github.vihana42425d:nexa-v6-sdk:1.0.0 on Maven Central](https://central.sonatype.com/artifact/io.github.vihana42425d/nexa-v6-sdk/1.0.0) |
-| .NET | [Nexa.Solver.V6.Sdk 1.0.0 on NuGet](https://www.nuget.org/packages/Nexa.Solver.V6.Sdk/1.0.0) |
+| .NET | [VihanA.Nexa.V6.Sdk 1.0.0 on NuGet](https://www.nuget.org/packages/VihanA.Nexa.V6.Sdk/1.0.0) |
 
 Go and .NET use their exported PascalCase naming convention; the behavioral
 mapping to discover, getRoutes, getRoute, verifyFeed, requestPermitMessage,

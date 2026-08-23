@@ -64,6 +64,7 @@
       "action": "BRIDGE_LIQUIDITY_SOURCE_ONBOARDING",
       "status": "HUMAN_CHANNEL_CREDENTIAL_REQUIRED",
       "evidence": "https://docs.openocean.finance/docs/overview/dexs-integration",
+      "submissionChannel": "https://t.me/OpenOceanAPI",
       "reason": "OpenOcean accepts new liquidity-source requests through its authenticated Discord or Telegram channels; Base, BSC and HyperEVM are supported networks",
       "nextAction": "A Nexa organization representative submits the v6.1.0 package and SDK contract through OpenOcean Discord or Telegram"
     },
@@ -73,6 +74,8 @@
       "action": "LIQUIDITY_SOURCE_AND_RESOLVER_ONBOARDING",
       "status": "BUSINESS_KYB_REQUIRED",
       "evidence": "https://business.1inch.com/portal/documentation/aqua/liquidity-layer/access-resolvers-and-pathfinder",
+      "registration": "https://business.1inch.com/portal/registration",
+      "resolverContact": "mailto:csm@1inch.com",
       "reason": "Pathfinder source inclusion is controlled by 1inch and Aqua resolver access requires 1inch Business onboarding with KYB/KYC",
       "nextAction": "A legally authorized Nexa representative completes 1inch Business onboarding and requests Pathfinder source review"
     },
@@ -82,6 +85,7 @@
       "action": "BRIDGE_AND_LIQUIDITY_PROTOCOL_ONBOARDING",
       "status": "HUMAN_CHANNEL_CREDENTIAL_REQUIRED",
       "evidence": "https://docs.rango.exchange/",
+      "submissionChannel": "https://rango.exchange/contact-us",
       "reason": "Rango invites bridge and liquidity protocols to contact the team through authenticated Telegram or Discord",
       "nextAction": "A Nexa organization representative submits the integration package and supported chain/asset matrix to Rango"
     },
@@ -89,8 +93,9 @@
       "id": "0x-cross-chain-source",
       "ecosystem": "0x Cross Chain API",
       "action": "BRIDGE_PROVIDER_SOURCE_REVIEW",
-      "status": "PARTNERSHIP_REVIEW_REQUIRED",
-      "evidence": "https://docs.0x.org/cross-chain/cross-chain-api/introduction",
+      "status": "HUMAN_FORM_SUBMISSION_REQUIRED",
+      "evidence": "https://docs.0x.org/liquidity-integration/liquidity-integrations",
+      "submissionForm": "https://0x.portal.usepylon.com/forms/dex-integration-request",
       "reason": "0x selects backend bridge providers and liquidity sources; it does not expose a permissionless source registry",
       "nextAction": "Submit the v6.1.0 provider dossier to the 0x partnership/integration team"
     },
@@ -127,8 +132,13 @@
     },
     {
       "party": "Nexa organization representative",
-      "action": "Use an authenticated organization Discord/Telegram identity for OpenOcean and Rango submissions",
-      "url": "https://docs.openocean.finance/docs/overview/dexs-integration"
+      "action": "Use the authenticated Nexa Telegram identity to submit the v6.1.0 package to OpenOcean",
+      "url": "https://t.me/OpenOceanAPI"
+    },
+    {
+      "party": "Nexa organization representative",
+      "action": "Submit the bridge/liquidity integration dossier through the Rango contact channel",
+      "url": "https://rango.exchange/contact-us"
     },
     {
       "party": "Nexa legally authorized representative",
@@ -137,8 +147,8 @@
     },
     {
       "party": "0x partnership team",
-      "action": "Review and approve Nexa as a Cross Chain API bridge provider/source",
-      "url": "https://docs.0x.org/cross-chain/cross-chain-api/introduction"
+      "action": "Review the Nexa DEX/liquidity-source integration request and decide the Cross Chain API provider path",
+      "url": "https://0x.portal.usepylon.com/forms/dex-integration-request"
     },
     {
       "party": "ERC-7683 maintainers",

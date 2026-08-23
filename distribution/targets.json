@@ -52,10 +52,11 @@
       "id": "rabby-bridge-provider",
       "ecosystem": "Rabby Wallet / Rabby Bridge",
       "action": "DIRECT_BRIDGE_PROVIDER_AND_ROUTER_ALLOWLIST",
-      "status": "READY_FOR_PUBLIC_RFC",
+      "status": "SUBMITTED_AWAITING_MAINTAINER_REVIEW",
       "evidence": "https://github.com/RabbyHub/rabby-bridge",
+      "submission": "https://github.com/RabbyHub/rabby-bridge/issues/8",
       "source": "distribution/submissions/rabby-bridge-provider.md",
-      "nextAction": "Open the prepared public RFC in RabbyHub/rabby-bridge; maintainer must confirm private-backend adapter ownership and Router/spender review"
+      "nextAction": "Rabby maintainers confirm private-backend adapter ownership, quote mapping and Router/spender review"
     },
     {
       "id": "openocean-liquidity-source",

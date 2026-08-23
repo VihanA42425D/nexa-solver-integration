@@ -8,6 +8,30 @@ import { isActiveV6Bundle, loadPublicSurface } from "../src/load-public-surface.
 import { PUBLIC_ENDPOINTS } from "../src/public-endpoints.mjs";
 import { auditRepositoryForSecrets } from "../scripts/repo-secret-audit.mjs";
 
+test("OpenAPI Route Detail preserves the canonical signed Feed route", async () => {
+  const openapi = JSON.parse(await readFile(
+    new URL("../openapi/openapi.json", import.meta.url),
+    "utf8",
+  ));
+  assert.equal(
+    openapi.paths["/api/v6/routes/{routeId}"].get.responses["200"]
+      .content["application/json"].schema.$ref,
+    "#/components/schemas/RouteDetailResponse",
+  );
+  assert.equal(
+    openapi.components.schemas.RouteDetailResponse.properties.route.$ref,
+    "#/components/schemas/Route",
+  );
+  const required = new Set(openapi.components.schemas.Route.required);
+  for (const field of [
+    "publicationLane", "serviceCategory", "feeMode", "serviceFeeBps",
+    "sourceTokenDecimals", "destinationTokenDecimals", "sourceFinalityBlocks",
+    "settlementWindowSeconds", "validAfter", "validUntil",
+  ]) {
+    assert.equal(required.has(field), true, field);
+  }
+});
+
 test("active V6 bundle exposes only the Solver-facing contract surface", async () => {
   const surface = await loadPublicSurface();
   assert.equal(surface.active, true);

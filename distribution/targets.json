@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "schemaVersion": "1.0.0",
+  "updatedAt": "2026-08-23",
+  "protocol": "Nexa V6",
+  "chains": [8453, 56, 999],
+  "onboardingPackage": {
+    "status": "READY",
+    "release": "https://github.com/VihanA42425D/nexa-solver-integration/releases/tag/v6.0.1",
+    "machineReadable": "https://raw.githubusercontent.com/VihanA42425D/nexa-solver-integration/main/onboarding/nexa-v6-solver-operator.json",
+    "sha256": "4c843857cd5ebd84789c35cebde96229cb6f78ce30bc4b4536d19c267f88cff6",
+    "bootstrap": "npx --yes github:VihanA42425D/nexa-solver-integration#v6.0.1"
+  },
+  "directOperatorIntake": {
+    "status": "READY_FOR_OPERATOR_SUBMISSION",
+    "url": "https://github.com/VihanA42425D/nexa-solver-integration/issues/new?template=solver-operator-onboarding.yml",
+    "requiredOperatorActions": [
+      "Review and approve the ERC-7683 Resolver vetting dossier before capital activation",
+      "Configure the operator wallet or KMS for Nexa Permit signing and source transactions",
+      "Run the published bootstrap verifier"
+    ]
+  },
+  "targets": [
+    {
+      "id": "erc7683-resolver-vetting",
+      "ecosystem": "Open Intents Framework / ERC-7683",
+      "action": "RESOLVER_CONFORMANCE_AND_VETTING",
+      "status": "SUBMITTED_AWAITING_MAINTAINER_REVIEW",
+      "submission": "https://github.com/openintentsframework/erc7683/issues/1",
+      "source": "distribution/submissions/erc7683-resolver-vetting.md",
+      "nextAction": "Maintainer confirms the conformance harness, Resolver-vetting process, and any canonical registry path"
+    },
+    {
+      "id": "oif-solver-discovery",
+      "ecosystem": "Open Intents Framework / OIF Solver",
+      "action": "SIGNED_FEED_DISCOVERY_SOURCE",
+      "status": "SUBMITTED_AWAITING_MAINTAINER_REVIEW",
+      "submission": "https://github.com/openintentsframework/oif-solver/issues/416",
+      "source": "distribution/submissions/oif-solver-discovery.md",
+      "nextAction": "Maintainer selects built-in discovery implementation or externally maintained plugin boundary"
+    },
+    {
+      "id": "oif-aggregator-adapter",
+      "ecosystem": "Open Intents Framework / OIF Aggregator",
+      "action": "NEXA_V6_SOURCE_ADAPTER",
+      "status": "SUBMITTED_AWAITING_MAINTAINER_REVIEW",
+      "submission": "https://github.com/openintentsframework/oif-aggregator/issues/123",
+      "source": "distribution/submissions/oif-aggregator-adapter.md",
+      "nextAction": "Maintainer approves adapter scope and the explicit wallet-signature capability boundary"
+    },
+    {
+      "id": "lifi-routing",
+      "ecosystem": "LI.FI",
+      "action": "INTENT_SOURCE_REGISTRATION",
+      "status": "NOT_CURRENTLY_ELIGIBLE",
+      "evidence": "https://docs.li.fi/introduction/learn-more/for-dexs",
+      "reason": "The published integration requirements currently state that intent execution, RFQ, and order-book integrations are unsupported"
+    },
+    {
+      "id": "protocol-specific-solver-networks",
+      "ecosystem": "Across / CoW Protocol / UniswapX",
+      "action": "EXTERNAL_SOURCE_REGISTRATION",
+      "status": "NOT_APPLICABLE",
+      "reason": "These are protocol-specific solver or filler networks, not public registries for independent external intent feeds"
+    }
+  ],
+  "humanApprovalRequired": [
+    {
+      "party": "ERC-7683 maintainers",
+      "action": "Respond to and approve or redirect the Resolver conformance and vetting request",
+      "url": "https://github.com/openintentsframework/erc7683/issues/1"
+    },
+    {
+      "party": "OIF Solver maintainers",
+      "action": "Select the supported signed-feed discovery integration boundary",
+      "url": "https://github.com/openintentsframework/oif-solver/issues/416"
+    },
+    {
+      "party": "OIF Aggregator maintainers",
+      "action": "Approve the Nexa adapter scope and wallet-signature capability model",
+      "url": "https://github.com/openintentsframework/oif-aggregator/issues/123"
+    },
+    {
+      "party": "Each Solver operator",
+      "action": "Approve the Resolver dossier and provision its own wallet or KMS before live execution",
+      "url": "https://github.com/VihanA42425D/nexa-solver-integration/issues/new?template=solver-operator-onboarding.yml"
+    }
+  ]
+}

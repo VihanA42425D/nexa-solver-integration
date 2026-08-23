@@ -1,6 +1,7 @@
 # Nexa Mainnet V6 Solver Integration
 
 [![Validate](https://github.com/VihanA42425D/nexa-solver-integration/actions/workflows/validate.yml/badge.svg)](https://github.com/VihanA42425D/nexa-solver-integration/actions/workflows/validate.yml)
+[![SDK conformance](https://github.com/VihanA42425D/nexa-solver-integration/actions/workflows/sdk-conformance.yml/badge.svg)](https://github.com/VihanA42425D/nexa-solver-integration/actions/workflows/sdk-conformance.yml)
 [![Release](https://img.shields.io/github/v/release/VihanA42425D/nexa-solver-integration)](https://github.com/VihanA42425D/nexa-solver-integration/releases)
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](LICENSE)
 
@@ -74,6 +75,29 @@ The [OpenAPI 3.1 document](openapi/openapi.json) covers:
 
 Verify every Feed with the published signer and [src/feed-verification.mjs](src/feed-verification.mjs) before selecting a Route.
 
+## Frozen SDK contract
+
+The language-neutral [SDK contract](sdk-spec/nexa-v6-sdk-contract.json) and
+[shared test vectors](sdk-spec/test-vectors.json) freeze canonical models,
+raw-digest Feed verification, Permit signing, ERC-7683 resolution, execution
+transaction building, Fill status and the shared error model at version 1.0.0.
+
+The same ten behavioral operations are implemented for:
+
+| Runtime | Package |
+| --- | --- |
+| Node / TypeScript | nexa-v6-sdk on npm |
+| Python | nexa-v6-sdk on PyPI |
+| Rust | nexa-v6-sdk on crates.io |
+| Go | github.com/VihanA42425D/nexa-solver-integration/sdks/go |
+| Java / Kotlin | com.vsnexa:nexa-v6-sdk on Maven Central |
+| .NET | Nexa.V6.Sdk on NuGet |
+
+Go and .NET use their exported PascalCase naming convention; the behavioral
+mapping to discover, getRoutes, getRoute, verifyFeed, requestPermitMessage,
+requestPermit, resolveExecution, previewExecution, buildExecutionTx and
+getFillStatus is pinned in the SDK contract.
+
 ## Standards and examples
 
 - ERC-7683: executable, resolver-centric `eth_call` integration. Run `npm run resolve:erc7683`.
@@ -91,6 +115,9 @@ npm run onboard:verify
 ```
 
 See [onboarding/README.md](onboarding/README.md) for the copy-paste registry record, trust boundary and operator intake path.
+The [distribution ledger](distribution/targets.json) tracks direct Rabby
+integration plus the review/KYB boundaries for OpenOcean, 1inch, Rango, 0x and
+other EVM wallets with bridge routing.
 
 ## Repository map
 
@@ -105,6 +132,9 @@ See [onboarding/README.md](onboarding/README.md) for the copy-paste registry rec
 | [events/events.json](events/events.json) | onchain Fill event signature and topic |
 | [verification](verification) | source, deployment, identity, signature and checksums |
 | [examples](examples) | discovery, Permit, Facade and resolution clients |
+| [sdk-spec](sdk-spec) | frozen cross-language behavior and byte-level vectors |
+| [sdks](sdks) | TypeScript, Python, Rust, Go, JVM and .NET implementations |
+| [distribution](distribution) | upstream aggregator/wallet onboarding ledger and submissions |
 
 ## Release verification
 
@@ -113,9 +143,11 @@ npm run generate:solver-manifest
 npm run generate:abi
 npm run generate:openapi
 npm run generate:onboarding
+npm run generate:sdk-vectors
 npm run generate:checksums
 npm run validate
 npm test
+npm run sdk:conformance
 npm run worker:check
 npm run verify:onchain
 ```

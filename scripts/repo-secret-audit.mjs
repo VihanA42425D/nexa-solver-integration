@@ -1,7 +1,10 @@
 import { readFile, readdir } from "node:fs/promises";
 import { relative, resolve } from "node:path";
 
-const excludedDirectories = new Set([".git", "node_modules"]);
+const excludedDirectories = new Set([
+  ".git", "node_modules", ".wrangler", ".venv", ".pytest_cache",
+  "__pycache__", "target", "dist", "build", "bin", "obj",
+]);
 
 const secretRules = [
   {
@@ -42,6 +45,7 @@ const secretRules = [
 const placeholderValues = new Set([
   "changeme",
   "example",
+  "maven_central_pass",
   "not-a-secret",
   "placeholder",
   "redacted",
@@ -66,7 +70,8 @@ const listRepositoryFiles = async (directory, root, files = []) => {
           + relative(root, absolutePath),
       );
     }
-    if (entry.isDirectory() && excludedDirectories.has(entry.name)) continue;
+    if (entry.isDirectory()
+        && (excludedDirectories.has(entry.name) || entry.name.endsWith(".egg-info"))) continue;
     if (entry.isDirectory()) {
       await listRepositoryFiles(absolutePath, root, files);
     } else if (entry.isFile()) {

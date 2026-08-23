@@ -32,6 +32,21 @@
   "abi": "./abi/solver-facing.json",
   "openapi": "./openapi/openapi.json",
   "solverOperatorOnboarding": "./onboarding/nexa-v6-solver-operator.json",
+  "sdk": {
+    "status": "FROZEN",
+    "specVersion": "1.0.0",
+    "contract": "./sdk-spec/nexa-v6-sdk-contract.json",
+    "testVectors": "./sdk-spec/test-vectors.json",
+    "implementations": {
+      "typescript": "./sdks/typescript",
+      "python": "./sdks/python",
+      "rust": "./sdks/rust",
+      "go": "./sdks/go",
+      "jvm": "./sdks/jvm",
+      "dotnet": "./sdks/dotnet"
+    }
+  },
+  "distribution": "./distribution/targets.json",
   "verification": {
     "facadeDeployment": "./verification/facade-deployment.json",
     "standardJsonInput": "./verification/NexaSolverDiscoveryV6.standard-input.json",

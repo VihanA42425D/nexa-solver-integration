@@ -1,6 +1,6 @@
 {
   "schema": "NEXA_V6_SOLVER_OPERATOR_ONBOARDING_V1",
-  "packageVersion": "6.0.1",
+  "packageVersion": "6.1.0",
   "protocol": "Nexa V6",
   "protocolVersion": 6,
   "environment": "mainnet",
@@ -93,7 +93,9 @@
   "feedTrust": {
     "schema": "NEXA_MAINNET_V6_SIGNED_FEED_V1",
     "signer": "0xCbeC1dDeEA1f4317ce6eF6F33Ad46d1fFD81c163",
-    "signatureScheme": "EIP191_PERSONAL_SIGN_UTF8",
+    "signatureScheme": "SECP256K1_RECOVERABLE_ECDSA_OVER_KECCAK256_UTF8_CANONICAL_JSON_RAW_DIGEST",
+    "preimage": "NEXA_MAINNET_V6_SIGNED_FEED_V1\\n{canonicalSignedPayload}",
+    "eip191PrefixApplied": false,
     "verificationModule": "https://github.com/VihanA42425D/nexa-solver-integration/blob/main/src/feed-verification.mjs",
     "reconnectWithLastEventId": true
   },
@@ -117,7 +119,7 @@
   },
   "integration": {
     "repository": "https://github.com/VihanA42425D/nexa-solver-integration",
-    "release": "https://github.com/VihanA42425D/nexa-solver-integration/releases/tag/v6.0.1",
+    "release": "https://github.com/VihanA42425D/nexa-solver-integration/releases/tag/v6.1.0",
     "canonicalBundle": "https://github.com/VihanA42425D/nexa-solver-integration/blob/main/nexa-mainnet-v6.json",
     "manifest": "https://github.com/VihanA42425D/nexa-solver-integration/blob/main/manifest.json",
     "abi": "https://github.com/VihanA42425D/nexa-solver-integration/blob/main/abi/solver-facing.json",
@@ -128,7 +130,7 @@
     "checksums": "https://github.com/VihanA42425D/nexa-solver-integration/blob/main/verification/checksums.sha256"
   },
   "zeroTouch": {
-    "bootstrapCommand": "npx --yes github:VihanA42425D/nexa-solver-integration#v6.0.1",
+    "bootstrapCommand": "npx --yes github:VihanA42425D/nexa-solver-integration#v6.1.0",
     "localVerificationCommand": "npm run onboard:verify",
     "sequence": [
       "FETCH_AND_PIN_PACKAGE",

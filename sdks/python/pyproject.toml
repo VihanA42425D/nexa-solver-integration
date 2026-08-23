@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nexa-v6-sdk"
+version = "1.0.0"
+description = "Canonical Python SDK for Nexa V6 Solver discovery and execution"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "ISC"
+authors = [{name = "Nexa"}]
+dependencies = [
+  "requests>=2.32,<3",
+  "eth-abi>=5.2,<6",
+  "eth-hash[pycryptodome]>=0.8,<1",
+  "eth-keys>=0.7,<1",
+  "eth-utils>=5,<6"
+]
+keywords = ["nexa", "erc-7683", "solver", "bridge", "intent"]
+
+[project.optional-dependencies]
+test = ["pytest>=8,<10"]
+
+[project.urls]
+Repository = "https://github.com/VihanA42425D/nexa-solver-integration"
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,0 +1,30 @@
+{
+  "name": "nexa-v6-sdk",
+  "version": "1.0.0",
+  "description": "Canonical Node.js and TypeScript SDK for Nexa V6 Solver discovery and execution",
+  "type": "module",
+  "license": "ISC",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js"
+    }
+  },
+  "files": ["src", "README.md"],
+  "engines": {"node": ">=20"},
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "package:check": "npm pack --dry-run"
+  },
+  "dependencies": {"ethers": "^6.15.0"},
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VihanA42425D/nexa-solver-integration.git",
+    "directory": "sdks/typescript"
+  },
+  "keywords": ["nexa", "erc-7683", "solver", "bridge", "intent"]
+}
+

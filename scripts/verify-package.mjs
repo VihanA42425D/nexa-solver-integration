@@ -1,4 +1,5 @@
 import { execFileSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 
 const npm = process.platform === "win32" ? "npm.cmd" : "npm";
 const output = execFileSync(npm, ["pack", "--dry-run", "--json", "--ignore-scripts"], {
@@ -6,7 +7,8 @@ const output = execFileSync(npm, ["pack", "--dry-run", "--json", "--ignore-scrip
   shell: process.platform === "win32",
 });
 const [report] = JSON.parse(output);
-if (report.name !== "@nexa/solver-integration" || report.version !== "6.0.1") {
+const packageJson = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
+if (report.name !== "@nexa/solver-integration" || report.version !== packageJson.version) {
   throw new Error("Public package identity mismatch");
 }
 const files = new Set(report.files.map(({ path }) => path.replaceAll("\\", "/")));
@@ -26,6 +28,15 @@ const required = [
   "verification/checksums.sha256",
   "verification/erc7683-resolver-vetting.json",
   "verification/facade-deployment.json",
+  "sdk-spec/nexa-v6-sdk-contract.json",
+  "sdk-spec/test-vectors.json",
+  "sdks/typescript/package.json",
+  "sdks/python/pyproject.toml",
+  "sdks/rust/Cargo.toml",
+  "sdks/go/go.mod",
+  "sdks/jvm/pom.xml",
+  "sdks/dotnet/src/Nexa.V6.Sdk/Nexa.V6.Sdk.csproj",
+  "distribution/targets.json",
 ];
 for (const file of required) {
   if (!files.has(file)) throw new Error("Public package missing " + file);

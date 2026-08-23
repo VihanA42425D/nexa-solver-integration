@@ -6,10 +6,10 @@
   "chains": [8453, 56, 999],
   "onboardingPackage": {
     "status": "READY",
-    "release": "https://github.com/VihanA42425D/nexa-solver-integration/releases/tag/v6.0.1",
+    "release": "https://github.com/VihanA42425D/nexa-solver-integration/releases/tag/v6.1.0",
     "machineReadable": "https://raw.githubusercontent.com/VihanA42425D/nexa-solver-integration/main/onboarding/nexa-v6-solver-operator.json",
-    "sha256": "4c843857cd5ebd84789c35cebde96229cb6f78ce30bc4b4536d19c267f88cff6",
-    "bootstrap": "npx --yes github:VihanA42425D/nexa-solver-integration#v6.0.1"
+    "sha256": "d44ad78e1f2367815e1ca52e8a982721d02a924ca2c26e21f92b3bb24ce6baa2",
+    "bootstrap": "npx --yes github:VihanA42425D/nexa-solver-integration#v6.1.0"
   },
   "directOperatorIntake": {
     "status": "READY_FOR_OPERATOR_SUBMISSION",
@@ -49,6 +49,60 @@
       "nextAction": "Maintainer approves adapter scope and the explicit wallet-signature capability boundary"
     },
     {
+      "id": "rabby-bridge-provider",
+      "ecosystem": "Rabby Wallet / Rabby Bridge",
+      "action": "DIRECT_BRIDGE_PROVIDER_AND_ROUTER_ALLOWLIST",
+      "status": "READY_FOR_PUBLIC_RFC",
+      "evidence": "https://github.com/RabbyHub/rabby-bridge",
+      "source": "distribution/submissions/rabby-bridge-provider.md",
+      "nextAction": "Open the prepared public RFC in RabbyHub/rabby-bridge; maintainer must confirm private-backend adapter ownership and Router/spender review"
+    },
+    {
+      "id": "openocean-liquidity-source",
+      "ecosystem": "OpenOcean",
+      "action": "BRIDGE_LIQUIDITY_SOURCE_ONBOARDING",
+      "status": "HUMAN_CHANNEL_CREDENTIAL_REQUIRED",
+      "evidence": "https://docs.openocean.finance/docs/overview/dexs-integration",
+      "reason": "OpenOcean accepts new liquidity-source requests through its authenticated Discord or Telegram channels; Base, BSC and HyperEVM are supported networks",
+      "nextAction": "A Nexa organization representative submits the v6.1.0 package and SDK contract through OpenOcean Discord or Telegram"
+    },
+    {
+      "id": "1inch-pathfinder-source",
+      "ecosystem": "1inch Pathfinder / Aqua",
+      "action": "LIQUIDITY_SOURCE_AND_RESOLVER_ONBOARDING",
+      "status": "BUSINESS_KYB_REQUIRED",
+      "evidence": "https://business.1inch.com/portal/documentation/aqua/liquidity-layer/access-resolvers-and-pathfinder",
+      "reason": "Pathfinder source inclusion is controlled by 1inch and Aqua resolver access requires 1inch Business onboarding with KYB/KYC",
+      "nextAction": "A legally authorized Nexa representative completes 1inch Business onboarding and requests Pathfinder source review"
+    },
+    {
+      "id": "rango-bridge-source",
+      "ecosystem": "Rango Exchange",
+      "action": "BRIDGE_AND_LIQUIDITY_PROTOCOL_ONBOARDING",
+      "status": "HUMAN_CHANNEL_CREDENTIAL_REQUIRED",
+      "evidence": "https://docs.rango.exchange/",
+      "reason": "Rango invites bridge and liquidity protocols to contact the team through authenticated Telegram or Discord",
+      "nextAction": "A Nexa organization representative submits the integration package and supported chain/asset matrix to Rango"
+    },
+    {
+      "id": "0x-cross-chain-source",
+      "ecosystem": "0x Cross Chain API",
+      "action": "BRIDGE_PROVIDER_SOURCE_REVIEW",
+      "status": "PARTNERSHIP_REVIEW_REQUIRED",
+      "evidence": "https://docs.0x.org/cross-chain/cross-chain-api/introduction",
+      "reason": "0x selects backend bridge providers and liquidity sources; it does not expose a permissionless source registry",
+      "nextAction": "Submit the v6.1.0 provider dossier to the 0x partnership/integration team"
+    },
+    {
+      "id": "wallet-bridge-distribution",
+      "ecosystem": "EVM wallets with bridge routing",
+      "action": "DIRECT_PROVIDER_ADAPTER_OR_UPSTREAM_AGGREGATOR_DISTRIBUTION",
+      "status": "IN_PROGRESS",
+      "evidence": "https://github.com/RabbyHub/rabby-bridge",
+      "reason": "Wallets consume curated bridge-provider backends; Nexa can be integrated directly or become available indirectly after an upstream aggregator accepts the source",
+      "nextAction": "Complete Rabby RFC first, then reuse the fixed adapter dossier for wallets that expose a provider intake"
+    },
+    {
       "id": "lifi-routing",
       "ecosystem": "LI.FI",
       "action": "INTENT_SOURCE_REGISTRATION",
@@ -65,6 +119,26 @@
     }
   ],
   "humanApprovalRequired": [
+    {
+      "party": "Rabby Bridge maintainers",
+      "action": "Approve the direct Nexa provider boundary, backend ownership, and Router/spender allowlist",
+      "url": "https://github.com/RabbyHub/rabby-bridge"
+    },
+    {
+      "party": "Nexa organization representative",
+      "action": "Use an authenticated organization Discord/Telegram identity for OpenOcean and Rango submissions",
+      "url": "https://docs.openocean.finance/docs/overview/dexs-integration"
+    },
+    {
+      "party": "Nexa legally authorized representative",
+      "action": "Complete 1inch Business KYB/KYC before Pathfinder or Aqua resolver review",
+      "url": "https://business.1inch.com/portal/documentation/aqua/liquidity-layer/access-resolvers-and-pathfinder"
+    },
+    {
+      "party": "0x partnership team",
+      "action": "Review and approve Nexa as a Cross Chain API bridge provider/source",
+      "url": "https://docs.0x.org/cross-chain/cross-chain-api/introduction"
+    },
     {
       "party": "ERC-7683 maintainers",
       "action": "Respond to and approve or redirect the Resolver conformance and vetting request",

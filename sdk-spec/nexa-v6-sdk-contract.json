@@ -1,0 +1,132 @@
+{
+  "schema": "NEXA_V6_SDK_CONTRACT_V1",
+  "specVersion": "1.0.0",
+  "status": "FROZEN",
+  "frozenAt": "2026-08-23",
+  "protocol": {
+    "name": "Nexa V6",
+    "version": 6,
+    "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
+    "chainIds": [8453, 56, 999],
+    "discoveryFacade": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+    "discoveryUri": "https://solver.vsnexa.com/.well-known/nexa-solver.json",
+    "erc7683Resolver": "0x534A0f500A7270b9b19d2AFa18DE24DCE93eb522",
+    "router": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+    "feedDomain": "NEXA_MAINNET_V6_SIGNED_FEED_V1",
+    "permitRequestDomain": "NEXA_MAINNET_V6_EXECUTION_PERMIT_REQUEST_V1"
+  },
+  "canonicalization": {
+    "input": "JSON values only; integers which affect execution are represented as base-10 strings",
+    "objectKeys": "ascending Unicode code-point order",
+    "objects": "compact JSON with recursively sorted keys",
+    "arrays": "input order preserved",
+    "strings": "UTF-8 JSON strings with JSON escapes and without ASCII-only escaping",
+    "feedPreimage": "NEXA_MAINNET_V6_SIGNED_FEED_V1\n{canonical-signedPayload}",
+    "feedHash": "keccak256(UTF8(feedPreimage))",
+    "feedSignature": "65-byte recoverable secp256k1 ECDSA over feedHash; no EIP-191 prefix",
+    "permitRequestSignature": "EIP-191 personal_sign over UTF-8 permitRequestMessage"
+  },
+  "operations": [
+    {"name": "discover", "input": "none", "output": "Discovery"},
+    {"name": "getRoutes", "input": "RouteQuery?", "output": "RouteList"},
+    {"name": "getRoute", "input": "routeId: Bytes32", "output": "Route"},
+    {"name": "verifyFeed", "input": "SignedFeed, VerifyFeedOptions?", "output": "FeedVerification"},
+    {"name": "requestPermitMessage", "input": "PermitRequest", "output": "string"},
+    {"name": "requestPermit", "input": "PermitRequest, requestSignature", "output": "PermitEnvelope"},
+    {"name": "resolveExecution", "input": "rpcUrl, payload", "output": "ResolvedExecution"},
+    {"name": "previewExecution", "input": "rpcUrl, PermitEnvelope", "output": "ExecutionPreview"},
+    {"name": "buildExecutionTx", "input": "PermitEnvelope", "output": "ExecutionTransaction"},
+    {"name": "getFillStatus", "input": "fillId: Bytes32", "output": "FillStatus"}
+  ],
+  "languageBindings": {
+    "typescript": ["discover", "getRoutes", "getRoute", "verifyFeed", "requestPermitMessage", "requestPermit", "resolveExecution", "previewExecution", "buildExecutionTx", "getFillStatus"],
+    "python": ["discover", "getRoutes", "getRoute", "verifyFeed", "requestPermitMessage", "requestPermit", "resolveExecution", "previewExecution", "buildExecutionTx", "getFillStatus"],
+    "rust": ["discover", "getRoutes", "getRoute", "verifyFeed", "requestPermitMessage", "requestPermit", "resolveExecution", "previewExecution", "buildExecutionTx", "getFillStatus"],
+    "go": ["Discover", "GetRoutes", "GetRoute", "VerifyFeed", "RequestPermitMessage", "RequestPermit", "ResolveExecution", "PreviewExecution", "BuildExecutionTx", "GetFillStatus"],
+    "jvm": ["discover", "getRoutes", "getRoute", "verifyFeed", "requestPermitMessage", "requestPermit", "resolveExecution", "previewExecution", "buildExecutionTx", "getFillStatus"],
+    "dotnet": ["Discover", "GetRoutes", "GetRoute", "VerifyFeed", "RequestPermitMessage", "RequestPermit", "ResolveExecution", "PreviewExecution", "BuildExecutionTx", "GetFillStatus"]
+  },
+  "models": {
+    "Bytes32": "0x-prefixed lowercase 32-byte hexadecimal string",
+    "Address": "EIP-55 address at API boundaries; lowercase for canonical Permit message fields",
+    "Uint": "base-10 non-negative integer string",
+    "Discovery": {
+      "required": ["schema", "deploymentVersion", "deploymentStatus", "releaseId", "feedSigner", "endpoints"],
+      "constants": {
+        "schema": "NEXA_MAINNET_V6_SOLVER_DISCOVERY_V2",
+        "deploymentVersion": 6,
+        "deploymentStatus": "ACTIVE"
+      }
+    },
+    "RouteQuery": {
+      "optional": ["sourceChainId", "sourceNetworkId"]
+    },
+    "Route": {
+      "required": ["routeId", "quoteId", "sourceNetworkId", "sourceAssetId", "destinationNetworkId", "destinationAssetId", "minimumFillInRaw", "maxAvailableInRaw", "executionStatus", "permitAvailable", "validUntil"]
+    },
+    "SignedFeed": {
+      "required": ["signedPayload", "feedHash", "feedSigner", "feedSignature"],
+      "signedPayloadRequired": ["schema", "releaseId", "dataVersion", "generatedAt", "validUntil", "routes"]
+    },
+    "FeedVerification": {
+      "required": ["valid", "computedHash", "expectedHash", "recoveredSigner", "declaredSigner", "expectedSigner", "expired"]
+    },
+    "PermitRequest": {
+      "required": ["quoteId", "requestedAmountInRaw", "standard", "idempotencyKey"],
+      "identity": "payer+recipient for EVM, otherwise accountId+canonical locator for each side"
+    },
+    "PermitEnvelope": {
+      "required": ["fillId", "state", "permit", "permitDigest", "permitSignature", "execution", "totalTransactionCount"]
+    },
+    "ResolvedExecution": {
+      "required": ["resolver", "routeId", "quoteId", "target", "value", "callData", "rawReturnData"]
+    },
+    "ExecutionPreview": {
+      "required": ["valid", "reason", "rawReturnData"]
+    },
+    "ExecutionTransaction": {
+      "required": ["chainId", "from", "to", "data", "value"],
+      "value": "base-10 uint string; equals amountInRaw only for zero-address native source assets"
+    },
+    "FillStatus": {
+      "required": ["fillId", "state", "totalTransactionCount"],
+      "successState": "PAID",
+      "successInvariant": "sourceTxHash and payoutTxHash are non-null and totalTransactionCount is 2"
+    }
+  },
+  "permitMessage": {
+    "normalization": {
+      "quoteId": "lowercase bytes32",
+      "requestedAmountInRaw": "base-10 uint128",
+      "standard": "uppercase",
+      "payerAndRecipient": "EIP-55 validation then lowercase message value",
+      "idempotencyKey": "trimmed; pattern ^[a-zA-Z0-9._:-]{8,128}$"
+    },
+    "lines": [
+      "NEXA_MAINNET_V6_EXECUTION_PERMIT_REQUEST_V1",
+      "quoteId={quoteId}",
+      "requestedAmountInRaw={requestedAmountInRaw}",
+      "standard={standard}",
+      "payer={payer}|payerAccountId={payerAccountId}\npayerLocator={canonicalJson(payerLocator)}",
+      "recipient={recipient}|recipientAccountId={recipientAccountId}\nrecipientLocator={canonicalJson(recipientLocator)}",
+      "idempotencyKey={idempotencyKey}"
+    ]
+  },
+  "errors": {
+    "NEXA_SDK_DISCOVERY_INVALID": "Discovery schema, version, status, release or endpoint invalid",
+    "NEXA_SDK_FEED_INVALID": "Signed payload structure invalid",
+    "NEXA_SDK_FEED_HASH_MISMATCH": "Computed hash differs from feedHash",
+    "NEXA_SDK_FEED_SIGNER_MISMATCH": "Recovered, declared or expected signer differs",
+    "NEXA_SDK_FEED_EXPIRED": "Feed generatedAt/validUntil window invalid",
+    "NEXA_SDK_ROUTE_NOT_FOUND": "Route detail was not found",
+    "NEXA_SDK_PERMIT_REQUEST_INVALID": "Permit request canonicalization failed",
+    "NEXA_SDK_HTTP_ERROR": "HTTP request failed; server V6 error is retained as serverCode",
+    "NEXA_SDK_RPC_ERROR": "JSON-RPC call failed",
+    "NEXA_SDK_ABI_ERROR": "ABI encoding or decoding failed"
+  },
+  "compatibility": {
+    "allSdkPackages": "1.0.0",
+    "testVectors": "sdk-spec/test-vectors.json",
+    "breakingChangePolicy": "Any change to bytes, method semantics, required fields or error mapping requires specVersion 2.0.0"
+  }
+}

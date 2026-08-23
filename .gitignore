@@ -7,3 +7,17 @@ node_modules/
 !.env.example
 coverage/
 *.log
+
+# SDK build/test outputs
+sdks/typescript/*.tgz
+sdks/python/.venv/
+sdks/python/.pytest_cache/
+sdks/python/dist/
+sdks/python/build/
+sdks/python/src/*.egg-info/
+sdks/python/**/__pycache__/
+sdks/rust/target/
+sdks/go/bin/
+sdks/jvm/target/
+sdks/dotnet/**/bin/
+sdks/dotnet/**/obj/

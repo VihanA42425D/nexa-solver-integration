@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackageId>Nexa.V6.Sdk</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Nexa</Authors>
+    <Description>Canonical .NET SDK for Nexa V6 solver integrations</Description>
+    <PackageProjectUrl>https://github.com/VihanA42425D/nexa-solver-integration</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/VihanA42425D/nexa-solver-integration.git</RepositoryUrl>
+    <PackageLicenseExpression>ISC</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>nexa;erc-7683;solver;bridge;intent</PackageTags>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Nethereum.Contracts" Version="5.0.0" />
+    <PackageReference Include="Nethereum.Signer" Version="5.0.0" />
+    <PackageReference Include="Nethereum.Util" Version="5.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>

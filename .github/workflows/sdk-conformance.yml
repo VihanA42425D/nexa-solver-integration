@@ -1,0 +1,108 @@
+name: SDK conformance
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  vectors:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: node scripts/generate-sdk-vectors.mjs
+      - run: git diff --exit-code -- sdk-spec/test-vectors.json
+
+  typescript:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sdks/typescript
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: sdks/typescript/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm pack --dry-run
+
+  python:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sdks/python
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.10"
+          cache: pip
+          cache-dependency-path: sdks/python/pyproject.toml
+      - run: python -m pip install --upgrade pip build
+      - run: python -m pip install -e ".[test]"
+      - run: python -m pytest
+      - run: python -m build
+
+  rust:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sdks/rust
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: sdks/rust
+      - run: cargo fmt --check
+      - run: cargo test --locked
+      - run: cargo package --locked --allow-dirty
+
+  go:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sdks/go
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v6
+        with:
+          go-version: "1.24.x"
+          cache-dependency-path: sdks/go/go.sum
+      - run: go mod download
+      - run: test -z "$(gofmt -l .)"
+      - run: go test ./...
+
+  jvm:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sdks/jvm
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+      - run: mvn --batch-mode verify
+
+  dotnet:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "8.0.x"
+      - run: dotnet test sdks/dotnet/tests/Nexa.V6.Sdk.Tests/Nexa.V6.Sdk.Tests.csproj --configuration Release
+      - run: dotnet pack sdks/dotnet/src/Nexa.V6.Sdk/Nexa.V6.Sdk.csproj --configuration Release --output artifacts/nuget

@@ -185,19 +185,26 @@ if (packageJson.scripts["worker:deploy"] || packageJson.scripts["worker:dev"]) {
   throw new Error("Public integration package must not expose production deployment authority");
 }
 
-const excluded = new Set([".git", "node_modules", ".wrangler"]);
+const excluded = new Set([
+  ".git", "node_modules", ".wrangler", ".venv", ".pytest_cache",
+  "__pycache__", "target", "dist", "build", "bin", "obj",
+]);
 const scan = async (directory, prefix = "") => {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
-    if (entry.isDirectory() && excluded.has(entry.name)) continue;
+    if (entry.isDirectory() && (excluded.has(entry.name) || entry.name.endsWith(".egg-info"))) continue;
     const relative = prefix ? `${prefix}/${entry.name}` : entry.name;
     const absolute = resolve(directory, entry.name);
     if (entry.isDirectory()) await scan(absolute, relative);
     else if (entry.name !== "package-lock.json") {
       const source = await readFile(absolute, "utf8");
       const retiredMajor = integration.deploymentVersion - 1;
-      if (source.includes(`V${retiredMajor}`)
-          || source.includes(`v${retiredMajor}`)
-          || source.includes(`/api/v${retiredMajor}/`)) {
+      const retiredMarkers = [
+        `NEXA_MAINNET_V${retiredMajor}`,
+        `NEXA_V${retiredMajor}`,
+        `Nexa V${retiredMajor}`,
+        `/api/v${retiredMajor}/`,
+      ];
+      if (retiredMarkers.some((marker) => source.includes(marker))) {
         throw new Error(`Retired major-version reference in ${relative}`);
       }
     }

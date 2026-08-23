@@ -1,6 +1,6 @@
 {
   "name": "@nexa/solver-integration",
-  "version": "6.0.1",
+  "version": "6.1.0",
   "description": "Public Nexa V6 Solver discovery and execution integration surface for intra-chain and cross-chain opportunities.",
   "type": "module",
   "private": false,
@@ -15,6 +15,7 @@
     "abi",
     "config",
     "contracts",
+    "distribution",
     "events",
     "examples",
     "networks",
@@ -28,6 +29,42 @@
     "nexa-mainnet-v6.json",
     "wrangler.jsonc",
     "scripts",
+    "sdk-spec",
+    "sdks/typescript/README.md",
+    "sdks/typescript/package.json",
+    "sdks/typescript/package-lock.json",
+    "sdks/typescript/src/index.js",
+    "sdks/typescript/src/index.d.ts",
+    "sdks/typescript/test/conformance.test.js",
+    "sdks/python/README.md",
+    "sdks/python/pyproject.toml",
+    "sdks/python/src/nexa_v6_sdk/__init__.py",
+    "sdks/python/src/nexa_v6_sdk/client.py",
+    "sdks/python/tests/test_conformance.py",
+    "sdks/rust/README.md",
+    "sdks/rust/Cargo.toml",
+    "sdks/rust/Cargo.lock",
+    "sdks/rust/src/lib.rs",
+    "sdks/rust/tests/conformance.rs",
+    "sdks/go/README.md",
+    "sdks/go/VERSION",
+    "sdks/go/go.mod",
+    "sdks/go/go.sum",
+    "sdks/go/core.go",
+    "sdks/go/abi.go",
+    "sdks/go/client.go",
+    "sdks/go/core_test.go",
+    "sdks/jvm/README.md",
+    "sdks/jvm/pom.xml",
+    "sdks/jvm/src",
+    "sdks/dotnet/README.md",
+    "sdks/dotnet/src/Nexa.V6.Sdk/Nexa.V6.Sdk.csproj",
+    "sdks/dotnet/src/Nexa.V6.Sdk/NexaSdkException.cs",
+    "sdks/dotnet/src/Nexa.V6.Sdk/NexaV6Core.cs",
+    "sdks/dotnet/src/Nexa.V6.Sdk/NexaV6Abi.cs",
+    "sdks/dotnet/src/Nexa.V6.Sdk/NexaV6Client.cs",
+    "sdks/dotnet/tests/Nexa.V6.Sdk.Tests/Nexa.V6.Sdk.Tests.csproj",
+    "sdks/dotnet/tests/Nexa.V6.Sdk.Tests/ConformanceTests.cs",
     "test"
   ],
   "scripts": {
@@ -42,12 +79,15 @@
     "generate:checksums": "node scripts/generate-checksums.mjs",
     "generate:openapi": "node scripts/generate-openapi.mjs",
     "generate:onboarding": "node scripts/generate-onboarding-package.mjs",
+    "generate:sdk-vectors": "node scripts/generate-sdk-vectors.mjs",
+    "assemble:sdk-release": "node scripts/assemble-sdk-release.mjs",
+    "sdk:conformance": "node scripts/verify-sdk-contract.mjs",
     "onboard:verify": "node scripts/verify-onboarding.mjs",
     "worker:check": "wrangler deploy --dry-run --outdir .wrangler/dry-run",
     "verify:onchain": "node scripts/verify-onchain.mjs",
     "validate": "node scripts/validate.mjs",
     "test": "node --test test/*.test.mjs",
-    "release:check": "npm run validate && npm test && npm run package:verify && npm run worker:check && npm run onboard:verify && npm run verify:onchain"
+    "release:check": "npm run validate && npm test && npm run sdk:conformance && npm run package:verify && npm run worker:check && npm run onboard:verify && npm run verify:onchain"
   },
   "dependencies": {
     "ethers": "^6.15.0"
@@ -85,5 +125,7 @@
     "./openapi": "./openapi/openapi.json",
     "./standards/standard-ids.json": "./standards/standard-ids.json",
     "./verification": "./verification/facade-deployment.json"
+    ,"./sdk-contract": "./sdk-spec/nexa-v6-sdk-contract.json"
+    ,"./sdk-test-vectors": "./sdk-spec/test-vectors.json"
   }
 }

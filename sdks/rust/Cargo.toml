@@ -1,0 +1,25 @@
+[package]
+name = "nexa-v6-sdk"
+version = "1.0.0"
+edition = "2021"
+rust-version = "1.85"
+description = "Canonical Rust SDK for Nexa V6 Solver discovery and execution"
+license = "ISC"
+repository = "https://github.com/VihanA42425D/nexa-solver-integration"
+keywords = ["nexa", "solver", "bridge", "intent"]
+categories = ["api-bindings", "cryptography::cryptocurrencies"]
+
+[lib]
+name = "nexa_v6_sdk"
+
+[dependencies]
+alloy-primitives = { version = "1.6.1", features = ["serde"] }
+alloy-sol-types = { version = "1.6.1", features = ["more-tuple-impls"] }
+k256 = { version = "0.14.0", features = ["ecdsa"] }
+reqwest = { version = "0.13.4", default-features = false, features = ["blocking", "json", "rustls"] }
+ruint = "=1.17.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "2.0"
+
+[dev-dependencies]

@@ -4,13 +4,13 @@ import { fileURLToPath } from "node:url";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const REPOSITORY = "https://github.com/VihanA42425D/nexa-solver-integration";
-const PACKAGE_VERSION = "6.0.1";
 
 const readJson = async (repositoryRoot, file) => JSON.parse(
   await readFile(resolve(repositoryRoot, file), "utf8"),
 );
 
 export async function buildOnboardingPackage(repositoryRoot = root) {
+  const { version: packageVersion } = await readJson(repositoryRoot, "package.json");
   const integration = await readJson(repositoryRoot, "nexa-mainnet-v6.json");
   const facade = integration.contracts.NexaSolverDiscoveryV6;
   const registry = integration.contracts.NexaMainnetRegistryV6;
@@ -34,7 +34,7 @@ export async function buildOnboardingPackage(repositoryRoot = root) {
 
   return {
     schema: "NEXA_V6_SOLVER_OPERATOR_ONBOARDING_V1",
-    packageVersion: PACKAGE_VERSION,
+    packageVersion,
     protocol: "Nexa V6",
     protocolVersion: 6,
     environment: "mainnet",
@@ -83,7 +83,9 @@ export async function buildOnboardingPackage(repositoryRoot = root) {
     feedTrust: {
       schema: "NEXA_MAINNET_V6_SIGNED_FEED_V1",
       signer: integration.discovery.feedSigner,
-      signatureScheme: "EIP191_PERSONAL_SIGN_UTF8",
+      signatureScheme: "SECP256K1_RECOVERABLE_ECDSA_OVER_KECCAK256_UTF8_CANONICAL_JSON_RAW_DIGEST",
+      preimage: "NEXA_MAINNET_V6_SIGNED_FEED_V1\\n{canonicalSignedPayload}",
+      eip191PrefixApplied: false,
       verificationModule: `${REPOSITORY}/blob/main/src/feed-verification.mjs`,
       reconnectWithLastEventId: true,
     },
@@ -107,7 +109,7 @@ export async function buildOnboardingPackage(repositoryRoot = root) {
     },
     integration: {
       repository: REPOSITORY,
-      release: `${REPOSITORY}/releases/tag/v${PACKAGE_VERSION}`,
+      release: `${REPOSITORY}/releases/tag/v${packageVersion}`,
       canonicalBundle: `${REPOSITORY}/blob/main/nexa-mainnet-v6.json`,
       manifest: `${REPOSITORY}/blob/main/manifest.json`,
       abi: `${REPOSITORY}/blob/main/abi/solver-facing.json`,
@@ -118,7 +120,7 @@ export async function buildOnboardingPackage(repositoryRoot = root) {
       checksums: `${REPOSITORY}/blob/main/verification/checksums.sha256`,
     },
     zeroTouch: {
-      bootstrapCommand: "npx --yes github:VihanA42425D/nexa-solver-integration#v6.0.1",
+      bootstrapCommand: `npx --yes github:VihanA42425D/nexa-solver-integration#v${packageVersion}`,
       localVerificationCommand: "npm run onboard:verify",
       sequence: [
         "FETCH_AND_PIN_PACKAGE",

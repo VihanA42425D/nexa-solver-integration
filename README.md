@@ -4,7 +4,7 @@
 [![Release](https://img.shields.io/github/v/release/VihanA42425D/nexa-solver-integration)](https://github.com/VihanA42425D/nexa-solver-integration/releases)
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](LICENSE)
 
-> **ACTIVE   Mainnet V6.** Public Nexa Solver discovery and execution integration for Base, BNB Smart Chain and HyperEVM.
+> **ACTIVE - Mainnet V6.** Public Nexa Solver discovery and execution integration for Base, BNB Smart Chain and HyperEVM.
 
 This is the machine-readable integration surface for Nexa solvers, indexers and intent frameworks. It publishes the verified onchain Discovery Facade, Registry and Router bindings, signed Feed protocol, ERC-7683 resolver, OIF discovery module, ABI, OpenAPI, events, network IDs and reproducible verification evidence.
 
@@ -12,22 +12,22 @@ This is the machine-readable integration surface for Nexa solvers, indexers and 
 
 Canonical discovery URI:
 
-~~~text
+```text
 https://solver.vsnexa.com/.well-known/nexa-solver.json
-~~~
+```
 
-~~~bash
+```bash
 npm install
 npm run discover
 npm run facade:read
 npm run verify:onchain
-~~~
+```
 
-The Facade exposes the same URI through discoveryURI(). A solver can resolve:
+The Facade exposes the same URI through `discoveryURI()`. A solver can resolve:
 
-~~~text
-onchain Facade !� .well-known !� discovery !� signed Feed !� ERC-7683 resolver !� Router
-~~~
+```text
+onchain Facade -> .well-known -> discovery -> signed Feed -> ERC-7683 resolver -> Router
+```
 
 ## Verified mainnet contracts
 
@@ -43,11 +43,11 @@ All five public components use the same deterministic address and runtime byteco
 
 Facade verification:
 
-- [BaseScan](https://basescan.org/address/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6#code) � [Sourcify](https://repo.sourcify.dev/8453/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6)
-- [BscScan](https://bscscan.com/address/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6#code) � [Sourcify](https://repo.sourcify.dev/56/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6)
-- [HyperEVMScan](https://hyperevmscan.io/address/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6#code) � [Sourcify](https://repo.sourcify.dev/999/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6)
+- [BaseScan](https://basescan.org/address/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6#code) - [Sourcify](https://repo.sourcify.dev/8453/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6)
+- [BscScan](https://bscscan.com/address/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6#code) - [Sourcify](https://repo.sourcify.dev/56/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6)
+- [HyperEVMScan](https://hyperevmscan.io/address/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6#code) - [Sourcify](https://repo.sourcify.dev/999/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6)
 
-Compiler identity is 0.8.26+commit.8a97fa7a.Emscripten.clang. Constructor arguments, init/runtime hashes, transactions and blocks are pinned in [verification/facade-deployment.json](verification/facade-deployment.json).
+Compiler identity is `0.8.26+commit.8a97fa7a.Emscripten.clang`. Constructor arguments, init/runtime hashes, transactions and blocks are pinned in [verification/facade-deployment.json](verification/facade-deployment.json).
 
 ## Networks
 
@@ -57,30 +57,40 @@ Compiler identity is 0.8.26+commit.8a97fa7a.Emscripten.clang. Constructor argume
 | BNB Smart Chain | 56 | 0x5863eb850b94ec5a94a1653871dc308d32f4aec504d789f356419886170a0928 | 126 |
 | HyperEVM | 999 | 0x5587698f40d78ef64484dda8f2c78692af870cfe3926dbc61a73881680bd01c8 | 108 |
 
-Each Router has sourceIntakeEnabled() == true, is bound to the published Registry and shares release ID 0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6.
+Each Router has `sourceIntakeEnabled() == true`, is bound to the published Registry and shares release ID `0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6`.
 
 ## Public API
 
 The [OpenAPI 3.1 document](openapi/openapi.json) covers:
 
-- GET /.well-known/nexa-solver.json
-- GET /api/v6/solver-discovery
-- GET /api/v6/solver-feed
-- GET /api/v6/solver-feed/events
-- GET /api/v6/routes/{routeId}
-- POST /api/v6/execution-permits/request-message
-- POST /api/v6/execution-permits
-- GET /api/v6/execution-permits/{fillId}
+- `GET /.well-known/nexa-solver.json`
+- `GET /api/v6/solver-discovery`
+- `GET /api/v6/solver-feed`
+- `GET /api/v6/solver-feed/events`
+- `GET /api/v6/routes/{routeId}`
+- `POST /api/v6/execution-permits/request-message`
+- `POST /api/v6/execution-permits`
+- `GET /api/v6/execution-permits/{fillId}`
 
 Verify every Feed with the published signer and [src/feed-verification.mjs](src/feed-verification.mjs) before selecting a Route.
 
 ## Standards and examples
 
-- ERC-7683: executable, resolver-centric eth_call integration. Run npm run resolve:erc7683.
-- OIF: discovery/description compatibility only; it deliberately exposes no execution resolver. Run npm run describe:oif.
-- Direct Nexa execution: request a signed execution Permit, preview Router.fillDirect, then submit the source transaction.
+- ERC-7683: executable, resolver-centric `eth_call` integration. Run `npm run resolve:erc7683`.
+- OIF: discovery/description compatibility only; it deliberately exposes no execution resolver. Run `npm run describe:oif`.
+- Direct Nexa execution: request a signed execution Permit, preview `Router.fillDirect`, then submit the source transaction.
 
 Examples never require a private key to be committed. Signing stays in the integrating wallet or bot.
+
+## Zero-touch Solver onboarding
+
+The fixed [Solver operator onboarding package](onboarding/nexa-v6-solver-operator.json) contains the chain IDs, same-address Facade, Registry and Router bindings, ERC-7683 Resolver, Feed, SSE, OpenAPI, ABI and verification references required by an automated operator.
+
+```bash
+npm run onboard:verify
+```
+
+See [onboarding/README.md](onboarding/README.md) for the copy-paste registry record, trust boundary and operator intake path.
 
 ## Repository map
 
@@ -88,6 +98,7 @@ Examples never require a private key to be committed. Signing stays in the integ
 | --- | --- |
 | [manifest.json](manifest.json) | final ACTIVE artifact index |
 | [nexa-mainnet-v6.json](nexa-mainnet-v6.json) | canonical public integration bundle |
+| [onboarding/nexa-v6-solver-operator.json](onboarding/nexa-v6-solver-operator.json) | fixed Solver/Aggregator onboarding record |
 | [abi/solver-facing.json](abi/solver-facing.json) | Facade, Registry, Router and module ABI |
 | [networks/network-ids.json](networks/network-ids.json) | chain and Nexa network identities |
 | [standards/standard-ids.json](standards/standard-ids.json) | ERC-7683 and OIF compatibility |
@@ -97,16 +108,17 @@ Examples never require a private key to be committed. Signing stays in the integ
 
 ## Release verification
 
-~~~bash
+```bash
 npm run generate:solver-manifest
 npm run generate:abi
 npm run generate:openapi
+npm run generate:onboarding
 npm run generate:checksums
 npm run validate
 npm test
 npm run worker:check
 npm run verify:onchain
-~~~
+```
 
 The production Edge remains owned by the private Nexa operations repository. This public package exposes no deploy command or production secret.
 

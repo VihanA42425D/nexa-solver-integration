@@ -1,12 +1,15 @@
 {
   "name": "@nexa/solver-integration",
-  "version": "6.0.0",
+  "version": "6.0.1",
   "description": "Public Nexa V6 Solver discovery and execution integration surface for intra-chain and cross-chain opportunities.",
   "type": "module",
   "private": false,
   "license": "ISC",
   "engines": {
     "node": ">=20"
+  },
+  "bin": {
+    "nexa-v6-onboard-verify": "./scripts/verify-onboarding.mjs"
   },
   "files": [
     "abi",
@@ -15,6 +18,7 @@
     "events",
     "examples",
     "networks",
+    "onboarding",
     "openapi",
     "src",
     "public",
@@ -37,11 +41,13 @@
     "generate:solver-manifest": "node scripts/generate-nexa-solver-manifest.mjs",
     "generate:checksums": "node scripts/generate-checksums.mjs",
     "generate:openapi": "node scripts/generate-openapi.mjs",
+    "generate:onboarding": "node scripts/generate-onboarding-package.mjs",
+    "onboard:verify": "node scripts/verify-onboarding.mjs",
     "worker:check": "wrangler deploy --dry-run --outdir .wrangler/dry-run",
     "verify:onchain": "node scripts/verify-onchain.mjs",
     "validate": "node scripts/validate.mjs",
     "test": "node --test test/*.test.mjs",
-    "release:check": "npm run validate && npm test && npm run package:verify && npm run worker:check && npm run verify:onchain"
+    "release:check": "npm run validate && npm test && npm run package:verify && npm run worker:check && npm run onboard:verify && npm run verify:onchain"
   },
   "dependencies": {
     "ethers": "^6.15.0"
@@ -75,6 +81,7 @@
     "./contracts/NexaSolverDiscoveryV6.sol": "./contracts/NexaSolverDiscoveryV6.sol",
     "./events": "./events/events.json",
     "./networks": "./networks/network-ids.json",
+    "./onboarding": "./onboarding/nexa-v6-solver-operator.json",
     "./openapi": "./openapi/openapi.json",
     "./standards/standard-ids.json": "./standards/standard-ids.json",
     "./verification": "./verification/facade-deployment.json"

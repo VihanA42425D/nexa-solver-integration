@@ -5,6 +5,7 @@ import { getAddress, id, Interface, recoverAddress } from "ethers";
 import { buildAbiBundle } from "./generate-abi.mjs";
 import { buildChecksums } from "./generate-checksums.mjs";
 import { buildNexaSolverManifest, serializeNexaSolverManifest } from "./generate-nexa-solver-manifest.mjs";
+import { buildOnboardingPackage, serializeOnboardingPackage } from "./generate-onboarding-package.mjs";
 import { buildOpenApi } from "./generate-openapi.mjs";
 import { auditRepositoryForSecrets } from "./repo-secret-audit.mjs";
 import { PUBLIC_ENDPOINTS, PUBLIC_PATHS } from "../src/public-endpoints.mjs";
@@ -20,7 +21,7 @@ const hash = (value, code) => {
 };
 
 const [manifest, integration, standards, events, networkIds, abi, facadeEvidence,
-  inputEvidence, ownershipEvidence, identityEvidence, openapi, packageJson] = await Promise.all([
+  inputEvidence, ownershipEvidence, identityEvidence, resolverVetting, openapi, onboarding, packageJson] = await Promise.all([
   readJson("manifest.json"),
   readJson("nexa-mainnet-v6.json"),
   readJson("standards/standard-ids.json"),
@@ -31,7 +32,9 @@ const [manifest, integration, standards, events, networkIds, abi, facadeEvidence
   readJson("verification/NexaSolverDiscoveryV6.standard-input.json"),
   readJson("verification/explorer-ownership-signatures.json"),
   readJson("verification/onchain-identity.json"),
+  readJson("verification/erc7683-resolver-vetting.json"),
   readJson("openapi/openapi.json"),
+  readJson("onboarding/nexa-v6-solver-operator.json"),
   readJson("package.json"),
 ]);
 
@@ -147,6 +150,28 @@ for (const [name, value] of Object.entries(identityEvidence.contracts)) {
 
 same(await buildAbiBundle(root), abi, "Generated ABI is stale");
 same(buildOpenApi(), openapi, "Generated OpenAPI is stale");
+same(await buildOnboardingPackage(root), onboarding, "Generated onboarding package is stale");
+if (await read("onboarding/nexa-v6-solver-operator.json")
+    !== serializeOnboardingPackage(await buildOnboardingPackage(root))) {
+  throw new Error("Serialized onboarding package is stale");
+}
+if (onboarding.protocol !== "Nexa V6"
+    || onboarding.status !== "ACTIVE"
+    || onboarding.releaseId !== integration.releaseId
+    || onboarding.discoveryFacade.address !== facade.address
+    || onboarding.contracts.erc7683Resolver.address !== standards.standards.erc7683.moduleAddress
+    || onboarding.endpoints.feed !== PUBLIC_ENDPOINTS.solverFeed
+    || onboarding.endpoints.sse !== PUBLIC_ENDPOINTS.solverFeedEvents
+    || JSON.stringify(onboarding.chainIds) !== JSON.stringify([8453, 56, 999])) {
+  throw new Error("Zero-touch onboarding identity drift");
+}
+if (resolverVetting.status !== "READY_FOR_EXTERNAL_OPERATOR_REVIEW"
+    || resolverVetting.sourceIdentity.externalVettingRequiredBeforeCapitalActivation !== true
+    || resolverVetting.resolver.address !== standards.standards.erc7683.moduleAddress
+    || resolverVetting.resolver.runtimeCodeHash !== standards.standards.erc7683.runtimeCodeHash
+    || resolverVetting.resolver.router !== router.address) {
+  throw new Error("ERC-7683 Resolver vetting evidence drift");
+}
 same(Object.keys(openapi.paths).sort(), Object.values(PUBLIC_PATHS).sort(), "OpenAPI path catalog drift");
 const generatedDiscovery = serializeNexaSolverManifest(await buildNexaSolverManifest(root));
 if (await read("public/.well-known/nexa-solver.json") !== generatedDiscovery) {

@@ -1,0 +1,66 @@
+{
+  "schema": "NEXA_V6_ERC7683_RESOLVER_VETTING_V1",
+  "status": "READY_FOR_EXTERNAL_OPERATOR_REVIEW",
+  "protocol": "Nexa V6",
+  "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
+  "resolver": {
+    "address": "0x534A0f500A7270b9b19d2AFa18DE24DCE93eb522",
+    "sameAddressOnEveryChain": true,
+    "runtimeCodeHash": "0xea99f0e1e33a9a9e1ae926e8f15fd09bf1b7b9cecf81a2ef294cd4820e26d392",
+    "router": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+    "standardId": "0x27ecffeeec898dbaf864fc095016ad6212d7a27e32a3069234a4a1da23f50993",
+    "resolutionMode": "OFFCHAIN_ETH_CALL"
+  },
+  "sourceIdentity": {
+    "status": "BYTECODE_AND_BEHAVIOR_PINNED_SOURCE_REVIEW_REQUIRED",
+    "exactStandardJsonPublished": false,
+    "externalVettingRequiredBeforeCapitalActivation": true
+  },
+  "payload": {
+    "encoding": "abi.encode(ExecutionPermitV6,bytes signature)",
+    "permitAbiPath": "../abi/solver-facing.json#/contracts/NexaERC7683ModuleV6",
+    "permitSource": "POST /api/v6/execution-permits"
+  },
+  "resolvedBehavior": {
+    "preflight": "Router.previewFillDirect(permit,signature) must return valid=true",
+    "steps": 1,
+    "step": "Router.fillDirect(permit,signature)",
+    "variables": [
+      "PaymentRecipient",
+      "StepCaller(0)"
+    ],
+    "payment": "ERC20 destination payout from destination Vault",
+    "nativeAssetsSupported": false,
+    "namedAssumptions": [
+      "NexaPermitPayerIsStepCaller",
+      "NexaPermitRecipientIsPaymentRecipient"
+    ]
+  },
+  "onchainEvidence": {
+    "8453": {
+      "runtimeVerified": true,
+      "routerBindingVerified": true,
+      "explorer": "https://basescan.org/address/0x534A0f500A7270b9b19d2AFa18DE24DCE93eb522#code"
+    },
+    "56": {
+      "runtimeVerified": true,
+      "routerBindingVerified": true,
+      "explorer": "https://bscscan.com/address/0x534A0f500A7270b9b19d2AFa18DE24DCE93eb522#code"
+    },
+    "999": {
+      "runtimeVerified": true,
+      "routerBindingVerified": true,
+      "explorer": "https://hyperevmscan.io/address/0x534A0f500A7270b9b19d2AFa18DE24DCE93eb522#code"
+    }
+  },
+  "operatorChecklist": [
+    "PIN_RESOLVER_RUNTIME_HASH",
+    "PIN_ROUTER_BINDING",
+    "REVIEW_NAMED_ASSUMPTIONS",
+    "REJECT_NATIVE_ASSET_PAYLOADS",
+    "ETH_CALL_RESOLVE_BEFORE_ANY_CAPITAL_COMMITMENT",
+    "SIMULATE_RESOLVED_CALL",
+    "REQUIRE_VALID_SIGNED_EXECUTION_PERMIT",
+    "STAGE_CAPITAL_LIMITS_BEFORE_PRODUCTION"
+  ]
+}

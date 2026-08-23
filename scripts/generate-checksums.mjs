@@ -14,9 +14,12 @@ export const CHECKSUM_FILES = Object.freeze([
   "events/events.json",
   "networks/network-ids.json",
   "openapi/openapi.json",
+  "onboarding/README.md",
+  "onboarding/nexa-v6-solver-operator.json",
   "standards/standard-ids.json",
   "verification/NexaSolverDiscoveryV6.standard-input.json",
   "verification/explorer-ownership-signatures.json",
+  "verification/erc7683-resolver-vetting.json",
   "verification/facade-deployment.json",
   "verification/onchain-identity.json",
 ]);

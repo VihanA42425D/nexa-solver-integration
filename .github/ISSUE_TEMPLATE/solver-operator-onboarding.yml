@@ -1,0 +1,58 @@
+name: Solver operator onboarding
+description: Register an operator or aggregator integration with the Nexa V6 public surface.
+title: "[Operator onboarding]: "
+labels:
+  - integration
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use the public onboarding package and do not submit private keys, API secrets or seed phrases.
+  - type: input
+    id: operator
+    attributes:
+      label: Operator or aggregator
+      placeholder: Organization or project name
+    validations:
+      required: true
+  - type: input
+    id: public_contact
+    attributes:
+      label: Public technical contact
+      description: GitHub handle or public team contact; do not provide private credentials.
+    validations:
+      required: true
+  - type: checkboxes
+    id: chains
+    attributes:
+      label: Chains
+      options:
+        - label: Base (8453)
+        - label: BNB Smart Chain (56)
+        - label: HyperEVM (999)
+    validations:
+      required: true
+  - type: dropdown
+    id: ingestion
+    attributes:
+      label: Feed ingestion
+      options:
+        - SSE with HTTP recovery
+        - HTTP polling
+        - Evaluation only
+    validations:
+      required: true
+  - type: checkboxes
+    id: verification
+    attributes:
+      label: Verification checklist
+      options:
+        - label: Facade runtime and immutable bindings verified
+        - label: Feed signer and signature verification implemented
+        - label: ERC-7683 Resolver reviewed or queued for review
+        - label: Router preview required before source broadcast
+  - type: textarea
+    id: notes
+    attributes:
+      label: Adapter or rollout notes
+      description: Describe any protocol-specific adapter, staged rollout or audit requirement.

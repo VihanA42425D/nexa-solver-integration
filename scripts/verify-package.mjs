@@ -6,7 +6,7 @@ const output = execFileSync(npm, ["pack", "--dry-run", "--json", "--ignore-scrip
   shell: process.platform === "win32",
 });
 const [report] = JSON.parse(output);
-if (report.name !== "@nexa/solver-integration" || report.version !== "6.0.0") {
+if (report.name !== "@nexa/solver-integration" || report.version !== "6.0.1") {
   throw new Error("Public package identity mismatch");
 }
 const files = new Set(report.files.map(({ path }) => path.replaceAll("\\", "/")));
@@ -19,9 +19,12 @@ const required = [
   "events/events.json",
   "networks/network-ids.json",
   "openapi/openapi.json",
+  "onboarding/nexa-v6-solver-operator.json",
+  "scripts/verify-onboarding.mjs",
   "public/.well-known/nexa-solver.json",
   "standards/standard-ids.json",
   "verification/checksums.sha256",
+  "verification/erc7683-resolver-vetting.json",
   "verification/facade-deployment.json",
 ];
 for (const file of required) {

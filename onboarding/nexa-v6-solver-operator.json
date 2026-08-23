@@ -1,0 +1,150 @@
+{
+  "schema": "NEXA_V6_SOLVER_OPERATOR_ONBOARDING_V1",
+  "packageVersion": "6.0.1",
+  "protocol": "Nexa V6",
+  "protocolVersion": 6,
+  "environment": "mainnet",
+  "status": "ACTIVE",
+  "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
+  "chains": [
+    {
+      "slug": "base",
+      "name": "Base",
+      "chainId": 8453,
+      "networkId": "0x3d5484ad492110227dc184ab6abbeeccd54b127aa00bfc256fd8d8037a4e48c2",
+      "discoveryFacade": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+      "registry": "0x3db7752f052ACFECB3DA99BeE7c6a34D22367141",
+      "router": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+      "routeCountAtPublication": 108,
+      "onchainStatus": "ACTIVE",
+      "explorerVerification": "https://basescan.org/address/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6#code",
+      "sourcifyVerification": "https://repo.sourcify.dev/8453/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6"
+    },
+    {
+      "slug": "bsc",
+      "name": "BNB Smart Chain",
+      "chainId": 56,
+      "networkId": "0x5863eb850b94ec5a94a1653871dc308d32f4aec504d789f356419886170a0928",
+      "discoveryFacade": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+      "registry": "0x3db7752f052ACFECB3DA99BeE7c6a34D22367141",
+      "router": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+      "routeCountAtPublication": 126,
+      "onchainStatus": "ACTIVE",
+      "explorerVerification": "https://bscscan.com/address/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6#code",
+      "sourcifyVerification": "https://repo.sourcify.dev/56/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6"
+    },
+    {
+      "slug": "hyperevm",
+      "name": "HyperEVM",
+      "chainId": 999,
+      "networkId": "0x5587698f40d78ef64484dda8f2c78692af870cfe3926dbc61a73881680bd01c8",
+      "discoveryFacade": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+      "registry": "0x3db7752f052ACFECB3DA99BeE7c6a34D22367141",
+      "router": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+      "routeCountAtPublication": 108,
+      "onchainStatus": "ACTIVE",
+      "explorerVerification": "https://hyperevmscan.io/address/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6#code",
+      "sourcifyVerification": "https://repo.sourcify.dev/999/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6"
+    }
+  ],
+  "chainIds": [
+    8453,
+    56,
+    999
+  ],
+  "discoveryFacade": {
+    "address": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+    "sameAddressOnEveryChain": true,
+    "runtimeCodeHash": "0x57cb853a995215d352eb64ab9ec33aed60f4ef5f8a38575bc2dd018b38babfc1",
+    "discoveryURI": "https://solver.vsnexa.com/.well-known/nexa-solver.json"
+  },
+  "contracts": {
+    "registry": {
+      "address": "0x3db7752f052ACFECB3DA99BeE7c6a34D22367141",
+      "runtimeCodeHash": "0x5e766be0eb7a9b75f0b38c8509a15ac261209f06b0c993e8904a9f38633c790a"
+    },
+    "router": {
+      "address": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+      "runtimeCodeHash": "0xcdda1b571b317479c6d297aa4354c406d4709f83562e2b6b29bd0e1268e4af70"
+    },
+    "erc7683Resolver": {
+      "address": "0x534A0f500A7270b9b19d2AFa18DE24DCE93eb522",
+      "runtimeCodeHash": "0xea99f0e1e33a9a9e1ae926e8f15fd09bf1b7b9cecf81a2ef294cd4820e26d392",
+      "compatibilityLevel": "EXECUTABLE_RESOLVER",
+      "executable": true
+    },
+    "oifDiscoveryModule": {
+      "address": "0x4f81426fE8999E982aE6b771536a4093879F6A20",
+      "runtimeCodeHash": "0x103c954e71ec79abefc0f8e1ef745787649edb91742a4d4a7b0d2a4646925cba",
+      "compatibilityLevel": "DISCOVERY_DESCRIPTION_ONLY",
+      "executable": false
+    }
+  },
+  "endpoints": {
+    "discovery": "https://solver.vsnexa.com/.well-known/nexa-solver.json",
+    "solverDiscovery": "https://solver.vsnexa.com/api/v6/solver-discovery",
+    "feed": "https://solver.vsnexa.com/api/v6/solver-feed",
+    "sse": "https://solver.vsnexa.com/api/v6/solver-feed/events",
+    "routeDetailTemplate": "https://solver.vsnexa.com/api/v6/routes/{routeId}",
+    "permitRequestMessage": "https://solver.vsnexa.com/api/v6/execution-permits/request-message",
+    "permit": "https://solver.vsnexa.com/api/v6/execution-permits",
+    "permitStatusTemplate": "https://solver.vsnexa.com/api/v6/execution-permits/{fillId}"
+  },
+  "feedTrust": {
+    "schema": "NEXA_MAINNET_V6_SIGNED_FEED_V1",
+    "signer": "0xCbeC1dDeEA1f4317ce6eF6F33Ad46d1fFD81c163",
+    "signatureScheme": "EIP191_PERSONAL_SIGN_UTF8",
+    "verificationModule": "https://github.com/VihanA42425D/nexa-solver-integration/blob/main/src/feed-verification.mjs",
+    "reconnectWithLastEventId": true
+  },
+  "standards": {
+    "erc7683": {
+      "status": "EXECUTABLE_RESOLVER",
+      "resolver": "0x534A0f500A7270b9b19d2AFa18DE24DCE93eb522",
+      "resolutionMode": "ETH_CALL",
+      "vettingStatus": "READY_FOR_EXTERNAL_OPERATOR_REVIEW",
+      "vettingEvidence": "https://github.com/VihanA42425D/nexa-solver-integration/blob/main/verification/erc7683-resolver-vetting.json",
+      "abi": "https://github.com/VihanA42425D/nexa-solver-integration/blob/main/abi/solver-facing.json",
+      "example": "https://github.com/VihanA42425D/nexa-solver-integration/blob/main/examples/resolve-erc7683.mjs"
+    },
+    "oif": {
+      "status": "DISCOVERY_DESCRIPTION_ONLY",
+      "module": "0x4f81426fE8999E982aE6b771536a4093879F6A20",
+      "executable": false,
+      "adapterRequiredForExecution": true,
+      "example": "https://github.com/VihanA42425D/nexa-solver-integration/blob/main/examples/describe-oif-mandate.mjs"
+    }
+  },
+  "integration": {
+    "repository": "https://github.com/VihanA42425D/nexa-solver-integration",
+    "release": "https://github.com/VihanA42425D/nexa-solver-integration/releases/tag/v6.0.1",
+    "canonicalBundle": "https://github.com/VihanA42425D/nexa-solver-integration/blob/main/nexa-mainnet-v6.json",
+    "manifest": "https://github.com/VihanA42425D/nexa-solver-integration/blob/main/manifest.json",
+    "abi": "https://github.com/VihanA42425D/nexa-solver-integration/blob/main/abi/solver-facing.json",
+    "openapi": "https://github.com/VihanA42425D/nexa-solver-integration/blob/main/openapi/openapi.json",
+    "events": "https://github.com/VihanA42425D/nexa-solver-integration/blob/main/events/events.json",
+    "networkIds": "https://github.com/VihanA42425D/nexa-solver-integration/blob/main/networks/network-ids.json",
+    "verificationEvidence": "https://github.com/VihanA42425D/nexa-solver-integration/tree/main/verification",
+    "checksums": "https://github.com/VihanA42425D/nexa-solver-integration/blob/main/verification/checksums.sha256"
+  },
+  "zeroTouch": {
+    "bootstrapCommand": "npx --yes github:VihanA42425D/nexa-solver-integration#v6.0.1",
+    "localVerificationCommand": "npm run onboard:verify",
+    "sequence": [
+      "FETCH_AND_PIN_PACKAGE",
+      "VERIFY_CHECKSUMS",
+      "VERIFY_FACADE_RUNTIME_AND_BINDINGS",
+      "VERIFY_FEED_SIGNATURE",
+      "VET_ERC7683_RESOLVER",
+      "SUBSCRIBE_SSE_WITH_HTTP_RECOVERY",
+      "REQUEST_WALLET_SIGNED_EXECUTION_PERMIT",
+      "PREVIEW_ROUTER_FILL",
+      "EXECUTE_SOURCE_TRANSACTION",
+      "TRACK_DESTINATION_PAYOUT_TO_PAID"
+    ],
+    "requiresProtocolContractDeployment": false,
+    "operatorSecretsRequiredForDiscovery": false,
+    "operatorSignatureRequiredForDiscovery": false,
+    "operatorSignatureRequiredForPermit": true
+  }
+}

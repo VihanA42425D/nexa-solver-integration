@@ -146,6 +146,23 @@ test("only V6 public endpoint catalog is exported", () => {
   ]);
 });
 
+test("zero-touch operator package pins the canonical Facade, Resolver and transports", async () => {
+  const onboarding = JSON.parse(await readFile(
+    new URL("../onboarding/nexa-v6-solver-operator.json", import.meta.url),
+    "utf8",
+  ));
+  assert.equal(onboarding.protocol, "Nexa V6");
+  assert.equal(onboarding.status, "ACTIVE");
+  assert.deepEqual(onboarding.chainIds, [8453, 56, 999]);
+  assert.equal(onboarding.discoveryFacade.sameAddressOnEveryChain, true);
+  assert.equal(onboarding.discoveryFacade.address, "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6");
+  assert.equal(onboarding.contracts.erc7683Resolver.address, "0x534A0f500A7270b9b19d2AFa18DE24DCE93eb522");
+  assert.equal(onboarding.endpoints.feed, PUBLIC_ENDPOINTS.solverFeed);
+  assert.equal(onboarding.endpoints.sse, PUBLIC_ENDPOINTS.solverFeedEvents);
+  assert.equal(onboarding.standards.oif.executable, false);
+  assert.equal(onboarding.zeroTouch.requiresProtocolContractDeployment, false);
+});
+
 test("secret audit covers files outside src and examples", async (context) => {
   const repository = await mkdtemp(join(tmpdir(), "nexa-public-audit-"));
   context.after(() => rm(repository, { recursive: true, force: true }));

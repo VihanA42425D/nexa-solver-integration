@@ -23,6 +23,13 @@ Passive onchain fingerprint for scanners and indexers:
 https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json
 ```
 
+Authoritative OpenAPI and standards discovery:
+
+```text
+https://solver.vsnexa.com/openapi.json
+https://solver.vsnexa.com/.well-known/nexa-standards.json
+```
+
 ```bash
 npm install
 npm run discover
@@ -81,6 +88,8 @@ The [OpenAPI 3.1 document](openapi/openapi.json) covers:
 
 - `GET /.well-known/nexa-solver.json`
 - `GET /.well-known/nexa-onchain-discovery.json`
+- `GET /openapi.json`
+- `GET /.well-known/nexa-standards.json`
 - `GET /api/v6/solver-discovery`
 - `GET /api/v6/solver-feed`
 - `GET /api/v6/solver-feed/events`
@@ -90,6 +99,17 @@ The [OpenAPI 3.1 document](openapi/openapi.json) covers:
 - `GET /api/v6/execution-permits/{fillId}`
 
 Verify every Feed with the published signer and [src/feed-verification.mjs](src/feed-verification.mjs) before selecting a Route.
+`signedPayload` is the cryptographically authoritative object authenticated by
+`feedHash`, `feedSigner` and `feedSignature`; filtered top-level `routes` and
+`openRoutes` are convenience views and must never replace it as the signature
+preimage. Route Detail returns the exact canonical active Feed route, while
+operational metrics remain separate and non-authoritative.
+
+SSE event IDs are Feed `dataVersion` values. A missing, invalid or older
+`Last-Event-ID` receives the current confirmed Feed immediately; an ID equal to
+the current `dataVersion` suppresses only that duplicate initial event. The
+stream publishes `feed`, `publication-closed` and `error` events through the
+runtime's existing LISTEN/NOTIFY path, without replay storage or polling.
 
 ## Frozen SDK contract
 
@@ -119,8 +139,10 @@ Maven Central artifacts are signed with OpenPGP fingerprint
 
 ## Standards and examples
 
-- ERC-7683: executable, resolver-centric `eth_call` integration. Run `npm run resolve:erc7683`.
-- OIF: discovery/description compatibility only; it deliberately exposes no execution resolver. Run `npm run describe:oif`.
+- [Standards manifest](standards/nexa-standards.json): canonical deployed identities, selectors, interface IDs, router bindings and resolution semantics.
+- [Deterministic standards vectors](standards/test-vectors.json): canonical public SDK Permit projected into ERC-7683 and OIF ABI vectors.
+- ERC-7683: executable, resolver-centric off-chain `eth_call` integration. `resolve(bytes)` returns exactly one `Call` targeting the canonical Router `fillDirect`; it introduces no second source transaction. Run `npm run resolve:erc7683`.
+- OIF: `DISCOVERY_DESCRIPTION_ONLY` with `executable = false`; `resolveExecution(bytes)` remains unsupported with `OIFExecutionUnsupported()`. Run `npm run describe:oif`.
 - Direct Nexa execution: request a signed execution Permit, preview `Router.fillDirect`, then submit the source transaction.
 
 Examples never require a private key to be committed. Signing stays in the integrating wallet or bot.
@@ -145,10 +167,14 @@ other EVM wallets with bridge routing.
 | [manifest.json](manifest.json) | final ACTIVE artifact index |
 | [nexa-mainnet-v6.json](nexa-mainnet-v6.json) | canonical public integration bundle |
 | [public/.well-known/nexa-onchain-discovery.json](public/.well-known/nexa-onchain-discovery.json) | passive onchain selectors, events, CREATE2 and Sourcify fingerprint |
+| [public/.well-known/nexa-standards.json](public/.well-known/nexa-standards.json) | stable HTTP projection of canonical ERC-7683/OIF metadata |
+| [openapi/openapi.json](openapi/openapi.json) | generated, fully typed OpenAPI 3.1 solver surface |
 | [onboarding/nexa-v6-solver-operator.json](onboarding/nexa-v6-solver-operator.json) | fixed Solver/Aggregator onboarding record |
 | [abi/solver-facing.json](abi/solver-facing.json) | Facade, Registry, Router and module ABI |
 | [networks/network-ids.json](networks/network-ids.json) | chain and Nexa network identities |
 | [standards/standard-ids.json](standards/standard-ids.json) | ERC-7683 and OIF compatibility |
+| [standards/nexa-standards.json](standards/nexa-standards.json) | canonical standards machine manifest |
+| [standards/test-vectors.json](standards/test-vectors.json) | deterministic ERC-7683 and OIF vectors |
 | [events/events.json](events/events.json) | onchain Fill event signature and topic |
 | [verification](verification) | source, deployment, identity, signature and checksums |
 | [examples](examples) | discovery, Permit, Facade and resolution clients |
@@ -161,6 +187,8 @@ other EVM wallets with bridge routing.
 ```bash
 npm run generate:solver-manifest
 npm run generate:onchain-discovery
+npm run generate:standards
+npm run generate:standard-vectors
 npm run generate:abi
 npm run generate:openapi
 npm run generate:onboarding

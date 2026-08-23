@@ -20,10 +20,22 @@ const provider = new JsonRpcProvider(rpcByNetwork[networkName], surface.network.
 });
 try {
   const resolver = new Contract(definition.address, definition.abi, provider);
-  const order = await resolver.resolve(payload);
+  // Explicit eth_call: no signer, transaction, gas payment or state change.
+  const order = await resolver.resolve.staticCall(payload);
+  if (order.steps.length !== 1) {
+    throw new Error("NEXA_ERC7683_RESOLUTION_MUST_CONTAIN_EXACTLY_ONE_CALL");
+  }
   console.log(JSON.stringify({
     module: definition.address,
     standardId: definition.standardId,
+    transport: "eth_call",
+    transactionCount: 0,
+    sourceExecution: {
+      callCount: 1,
+      target: surface.integration.contracts.NexaMainnetRouterV6.address,
+      function: "fillDirect",
+      sourceTransactionCount: 1,
+    },
     steps: [...order.steps],
     variables: [...order.variables],
     payments: [...order.payments],

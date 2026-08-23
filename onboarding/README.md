@@ -10,6 +10,8 @@ Chains: 8453 / 56 / 999
 DiscoveryFacade: 0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6
 DiscoveryURI: https://solver.vsnexa.com/.well-known/nexa-solver.json
 OnchainDiscovery: https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json
+OpenAPI: https://solver.vsnexa.com/openapi.json
+Standards: https://solver.vsnexa.com/.well-known/nexa-standards.json
 ERC7683Resolver: 0x534A0f500A7270b9b19d2AFa18DE24DCE93eb522
 Feed: https://solver.vsnexa.com/api/v6/solver-feed
 SSE: https://solver.vsnexa.com/api/v6/solver-feed/events
@@ -40,6 +42,7 @@ Discovery and Feed reading need no Nexa credential or wallet signature. Executio
 ## Compatibility boundaries
 
 - ERC-7683 is executable through resolver-centric `eth_call` resolution.
+- ERC-7683 resolution produces exactly one source `Router.fillDirect` Call and does not add a transaction.
 - OIF is discovery-description compatible only. The published OIF module is intentionally non-executable; an ecosystem-specific adapter is required before execution.
 - Nexa does not require an integrating operator to deploy a new protocol contract.
 

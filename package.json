@@ -1,6 +1,6 @@
 {
   "name": "@nexa/solver-integration",
-  "version": "6.2.0",
+  "version": "6.3.0",
   "description": "Public Nexa V6 Solver discovery and execution integration surface for intra-chain and cross-chain opportunities.",
   "type": "module",
   "private": false,
@@ -77,6 +77,8 @@
     "generate:abi": "node scripts/generate-abi.mjs",
     "generate:solver-manifest": "node scripts/generate-nexa-solver-manifest.mjs",
     "generate:onchain-discovery": "node scripts/generate-onchain-discovery.mjs",
+    "generate:standards": "node scripts/generate-standards-manifest.mjs",
+    "generate:standard-vectors": "node scripts/generate-standard-vectors.mjs",
     "generate:checksums": "node scripts/generate-checksums.mjs",
     "generate:openapi": "node scripts/generate-openapi.mjs",
     "generate:onboarding": "node scripts/generate-onboarding-package.mjs",
@@ -125,6 +127,8 @@
     "./networks": "./networks/network-ids.json",
     "./onboarding": "./onboarding/nexa-v6-solver-operator.json",
     "./openapi": "./openapi/openapi.json",
+    "./standards": "./standards/nexa-standards.json",
+    "./standards/test-vectors": "./standards/test-vectors.json",
     "./standards/standard-ids.json": "./standards/standard-ids.json",
     "./verification": "./verification/facade-deployment.json"
     ,"./sdk-contract": "./sdk-spec/nexa-v6-sdk-contract.json"

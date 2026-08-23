@@ -69,6 +69,41 @@
         "permitNonce",
         "executionGeneration"
       ],
+      "indexedFields": [
+        {
+          "name": "fillId",
+          "type": "bytes32",
+          "topicPosition": 1
+        },
+        {
+          "name": "routeId",
+          "type": "bytes32",
+          "topicPosition": 2
+        },
+        {
+          "name": "quoteId",
+          "type": "bytes32",
+          "topicPosition": 3
+        }
+      ],
+      "indexedTopicPositions": {
+        "fillId": 1,
+        "routeId": 2,
+        "quoteId": 3
+      },
+      "nonIndexed": [
+        "payer",
+        "recipient",
+        "sourceAsset",
+        "destinationAsset",
+        "destinationChainId",
+        "amountInRaw",
+        "amountOutRaw",
+        "sourceFinalityBlocks",
+        "settlementDeadline",
+        "permitNonce",
+        "executionGeneration"
+      ],
       "discoveryMapping": {
         "router": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
         "facade": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
@@ -79,6 +114,11 @@
   "erc7683": {
     "resolver": "0x534A0f500A7270b9b19d2AFa18DE24DCE93eb522",
     "sameAddressAcrossChains": true,
+    "chains": [
+      8453,
+      56,
+      999
+    ],
     "runtimeCodeHash": "0xea99f0e1e33a9a9e1ae926e8f15fd09bf1b7b9cecf81a2ef294cd4820e26d392",
     "router": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
     "standardId": "0x27ecffeeec898dbaf864fc095016ad6212d7a27e32a3069234a4a1da23f50993",
@@ -88,6 +128,13 @@
       "resolve": "0xe4056186",
       "resolveExecution": "0xe55814c5",
       "router": "0xf887ea40"
+    },
+    "selectorSignatures": {
+      "standardId": "standardId()",
+      "supportsInterface": "supportsInterface(bytes4)",
+      "resolve": "resolve(bytes)",
+      "resolveExecution": "resolveExecution(bytes)",
+      "router": "router()"
     },
     "erc165": {
       "supported": true,
@@ -105,14 +152,51 @@
   "oif": {
     "module": "0x4f81426fE8999E982aE6b771536a4093879F6A20",
     "sameAddressAcrossChains": true,
+    "chains": [
+      8453,
+      56,
+      999
+    ],
     "runtimeCodeHash": "0x103c954e71ec79abefc0f8e1ef745787649edb91742a4d4a7b0d2a4646925cba",
-    "standardId": "0x3de00a2eccd5b86df839b3747bda483b2de2a855d640eb3d4938d6d43cb162c0"
+    "router": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+    "standardId": "0x3de00a2eccd5b86df839b3747bda483b2de2a855d640eb3d4938d6d43cb162c0",
+    "compatibilityLevel": "0x733ae58d730378b55d837e45d20e05882481ab7715890fd971ee75f1cd63643c",
+    "compatibilityLevelName": "DISCOVERY_DESCRIPTION_ONLY",
+    "executable": false,
+    "selectors": {
+      "standardId": "0x6838c23c",
+      "supportsInterface": "0x01ffc9a7",
+      "resolveExecution": "0xe55814c5",
+      "router": "0xf887ea40",
+      "compatibilityLevel": "0x4658e14b",
+      "describeMandate": "0xd3528a0f"
+    },
+    "selectorSignatures": {
+      "standardId": "standardId()",
+      "supportsInterface": "supportsInterface(bytes4)",
+      "resolveExecution": "resolveExecution(bytes)",
+      "router": "router()",
+      "compatibilityLevel": "compatibilityLevel()",
+      "describeMandate": "describeMandate(bytes)"
+    },
+    "erc165": {
+      "supported": true,
+      "erc165InterfaceId": "0x01ffc9a7",
+      "nexaStandardModuleV6InterfaceId": "0x8d60d6f9"
+    }
   },
   "deployment": {
     "method": "CREATE2",
     "factory": "0x4e59b44847b379578588920cA78FbF26c0B4956C",
     "salt": "0x8d4a8973d84d481496121b1cd41925837c86b37186da92debcebba1e96f79372",
     "initCodeHash": "0xbdf7fc63e9d23151249eaf7a7efa2433a0466e498e0cc6d884b50bed26f9e534",
+    "expectedFacadeAddress": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+    "supportedChainIds": [
+      8453,
+      56,
+      999
+    ],
+    "sameAddressAcrossChains": true,
     "compiler": "0.8.26+commit.8a97fa7a.Emscripten.clang",
     "standardJsonInputHash": "0xdf265c811f70686d74a717f60d51d20747ac4529e30f0f7d33b08a0b01f357e7",
     "blocks": {
@@ -173,5 +257,500 @@
     "ERC-7683 standardId -> Resolver.router -> Facade -> discoveryURI -> signed Feed",
     "Sourcify chain enumeration -> Facade ABI -> discoveryURI -> signed Feed",
     "Facade found on one chain -> same-address probe on chains 8453/56/999"
-  ]
+  ],
+  "scannerHints": {
+    "schema": "NEXA_MAINNET_V6_SCANNER_HINTS_V1",
+    "generatedFrom": "CANONICAL_ONCHAIN_DISCOVERY_FINGERPRINT",
+    "protocol": "Nexa V6",
+    "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
+    "deploymentVersion": 6,
+    "status": "ACTIVE",
+    "supportedChainIds": [
+      8453,
+      56,
+      999
+    ],
+    "sameAddressAcrossChains": true,
+    "contracts": {
+      "facade": {
+        "name": "NexaSolverDiscoveryV6",
+        "role": "ONCHAIN_DISCOVERY_FACADE",
+        "address": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+        "expectedRuntimeCodeHash": "0x57cb853a995215d352eb64ab9ec33aed60f4ef5f8a38575bc2dd018b38babfc1",
+        "supportedChainIds": [
+          8453,
+          56,
+          999
+        ],
+        "sameAddressAcrossChains": true
+      },
+      "registry": {
+        "name": "NexaMainnetRegistryV6",
+        "role": "ROUTE_REGISTRY",
+        "address": "0x3db7752f052ACFECB3DA99BeE7c6a34D22367141",
+        "expectedRuntimeCodeHash": "0x5e766be0eb7a9b75f0b38c8509a15ac261209f06b0c993e8904a9f38633c790a",
+        "supportedChainIds": [
+          8453,
+          56,
+          999
+        ],
+        "sameAddressAcrossChains": true
+      },
+      "router": {
+        "name": "NexaMainnetRouterV6",
+        "role": "SOURCE_FILL_ROUTER",
+        "address": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+        "expectedRuntimeCodeHash": "0xcdda1b571b317479c6d297aa4354c406d4709f83562e2b6b29bd0e1268e4af70",
+        "supportedChainIds": [
+          8453,
+          56,
+          999
+        ],
+        "sameAddressAcrossChains": true
+      },
+      "erc7683Resolver": {
+        "name": "NexaERC7683ModuleV6",
+        "role": "ERC_7683_RESOLVER",
+        "address": "0x534A0f500A7270b9b19d2AFa18DE24DCE93eb522",
+        "expectedRuntimeCodeHash": "0xea99f0e1e33a9a9e1ae926e8f15fd09bf1b7b9cecf81a2ef294cd4820e26d392",
+        "supportedChainIds": [
+          8453,
+          56,
+          999
+        ],
+        "sameAddressAcrossChains": true
+      },
+      "oifModule": {
+        "name": "NexaOIFModuleV6",
+        "role": "OIF_DESCRIPTION_MODULE",
+        "address": "0x4f81426fE8999E982aE6b771536a4093879F6A20",
+        "expectedRuntimeCodeHash": "0x103c954e71ec79abefc0f8e1ef745787649edb91742a4d4a7b0d2a4646925cba",
+        "supportedChainIds": [
+          8453,
+          56,
+          999
+        ],
+        "sameAddressAcrossChains": true
+      }
+    },
+    "probe": {
+      "mode": "EXTERNAL_SCANNER_READ_ONLY",
+      "externalScannerOnly": true,
+      "executedByNexa": false,
+      "performsWrites": false,
+      "pollingRequired": false,
+      "methods": {
+        "discoveryURI": {
+          "contract": "facade",
+          "address": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+          "signature": "discoveryURI()",
+          "selector": "0x5b9b12c1",
+          "stateMutability": "pure",
+          "returns": [
+            {
+              "name": "uri",
+              "type": "string"
+            }
+          ]
+        },
+        "isLive": {
+          "contract": "facade",
+          "address": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+          "signature": "isLive()",
+          "selector": "0xb8f7a665",
+          "stateMutability": "view",
+          "returns": [
+            {
+              "name": "live",
+              "type": "bool"
+            }
+          ]
+        },
+        "systemState": {
+          "contract": "facade",
+          "address": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+          "signature": "systemState()",
+          "selector": "0x991292e3",
+          "stateMutability": "view",
+          "returns": [
+            {
+              "name": "currentChainId",
+              "type": "uint256"
+            },
+            {
+              "name": "release",
+              "type": "bytes32"
+            },
+            {
+              "name": "publicRegistry",
+              "type": "address"
+            },
+            {
+              "name": "publicRouter",
+              "type": "address"
+            },
+            {
+              "name": "discoverableRouteCount",
+              "type": "uint256"
+            },
+            {
+              "name": "live",
+              "type": "bool"
+            }
+          ]
+        },
+        "routeCount": {
+          "contract": "facade",
+          "address": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+          "signature": "routeCount()",
+          "selector": "0xbf539cb4",
+          "stateMutability": "view",
+          "returns": [
+            {
+              "name": "discoverableRouteCount",
+              "type": "uint256"
+            }
+          ]
+        }
+      },
+      "steps": [
+        {
+          "order": 1,
+          "id": "facade-code-present",
+          "required": true,
+          "transport": "JSON_RPC",
+          "rpcMethod": "eth_getCode",
+          "address": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+          "supportedChainIds": [
+            8453,
+            56,
+            999
+          ],
+          "expected": {
+            "nonEmptyRuntimeCode": true
+          }
+        },
+        {
+          "order": 2,
+          "id": "facade-runtime-code-hash",
+          "required": true,
+          "operation": "KECCAK256_RUNTIME_CODE",
+          "inputFromStep": "facade-code-present",
+          "expected": {
+            "equals": "0x57cb853a995215d352eb64ab9ec33aed60f4ef5f8a38575bc2dd018b38babfc1"
+          }
+        },
+        {
+          "order": 3,
+          "id": "facade-discovery-uri",
+          "required": true,
+          "transport": "JSON_RPC",
+          "rpcMethod": "eth_call",
+          "call": {
+            "contract": "facade",
+            "address": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+            "signature": "discoveryURI()",
+            "selector": "0x5b9b12c1",
+            "stateMutability": "pure",
+            "returns": [
+              {
+                "name": "uri",
+                "type": "string"
+              }
+            ]
+          },
+          "expected": {
+            "equals": "https://solver.vsnexa.com/.well-known/nexa-solver.json"
+          }
+        },
+        {
+          "order": 4,
+          "id": "facade-live-status",
+          "required": true,
+          "transport": "JSON_RPC",
+          "rpcMethod": "eth_call",
+          "call": {
+            "contract": "facade",
+            "address": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+            "signature": "isLive()",
+            "selector": "0xb8f7a665",
+            "stateMutability": "view",
+            "returns": [
+              {
+                "name": "live",
+                "type": "bool"
+              }
+            ]
+          },
+          "expected": {
+            "equals": true
+          }
+        },
+        {
+          "order": 5,
+          "id": "facade-system-state",
+          "required": true,
+          "transport": "JSON_RPC",
+          "rpcMethod": "eth_call",
+          "call": {
+            "contract": "facade",
+            "address": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+            "signature": "systemState()",
+            "selector": "0x991292e3",
+            "stateMutability": "view",
+            "returns": [
+              {
+                "name": "currentChainId",
+                "type": "uint256"
+              },
+              {
+                "name": "release",
+                "type": "bytes32"
+              },
+              {
+                "name": "publicRegistry",
+                "type": "address"
+              },
+              {
+                "name": "publicRouter",
+                "type": "address"
+              },
+              {
+                "name": "discoverableRouteCount",
+                "type": "uint256"
+              },
+              {
+                "name": "live",
+                "type": "bool"
+              }
+            ]
+          },
+          "expected": {
+            "currentChainId": "CHAIN_BEING_PROBED",
+            "release": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
+            "publicRegistry": "0x3db7752f052ACFECB3DA99BeE7c6a34D22367141",
+            "publicRouter": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+            "discoverableRouteCount": {
+              "comparison": "GREATER_THAN",
+              "value": "0"
+            },
+            "live": true
+          }
+        },
+        {
+          "order": 6,
+          "id": "facade-route-count",
+          "required": true,
+          "transport": "JSON_RPC",
+          "rpcMethod": "eth_call",
+          "call": {
+            "contract": "facade",
+            "address": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+            "signature": "routeCount()",
+            "selector": "0xbf539cb4",
+            "stateMutability": "view",
+            "returns": [
+              {
+                "name": "discoverableRouteCount",
+                "type": "uint256"
+              }
+            ]
+          },
+          "expected": {
+            "comparison": "GREATER_THAN",
+            "value": "0"
+          }
+        },
+        {
+          "order": 7,
+          "id": "same-facade-address-on-all-supported-chains",
+          "required": true,
+          "transport": "JSON_RPC",
+          "rpcMethod": "eth_getCode",
+          "address": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+          "supportedChainIds": [
+            8453,
+            56,
+            999
+          ],
+          "expected": {
+            "sameAddressAcrossChains": true,
+            "runtimeCodeHashOnEveryChain": "0x57cb853a995215d352eb64ab9ec33aed60f4ef5f8a38575bc2dd018b38babfc1"
+          }
+        },
+        {
+          "order": 8,
+          "id": "source-fill-router-event",
+          "required": false,
+          "optional": true,
+          "transport": "JSON_RPC",
+          "rpcMethod": "eth_getLogs",
+          "address": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+          "supportedChainIds": [
+            8453,
+            56,
+            999
+          ],
+          "topics": [
+            "0x77d880254b141dedc64867f6d2d253eedfc609837b892c4ddfe154a43ea80561"
+          ],
+          "expected": {
+            "emittingContract": "NexaMainnetRouterV6"
+          }
+        },
+        {
+          "order": 9,
+          "id": "follow-canonical-solver-discovery-uri",
+          "required": true,
+          "transport": "HTTPS",
+          "method": "GET",
+          "uriFromStep": "facade-discovery-uri",
+          "expected": {
+            "uri": "https://solver.vsnexa.com/.well-known/nexa-solver.json"
+          }
+        }
+      ]
+    },
+    "eventDiscovery": {
+      "SourceFillV6": {
+        "emittingContract": "NexaMainnetRouterV6",
+        "address": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+        "supportedChainIds": [
+          8453,
+          56,
+          999
+        ],
+        "signature": "SourceFillV6(bytes32,bytes32,bytes32,address,address,address,address,uint256,uint128,uint128,uint32,uint64,bytes32,bytes32)",
+        "topic0": "0x77d880254b141dedc64867f6d2d253eedfc609837b892c4ddfe154a43ea80561",
+        "indexedFields": [
+          {
+            "name": "fillId",
+            "type": "bytes32",
+            "topicPosition": 1
+          },
+          {
+            "name": "routeId",
+            "type": "bytes32",
+            "topicPosition": 2
+          },
+          {
+            "name": "quoteId",
+            "type": "bytes32",
+            "topicPosition": 3
+          }
+        ],
+        "indexedTopicPositions": {
+          "fillId": 1,
+          "routeId": 2,
+          "quoteId": 3
+        },
+        "nonIndexedFields": [
+          "payer",
+          "recipient",
+          "sourceAsset",
+          "destinationAsset",
+          "destinationChainId",
+          "amountInRaw",
+          "amountOutRaw",
+          "sourceFinalityBlocks",
+          "settlementDeadline",
+          "permitNonce",
+          "executionGeneration"
+        ],
+        "discoveryMapping": {
+          "router": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+          "facade": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+          "discoveryURI": "https://solver.vsnexa.com/.well-known/nexa-solver.json"
+        }
+      }
+    },
+    "deterministicDeployment": {
+      "method": "CREATE2",
+      "factory": "0x4e59b44847b379578588920cA78FbF26c0B4956C",
+      "salt": "0x8d4a8973d84d481496121b1cd41925837c86b37186da92debcebba1e96f79372",
+      "initCodeHash": "0xbdf7fc63e9d23151249eaf7a7efa2433a0466e498e0cc6d884b50bed26f9e534",
+      "expectedFacadeAddress": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+      "supportedChainIds": [
+        8453,
+        56,
+        999
+      ],
+      "deploymentBlocks": {
+        "56": 117488361,
+        "999": 43894134,
+        "8453": 50320644
+      },
+      "deploymentTransactions": {
+        "56": "0x416cf6de4552414be42fd5a1a9e75fdf2c9c0466c64fda6e1e66bb1aa8fbf1c8",
+        "999": "0x504b9d54c686248d98a7b610c41de76f7c8077e8f592546dbd063c1b52ae3617",
+        "8453": "0x334767284d7041afb92f807a8a762f16ce6dd3e9af1b95f2231c5f79e1de9cc4"
+      },
+      "sameAddressAcrossChains": true
+    },
+    "standards": {
+      "erc7683": {
+        "resolver": "0x534A0f500A7270b9b19d2AFa18DE24DCE93eb522",
+        "supportedChainIds": [
+          8453,
+          56,
+          999
+        ],
+        "standardId": "0x27ecffeeec898dbaf864fc095016ad6212d7a27e32a3069234a4a1da23f50993",
+        "erc165InterfaceIds": [
+          "0x01ffc9a7",
+          "0x8d60d6f9"
+        ],
+        "selectors": {
+          "standardId": "0x6838c23c",
+          "supportsInterface": "0x01ffc9a7",
+          "resolve": "0xe4056186",
+          "resolveExecution": "0xe55814c5",
+          "router": "0xf887ea40"
+        },
+        "selectorSignatures": {
+          "standardId": "standardId()",
+          "supportsInterface": "supportsInterface(bytes4)",
+          "resolve": "resolve(bytes)",
+          "resolveExecution": "resolveExecution(bytes)",
+          "router": "router()"
+        },
+        "router": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+        "expectedRuntimeCodeHash": "0xea99f0e1e33a9a9e1ae926e8f15fd09bf1b7b9cecf81a2ef294cd4820e26d392"
+      },
+      "oif": {
+        "module": "0x4f81426fE8999E982aE6b771536a4093879F6A20",
+        "supportedChainIds": [
+          8453,
+          56,
+          999
+        ],
+        "standardId": "0x3de00a2eccd5b86df839b3747bda483b2de2a855d640eb3d4938d6d43cb162c0",
+        "compatibilityLevel": "0x733ae58d730378b55d837e45d20e05882481ab7715890fd971ee75f1cd63643c",
+        "compatibilityLevelName": "DISCOVERY_DESCRIPTION_ONLY",
+        "executable": false,
+        "erc165InterfaceIds": [
+          "0x01ffc9a7",
+          "0x8d60d6f9"
+        ],
+        "selectors": {
+          "standardId": "0x6838c23c",
+          "supportsInterface": "0x01ffc9a7",
+          "resolveExecution": "0xe55814c5",
+          "router": "0xf887ea40",
+          "compatibilityLevel": "0x4658e14b",
+          "describeMandate": "0xd3528a0f"
+        },
+        "selectorSignatures": {
+          "standardId": "standardId()",
+          "supportsInterface": "supportsInterface(bytes4)",
+          "resolveExecution": "resolveExecution(bytes)",
+          "router": "router()",
+          "compatibilityLevel": "compatibilityLevel()",
+          "describeMandate": "describeMandate(bytes)"
+        },
+        "router": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+        "expectedRuntimeCodeHash": "0x103c954e71ec79abefc0f8e1ef745787649edb91742a4d4a7b0d2a4646925cba"
+      }
+    }
+  }
 }

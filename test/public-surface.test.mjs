@@ -164,6 +164,8 @@ test("only V6 public endpoint catalog is exported", () => {
   assert.deepEqual(Object.values(PUBLIC_ENDPOINTS), [
     "https://solver.vsnexa.com/.well-known/nexa-solver.json",
     "https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json",
+    "https://solver.vsnexa.com/openapi.json",
+    "https://solver.vsnexa.com/.well-known/nexa-standards.json",
     "https://solver.vsnexa.com/api/v6/solver-discovery",
     "https://solver.vsnexa.com/api/v6/solver-feed",
     "https://solver.vsnexa.com/api/v6/solver-feed/events",

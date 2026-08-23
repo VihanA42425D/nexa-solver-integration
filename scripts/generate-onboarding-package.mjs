@@ -73,6 +73,8 @@ export async function buildOnboardingPackage(repositoryRoot = root) {
     endpoints: {
       discovery: integration.discovery.endpoints.manifest,
       onchainDiscovery: integration.discovery.endpoints.onchainDiscovery,
+      openapi: integration.discovery.endpoints.openapi,
+      standards: integration.discovery.endpoints.standards,
       solverDiscovery: integration.discovery.endpoints.solverDiscovery,
       feed: integration.discovery.endpoints.solverFeed,
       sse: integration.discovery.endpoints.solverFeedEvents,
@@ -116,6 +118,8 @@ export async function buildOnboardingPackage(repositoryRoot = root) {
       onchainDiscovery: `${REPOSITORY}/blob/main/public/.well-known/nexa-onchain-discovery.json`,
       abi: `${REPOSITORY}/blob/main/abi/solver-facing.json`,
       openapi: `${REPOSITORY}/blob/main/openapi/openapi.json`,
+      standardsManifest: `${REPOSITORY}/blob/main/standards/nexa-standards.json`,
+      standardTestVectors: `${REPOSITORY}/blob/main/standards/test-vectors.json`,
       events: `${REPOSITORY}/blob/main/events/events.json`,
       networkIds: `${REPOSITORY}/blob/main/networks/network-ids.json`,
       verificationEvidence: `${REPOSITORY}/tree/main/verification`,

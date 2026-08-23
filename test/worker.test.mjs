@@ -40,6 +40,8 @@ test("Worker proxies only the public route allowlist with public CORS", async ()
   for (const url of [
     PUBLIC_ENDPOINTS.manifest,
     PUBLIC_ENDPOINTS.onchainDiscovery,
+    PUBLIC_ENDPOINTS.openapi,
+    PUBLIC_ENDPOINTS.standards,
     PUBLIC_ENDPOINTS.solverDiscovery,
     PUBLIC_ENDPOINTS.solverFeed,
     PUBLIC_ENDPOINTS.routeDetailTemplate.replace("{routeId}", "0x" + "11".repeat(32)),
@@ -50,7 +52,7 @@ test("Worker proxies only the public route allowlist with public CORS", async ()
     assert.equal(response.headers.get("access-control-allow-origin"), "*");
     assert.equal(response.headers.has("set-cookie"), false);
   }
-  assert.equal(upstream.length, 6);
+  assert.equal(upstream.length, 8);
   assert.equal(new URL(upstream[0].url).pathname, PUBLIC_PATHS.manifest);
 
   for (const path of ["/", "/api/unsupported/solver-feed", "/api/v6/not-allowed", "/manifest.json"]) {

@@ -25,11 +25,24 @@ export function isActiveV6Bundle(bundle) {
 }
 
 export async function loadPublicSurface(networkName = null, options = {}) {
-  const [manifest, integration, standards, events, networkIds, abi, verification, openapi,
-    onchainDiscovery] = await Promise.all([
+  const [
+    manifest,
+    integration,
+    standards,
+    standardsManifest,
+    standardVectors,
+    events,
+    networkIds,
+    abi,
+    verification,
+    openapi,
+    onchainDiscovery,
+  ] = await Promise.all([
     readJson("manifest.json"),
     readJson("nexa-mainnet-v6.json"),
     readJson("standards/standard-ids.json"),
+    readJson("standards/nexa-standards.json"),
+    readJson("standards/test-vectors.json"),
     readJson("events/events.json"),
     readJson("networks/network-ids.json"),
     readJson("abi/solver-facing.json"),
@@ -49,6 +62,8 @@ export async function loadPublicSurface(networkName = null, options = {}) {
     manifest,
     integration,
     standards,
+    standardsManifest,
+    standardVectors,
     events,
     networkIds,
     abi,

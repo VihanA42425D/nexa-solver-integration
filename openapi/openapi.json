@@ -1,42 +1,60 @@
 {
   "openapi": "3.1.0",
+  "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
   "info": {
-    "title": "Nexa Mainnet V6 Solver API",
-    "version": "6.0.0",
-    "description": "Public discovery, signed Feed, SSE, Route and execution Permit API."
+    "title": "Nexa V6 Solver Integration API",
+    "version": "6.3.0",
+    "description": "Machine-readable Nexa V6 discovery, signed active-set feed, route detail, and execution-permit surface. Static discovery endpoints perform no database, RPC, timer, or transaction work."
   },
   "servers": [
     {
       "url": "https://solver.vsnexa.com"
     }
   ],
+  "tags": [
+    {
+      "name": "Discovery"
+    },
+    {
+      "name": "Feed"
+    },
+    {
+      "name": "Routes"
+    },
+    {
+      "name": "Permits"
+    }
+  ],
   "paths": {
     "/.well-known/nexa-solver.json": {
       "get": {
-        "operationId": "getWellKnownDiscovery",
+        "tags": [
+          "Discovery"
+        ],
+        "operationId": "getSolverManifest",
         "responses": {
           "200": {
-            "description": "Successful response.",
+            "description": "Canonical Solver discovery manifest.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Discovery"
+                  "$ref": "#/components/schemas/SolverDiscovery"
                 }
               }
             }
-          },
-          "default": {
-            "$ref": "#/components/responses/Error"
           }
         }
       }
     },
     "/.well-known/nexa-onchain-discovery.json": {
       "get": {
-        "operationId": "getOnchainDiscoveryFingerprint",
+        "tags": [
+          "Discovery"
+        ],
+        "operationId": "getOnchainDiscovery",
         "responses": {
           "200": {
-            "description": "Successful response.",
+            "description": "Passive onchain fingerprint and scanner hints.",
             "content": {
               "application/json": {
                 "schema": {
@@ -44,39 +62,126 @@
                 }
               }
             }
-          },
-          "default": {
-            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/openapi.json": {
+      "get": {
+        "tags": [
+          "Discovery"
+        ],
+        "operationId": "getOpenApi",
+        "responses": {
+          "200": {
+            "description": "This OpenAPI 3.1 document.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "openapi",
+                    "info",
+                    "paths",
+                    "components"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/.well-known/nexa-standards.json": {
+      "get": {
+        "tags": [
+          "Discovery"
+        ],
+        "operationId": "getStandardsManifest",
+        "responses": {
+          "200": {
+            "description": "ERC-7683 and OIF machine integration metadata.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardsManifest"
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/v6/solver-discovery": {
       "get": {
+        "tags": [
+          "Discovery"
+        ],
         "operationId": "getSolverDiscovery",
         "responses": {
           "200": {
-            "description": "Successful response.",
+            "description": "Canonical Solver discovery manifest.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Discovery"
+                  "$ref": "#/components/schemas/SolverDiscovery"
                 }
               }
             }
           },
-          "default": {
-            "$ref": "#/components/responses/Error"
+          "500": {
+            "description": "Internal runtime error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Publication surface closed or required authority unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/v6/solver-feed": {
       "get": {
-        "operationId": "getSignedSolverFeed",
+        "tags": [
+          "Feed"
+        ],
+        "operationId": "getSolverFeed",
+        "parameters": [
+          {
+            "name": "sourceChainId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*$"
+            }
+          },
+          {
+            "name": "sourceNetworkId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^0x[0-9a-fA-F]{64}$",
+              "description": "32-byte hexadecimal value."
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Successful response.",
+            "description": "Signed active-set feed. Verify signedPayload, never a filtered route view.",
             "content": {
               "application/json": {
                 "schema": {
@@ -85,55 +190,132 @@
               }
             }
           },
-          "default": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "parameters": [
-          {
-            "name": "sourceChainId",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "minimum": 1
+          "400": {
+            "description": "Invalid request or filter.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
             }
           },
-          {
-            "name": "sourceNetworkId",
-            "in": "query",
-            "schema": {
-              "$ref": "#/components/schemas/Bytes32"
+          "500": {
+            "description": "Internal runtime error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Publication surface closed or required authority unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
             }
           }
-        ]
+        }
       }
     },
     "/api/v6/solver-feed/events": {
       "get": {
-        "operationId": "streamSignedSolverFeed",
+        "tags": [
+          "Feed"
+        ],
+        "operationId": "streamSolverFeed",
+        "description": "LISTEN/NOTIFY-backed current-state stream with no replay and no polling. No Last-Event-ID sends current immediately; an older ID sends current immediately; an ID equal to current suppresses the initial event; an invalid ID is ignored and current is sent. Subsequent confirmed publications are always emitted.",
+        "parameters": [
+          {
+            "name": "Last-Event-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^(?:0|[1-9][0-9]*)$"
+            },
+            "description": "Feed dataVersion used only to suppress an identical initial current-state event. No history is replayed."
+          }
+        ],
         "responses": {
           "200": {
-            "description": "SSE events: feed, publication-closed and error.",
+            "description": "SSE events: feed (id=dataVersion, data=SignedFeed), publication-closed, or error.",
             "content": {
               "text/event-stream": {
                 "schema": {
                   "type": "string"
                 }
               }
+            },
+            "x-nexa-events": {
+              "feed": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignedFeed"
+                },
+                "id": "dataVersion"
+              },
+              "publication-closed": {
+                "schema": {
+                  "$ref": "#/components/schemas/SseErrorEvent"
+                }
+              },
+              "error": {
+                "schema": {
+                  "$ref": "#/components/schemas/SseErrorEvent"
+                }
+              }
             }
           },
-          "default": {
-            "$ref": "#/components/responses/Error"
+          "500": {
+            "description": "Internal runtime error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Publication surface closed or required authority unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/v6/routes/{routeId}": {
       "get": {
+        "tags": [
+          "Routes"
+        ],
         "operationId": "getRouteDetail",
+        "parameters": [
+          {
+            "name": "routeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^0x[0-9a-fA-F]{64}$",
+              "description": "32-byte hexadecimal value."
+            },
+            "description": "Canonical routeId from the active signed feed."
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Successful response.",
+            "description": "Exact canonical active signed-feed route plus separate observational metrics.",
             "content": {
               "application/json": {
                 "schema": {
@@ -142,40 +324,45 @@
               }
             }
           },
-          "default": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "parameters": [
-          {
-            "name": "routeId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Bytes32"
-            }
-          }
-        ]
-      }
-    },
-    "/api/v6/execution-permits/request-message": {
-      "post": {
-        "operationId": "buildPermitRequestMessage",
-        "responses": {
-          "200": {
-            "description": "Successful response.",
+          "404": {
+            "description": "Resource not found.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/JsonObject"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
           },
-          "default": {
-            "$ref": "#/components/responses/Error"
+          "500": {
+            "description": "Internal runtime error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Publication surface closed or required authority unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
-        },
+        }
+      }
+    },
+    "/api/v6/execution-permits/request-message": {
+      "post": {
+        "tags": [
+          "Permits"
+        ],
+        "operationId": "buildPermitRequestMessage",
         "requestBody": {
           "required": true,
           "content": {
@@ -185,200 +372,320 @@
               }
             }
           }
+        },
+        "responses": {
+          "200": {
+            "description": "Exact deterministic UTF-8 message for local signing.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PermitRequestMessageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or filter.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Idempotency, capacity, or inventory conflict.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Quote is no longer open or has expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request body exceeds 32 KiB.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal runtime error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Publication surface closed or required authority unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
         }
       }
     },
     "/api/v6/execution-permits": {
       "post": {
+        "tags": [
+          "Permits"
+        ],
         "operationId": "createExecutionPermit",
-        "responses": {
-          "200": {
-            "description": "Successful response.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/JsonObject"
-                }
-              }
-            }
-          },
-          "default": {
-            "$ref": "#/components/responses/Error"
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9._:-]{8,128}$"
+            },
+            "description": "Must equal body idempotencyKey when both are supplied."
           }
-        },
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SignedPermitRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/PermitRequest"
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "requestSignature"
+                    ]
+                  }
+                ]
               }
             }
           }
         },
-        "parameters": [
-          {
-            "name": "Idempotency-Key",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1
-            }
-          }
-        ]
-      }
-    },
-    "/api/v6/execution-permits/{fillId}": {
-      "get": {
-        "operationId": "getExecutionPermit",
         "responses": {
           "200": {
-            "description": "Successful response.",
+            "description": "Existing permit returned for an identical idempotent request.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/JsonObject"
+                  "$ref": "#/components/schemas/ExecutionPermitResponse"
                 }
               }
             }
           },
-          "default": {
-            "$ref": "#/components/responses/Error"
+          "201": {
+            "description": "New execution permit issued.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionPermitResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or filter.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Idempotency, capacity, or inventory conflict.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Quote is no longer open or has expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request body exceeds 32 KiB.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Permit request rate limited.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal runtime error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Publication surface closed or required authority unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
-        },
+        }
+      }
+    },
+    "/api/v6/execution-permits/{fillId}": {
+      "get": {
+        "tags": [
+          "Permits"
+        ],
+        "operationId": "getExecutionPermit",
         "parameters": [
           {
             "name": "fillId",
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "#/components/schemas/Bytes32"
+              "type": "string",
+              "pattern": "^0x[0-9a-fA-F]{64}$",
+              "description": "32-byte hexadecimal value."
             }
           }
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "Current persisted permit status.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PermitStatusResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal runtime error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
       }
     }
   },
   "components": {
     "schemas": {
-      "Bytes32": {
-        "type": "string",
-        "pattern": "^0x[0-9a-fA-F]{64}$"
-      },
-      "Address": {
-        "type": "string",
-        "pattern": "^0x[0-9a-fA-F]{40}$"
-      },
-      "JsonObject": {
+      "ErrorResponse": {
         "type": "object",
-        "additionalProperties": true
-      },
-      "Discovery": {
-        "type": "object",
+        "additionalProperties": false,
         "required": [
-          "schema",
-          "deploymentVersion",
-          "deploymentStatus",
-          "releaseId",
-          "feedSigner",
-          "endpoints"
+          "ok",
+          "error"
         ],
         "properties": {
-          "schema": {
-            "const": "NEXA_MAINNET_V6_SOLVER_DISCOVERY_V2"
+          "ok": {
+            "const": false
           },
-          "deploymentVersion": {
-            "const": 6
+          "error": {
+            "type": "string"
           },
-          "deploymentStatus": {
-            "const": "ACTIVE"
-          },
-          "releaseId": {
-            "$ref": "#/components/schemas/Bytes32"
-          },
-          "feedSigner": {
-            "$ref": "#/components/schemas/Address"
-          },
-          "endpoints": {
-            "$ref": "#/components/schemas/JsonObject"
-          },
-          "standards": {
+          "reasonCodes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/JsonObject"
+              "type": "string"
             }
+          },
+          "diagnostics": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": true
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         }
       },
-      "OnchainDiscoveryFingerprint": {
+      "SseErrorEvent": {
         "type": "object",
+        "additionalProperties": false,
         "required": [
-          "schema",
-          "protocol",
-          "chains",
-          "sameAddressAcrossChains",
-          "facade",
-          "facadeRuntimeCodeHash",
-          "selectors",
-          "events",
-          "erc7683",
-          "deployment"
+          "error"
         ],
         "properties": {
-          "schema": {
-            "const": "NEXA_MAINNET_V6_ONCHAIN_DISCOVERY_FINGERPRINT_V1"
-          },
-          "protocol": {
-            "const": "Nexa V6"
-          },
-          "chains": {
-            "type": "array",
-            "prefixItems": [
-              {
-                "const": 8453
-              },
-              {
-                "const": 56
-              },
-              {
-                "const": 999
-              }
-            ]
-          },
-          "sameAddressAcrossChains": {
-            "const": true
-          },
-          "facade": {
-            "$ref": "#/components/schemas/Address"
-          },
-          "facadeRuntimeCodeHash": {
-            "$ref": "#/components/schemas/Bytes32"
-          },
-          "selectors": {
-            "$ref": "#/components/schemas/JsonObject"
-          },
-          "events": {
-            "$ref": "#/components/schemas/JsonObject"
-          },
-          "erc7683": {
-            "$ref": "#/components/schemas/JsonObject"
-          },
-          "deployment": {
-            "$ref": "#/components/schemas/JsonObject"
+          "error": {
+            "type": "string"
           }
-        },
-        "additionalProperties": true
+        }
       },
       "Route": {
         "type": "object",
-        "description": "The canonical route object from the active signed Feed. Route Detail returns this object without projecting or dropping fields.",
+        "additionalProperties": false,
         "required": [
+          "dataVersion",
           "routeId",
           "quoteId",
-          "dataVersion",
-          "executionGeneration",
-          "open",
           "sourceNetworkId",
           "sourceAssetId",
           "destinationNetworkId",
@@ -400,70 +707,91 @@
           "serviceCategory",
           "feeMode",
           "serviceFeeBps",
-          "dailyStatus",
-          "pricingMode",
-          "indicativePriceNumeratorRaw",
-          "indicativePriceDenominatorRaw",
           "sourceTokenDecimals",
           "destinationTokenDecimals",
-          "minimumFillInRaw",
-          "maxAvailableInRaw",
+          "pricingReferenceId",
+          "executionGeneration",
           "sourceFinalityBlocks",
           "settlementWindowSeconds",
-          "pricingReferenceId",
           "validAfter",
           "validUntil",
           "policyHash",
           "assumptionsHash",
-          "legacyRouteId"
+          "legacyRouteId",
+          "dailyStatus",
+          "open",
+          "pricingMode",
+          "indicativePriceNumeratorRaw",
+          "indicativePriceDenominatorRaw",
+          "minimumFillInRaw",
+          "maxAvailableInRaw"
         ],
         "properties": {
-          "routeId": {
-            "$ref": "#/components/schemas/Bytes32"
-          },
-          "quoteId": {
-            "$ref": "#/components/schemas/Bytes32"
-          },
           "dataVersion": {
             "type": "string",
-            "pattern": "^[0-9]+$"
+            "pattern": "^(?:0|[1-9][0-9]*)$",
+            "description": "Unsigned integer encoded as a base-10 string."
           },
-          "executionGeneration": {
-            "$ref": "#/components/schemas/Bytes32"
+          "routeId": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
           },
-          "open": {
-            "type": "boolean"
+          "quoteId": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
           },
           "sourceNetworkId": {
-            "$ref": "#/components/schemas/Bytes32"
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
           },
           "sourceAssetId": {
-            "$ref": "#/components/schemas/Bytes32"
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
           },
           "destinationNetworkId": {
-            "$ref": "#/components/schemas/Bytes32"
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
           },
           "destinationAssetId": {
-            "$ref": "#/components/schemas/Bytes32"
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
           },
           "sourceChainId": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "pattern": "^[0-9]+$"
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?:0|[1-9][0-9]*)$",
+                "description": "Unsigned integer encoded as a base-10 string."
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "destinationChainId": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "pattern": "^[0-9]+$"
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?:0|[1-9][0-9]*)$",
+                "description": "Unsigned integer encoded as a base-10 string."
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "sourceAsset": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/Address"
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$",
+                "description": "EVM address."
               },
               {
                 "type": "null"
@@ -473,7 +801,9 @@
           "destinationAsset": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/Address"
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$",
+                "description": "EVM address."
               },
               {
                 "type": "null"
@@ -483,7 +813,9 @@
           "sourceVault": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/Address"
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$",
+                "description": "EVM address."
               },
               {
                 "type": "null"
@@ -493,7 +825,9 @@
           "destinationVault": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/Address"
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$",
+                "description": "EVM address."
               },
               {
                 "type": "null"
@@ -503,7 +837,9 @@
           "sourceRouter": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/Address"
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$",
+                "description": "EVM address."
               },
               {
                 "type": "null"
@@ -511,22 +847,35 @@
             ]
           },
           "sourceLocator": {
-            "$ref": "#/components/schemas/JsonObject"
+            "type": "object",
+            "description": "Network-specific locator. Connector-defined keys are included in canonical JSON.",
+            "additionalProperties": true
           },
           "destinationLocator": {
-            "$ref": "#/components/schemas/JsonObject"
+            "type": "object",
+            "description": "Network-specific locator. Connector-defined keys are included in canonical JSON.",
+            "additionalProperties": true
           },
           "discoveryStatus": {
-            "type": "string"
+            "const": "DISCOVERABLE"
           },
           "executionStatus": {
-            "type": "string"
+            "enum": [
+              "OPEN",
+              "PAUSED",
+              "TEMP_UNAVAILABLE"
+            ]
           },
           "permitAvailable": {
             "type": "boolean"
           },
           "publicationLane": {
-            "type": "string"
+            "enum": [
+              "L1",
+              "L2",
+              "L3",
+              "L4"
+            ]
           },
           "publicationRank": {
             "type": "integer",
@@ -539,68 +888,66 @@
             "type": "string"
           },
           "serviceFeeBps": {
-            "type": [
-              "number",
-              "null"
-            ],
-            "minimum": 0
-          },
-          "dailyStatus": {
-            "type": "string"
-          },
-          "pricingMode": {
-            "const": "INDICATIVE_ENVELOPE_REPRICE_AT_PERMIT"
-          },
-          "indicativePriceNumeratorRaw": {
-            "type": "string",
-            "pattern": "^[0-9]+$"
-          },
-          "indicativePriceDenominatorRaw": {
-            "type": "string",
-            "pattern": "^[0-9]+$"
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 10000
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "sourceTokenDecimals": {
             "type": "integer",
-            "minimum": 0
+            "minimum": 0,
+            "maximum": 78
           },
           "destinationTokenDecimals": {
             "type": "integer",
-            "minimum": 0
+            "minimum": 0,
+            "maximum": 78
           },
-          "minimumFillInRaw": {
+          "pricingReferenceId": {
             "type": "string",
-            "pattern": "^[0-9]+$"
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
           },
-          "maxAvailableInRaw": {
+          "executionGeneration": {
             "type": "string",
-            "pattern": "^[0-9]+$"
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
           },
           "sourceFinalityBlocks": {
             "type": "integer",
-            "minimum": 0
+            "minimum": 1
           },
           "settlementWindowSeconds": {
             "type": "integer",
-            "minimum": 0
-          },
-          "pricingReferenceId": {
-            "$ref": "#/components/schemas/Bytes32"
+            "minimum": 1
           },
           "validAfter": {
             "type": "integer",
-            "minimum": 0
+            "minimum": 0,
+            "description": "Unix timestamp in seconds."
           },
           "validUntil": {
             "type": "integer",
-            "minimum": 0
+            "minimum": 0,
+            "description": "Unix timestamp in seconds."
           },
           "policyHash": {
-            "$ref": "#/components/schemas/Bytes32"
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
           },
           "assumptionsHash": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/Bytes32"
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{64}$",
+                "description": "32-byte hexadecimal value."
               },
               {
                 "type": "null"
@@ -610,48 +957,58 @@
           "legacyRouteId": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/Bytes32"
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{64}$",
+                "description": "32-byte hexadecimal value."
               },
               {
                 "type": "null"
               }
             ]
-          }
-        },
-        "additionalProperties": true
-      },
-      "RouteDetailResponse": {
-        "type": "object",
-        "required": [
-          "ok",
-          "route",
-          "metrics"
-        ],
-        "properties": {
-          "ok": {
-            "const": true
           },
-          "route": {
-            "$ref": "#/components/schemas/Route"
+          "dailyStatus": {
+            "enum": [
+              "OPEN",
+              "CLOSED"
+            ]
           },
-          "metrics": {
-            "type": "object",
-            "description": "Unsigned, non-authoritative operational telemetry kept separate from the canonical signed Feed route.",
-            "required": [
-              "telemetryAvailable"
-            ],
-            "additionalProperties": true
+          "open": {
+            "type": "boolean"
+          },
+          "pricingMode": {
+            "const": "INDICATIVE_ENVELOPE_REPRICE_AT_PERMIT"
+          },
+          "indicativePriceNumeratorRaw": {
+            "type": "string",
+            "pattern": "^(?:0|[1-9][0-9]*)$",
+            "description": "Unsigned integer encoded as a base-10 string."
+          },
+          "indicativePriceDenominatorRaw": {
+            "type": "string",
+            "pattern": "^(?:0|[1-9][0-9]*)$",
+            "description": "Unsigned integer encoded as a base-10 string."
+          },
+          "minimumFillInRaw": {
+            "type": "string",
+            "pattern": "^(?:0|[1-9][0-9]*)$",
+            "description": "Unsigned integer encoded as a base-10 string."
+          },
+          "maxAvailableInRaw": {
+            "type": "string",
+            "pattern": "^(?:0|[1-9][0-9]*)$",
+            "description": "Unsigned integer encoded as a base-10 string."
           }
-        },
-        "additionalProperties": false
+        }
       },
-      "SignedFeed": {
+      "SignedFeedPayload": {
         "type": "object",
+        "additionalProperties": false,
+        "description": "Sole cryptographic authority: feedHash and feedSignature cover this complete unfiltered object.",
         "required": [
           "schema",
-          "feedHash",
-          "feedSigner",
-          "feedSignature",
+          "releaseId",
+          "dataVersion",
+          "generatedAt",
           "validUntil",
           "routes"
         ],
@@ -659,18 +1016,25 @@
           "schema": {
             "const": "NEXA_MAINNET_V6_SIGNED_FEED_V1"
           },
-          "feedHash": {
-            "$ref": "#/components/schemas/Bytes32"
-          },
-          "feedSigner": {
-            "$ref": "#/components/schemas/Address"
-          },
-          "feedSignature": {
+          "releaseId": {
             "type": "string",
-            "pattern": "^0x[0-9a-fA-F]+$"
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "dataVersion": {
+            "type": "string",
+            "pattern": "^(?:0|[1-9][0-9]*)$",
+            "description": "Unsigned integer encoded as a base-10 string."
+          },
+          "generatedAt": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Unix timestamp in seconds."
           },
           "validUntil": {
-            "type": "integer"
+            "type": "integer",
+            "minimum": 0,
+            "description": "Unix timestamp in seconds."
           },
           "routes": {
             "type": "array",
@@ -680,8 +1044,115 @@
           }
         }
       },
+      "SignedFeed": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "signedPayload is the only signed authority. Top-level routes/openRoutes are filterable convenience views and must not be substituted during verification.",
+        "required": [
+          "schema",
+          "releaseId",
+          "dataVersion",
+          "generatedAt",
+          "validUntil",
+          "signedPayload",
+          "routes",
+          "openRoutes",
+          "feedHash",
+          "feedSigner",
+          "feedSignature",
+          "publicationGasWei",
+          "publicationTransactionHashes",
+          "routeCount",
+          "openRouteCount",
+          "returnedRouteCount",
+          "returnedOpenRouteCount"
+        ],
+        "properties": {
+          "schema": {
+            "const": "NEXA_MAINNET_V6_SIGNED_FEED_V1"
+          },
+          "releaseId": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "dataVersion": {
+            "type": "string",
+            "pattern": "^(?:0|[1-9][0-9]*)$",
+            "description": "Unsigned integer encoded as a base-10 string."
+          },
+          "generatedAt": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Unix timestamp in seconds."
+          },
+          "validUntil": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Unix timestamp in seconds."
+          },
+          "signedPayload": {
+            "$ref": "#/components/schemas/SignedFeedPayload"
+          },
+          "routes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Route"
+            }
+          },
+          "openRoutes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Route"
+            }
+          },
+          "feedHash": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "feedSigner": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$",
+            "description": "EVM address."
+          },
+          "feedSignature": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{130}$"
+          },
+          "publicationGasWei": {
+            "const": "0"
+          },
+          "publicationTransactionHashes": {
+            "type": "array",
+            "maxItems": 0,
+            "items": {
+              "type": "string",
+              "pattern": "^0x[0-9a-fA-F]{64}$",
+              "description": "32-byte hexadecimal value."
+            }
+          },
+          "routeCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "openRouteCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "returnedRouteCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "returnedOpenRouteCount": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
       "FeedResponse": {
         "type": "object",
+        "additionalProperties": false,
         "required": [
           "ok",
           "feed"
@@ -695,87 +1166,3404 @@
           }
         }
       },
-      "PermitRequest": {
+      "RouteMetrics": {
         "type": "object",
+        "additionalProperties": false,
         "required": [
-          "quoteId",
-          "requestedAmountInRaw",
-          "standard",
-          "payer",
-          "recipient",
-          "idempotencyKey"
+          "telemetryAvailable",
+          "permitConversionRate",
+          "fillConversionRate"
         ],
         "properties": {
-          "quoteId": {
-            "$ref": "#/components/schemas/Bytes32"
+          "telemetryAvailable": {
+            "type": "boolean"
           },
-          "requestedAmountInRaw": {
-            "type": "string",
-            "pattern": "^[0-9]+$"
+          "source": {
+            "const": "V6_PUBLICATION_LEARNING_STATE"
           },
-          "standard": {
-            "type": "string",
-            "enum": [
-              "DIRECT",
-              "ERC-7683",
-              "OIF"
+          "feed_exposures": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "permit_requests": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "permits_issued": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "source_observed": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "paid": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "updatedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
-          "payer": {
-            "$ref": "#/components/schemas/Address"
+          "permitConversionRate": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
-          "recipient": {
-            "$ref": "#/components/schemas/Address"
-          },
-          "idempotencyKey": {
-            "type": "string",
-            "minLength": 1
+          "fillConversionRate": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         }
       },
-      "SignedPermitRequest": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/PermitRequest"
-          },
-          {
-            "type": "object",
-            "required": [
-              "requestSignature"
-            ],
-            "properties": {
-              "requestSignature": {
-                "type": "string",
-                "pattern": "^0x[0-9a-fA-F]+$"
-              }
-            }
-          }
-        ]
-      },
-      "Error": {
+      "RouteDetailResponse": {
         "type": "object",
+        "additionalProperties": false,
         "required": [
           "ok",
-          "error"
+          "route",
+          "metrics"
         ],
         "properties": {
           "ok": {
-            "const": false
+            "const": true
           },
-          "error": {
+          "route": {
+            "$ref": "#/components/schemas/Route"
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/RouteMetrics"
+          }
+        }
+      },
+      "PermitRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "quoteId",
+          "requestedAmountInRaw",
+          "idempotencyKey"
+        ],
+        "allOf": [
+          {
+            "anyOf": [
+              {
+                "required": [
+                  "payer"
+                ]
+              },
+              {
+                "required": [
+                  "payerAccountId",
+                  "payerLocator"
+                ]
+              }
+            ]
+          },
+          {
+            "anyOf": [
+              {
+                "required": [
+                  "recipient"
+                ]
+              },
+              {
+                "required": [
+                  "recipientAccountId",
+                  "recipientLocator"
+                ]
+              }
+            ]
+          }
+        ],
+        "properties": {
+          "quoteId": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "requestedAmountInRaw": {
+            "type": "string",
+            "pattern": "^(?:0|[1-9][0-9]*)$",
+            "description": "Unsigned integer encoded as a base-10 string."
+          },
+          "standard": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$",
+            "description": "Defaults to DIRECT; canonical form is uppercase."
+          },
+          "payer": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$",
+            "description": "EVM address."
+          },
+          "recipient": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$",
+            "description": "EVM address."
+          },
+          "payerAccountId": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "recipientAccountId": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "payerLocator": {
+            "type": "object",
+            "description": "Network-specific locator. Connector-defined keys are included in canonical JSON.",
+            "additionalProperties": true
+          },
+          "recipientLocator": {
+            "type": "object",
+            "description": "Network-specific locator. Connector-defined keys are included in canonical JSON.",
+            "additionalProperties": true
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9._:-]{8,128}$"
+          },
+          "requestSignature": {
+            "type": "string",
+            "description": "EIP-191 signature for EVM ownership, or connector ownership proof."
+          }
+        }
+      },
+      "PermitRequestMessageResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "ok",
+          "message"
+        ],
+        "properties": {
+          "ok": {
+            "const": true
+          },
+          "message": {
+            "type": "string",
+            "description": "Exact deterministic UTF-8 message to sign locally."
+          }
+        }
+      },
+      "ExecutionPermit": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "releaseId",
+          "fillId",
+          "permitNonce",
+          "sourceNetworkId",
+          "sourceAssetId",
+          "destinationNetworkId",
+          "destinationAssetId",
+          "sourceVaultAccountId",
+          "destinationVaultAccountId",
+          "payerAccountId",
+          "recipientAccountId",
+          "routeId",
+          "quoteId",
+          "policyHash",
+          "dataVersion",
+          "executionGeneration",
+          "validAfter",
+          "validUntil",
+          "sourceFinalityBlocks",
+          "settlementWindowSeconds",
+          "sourceChainId",
+          "destinationChainId",
+          "sourceAsset",
+          "destinationAsset",
+          "sourceVault",
+          "destinationVault",
+          "sourceRouter",
+          "payer",
+          "recipient",
+          "amountInRaw",
+          "amountOutRaw",
+          "publicationLane",
+          "serviceCategory",
+          "feeMode",
+          "serviceFeeBps"
+        ],
+        "properties": {
+          "releaseId": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "fillId": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "permitNonce": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "sourceNetworkId": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "sourceAssetId": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "destinationNetworkId": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "destinationAssetId": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "sourceVaultAccountId": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "destinationVaultAccountId": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "payerAccountId": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "recipientAccountId": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "routeId": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "quoteId": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "policyHash": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "dataVersion": {
+            "type": "string",
+            "pattern": "^(?:0|[1-9][0-9]*)$",
+            "description": "Unsigned integer encoded as a base-10 string."
+          },
+          "executionGeneration": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "validAfter": {
+            "type": "string",
+            "pattern": "^(?:0|[1-9][0-9]*)$",
+            "description": "Unsigned integer encoded as a base-10 string."
+          },
+          "validUntil": {
+            "type": "string",
+            "pattern": "^(?:0|[1-9][0-9]*)$",
+            "description": "Unsigned integer encoded as a base-10 string."
+          },
+          "sourceFinalityBlocks": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "settlementWindowSeconds": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "sourceChainId": {
+            "type": "string",
+            "pattern": "^(?:0|[1-9][0-9]*)$",
+            "description": "Unsigned integer encoded as a base-10 string."
+          },
+          "destinationChainId": {
+            "type": "string",
+            "pattern": "^(?:0|[1-9][0-9]*)$",
+            "description": "Unsigned integer encoded as a base-10 string."
+          },
+          "sourceAsset": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$",
+            "description": "EVM address."
+          },
+          "destinationAsset": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$",
+            "description": "EVM address."
+          },
+          "sourceVault": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$",
+            "description": "EVM address."
+          },
+          "destinationVault": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$",
+            "description": "EVM address."
+          },
+          "sourceRouter": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$",
+            "description": "EVM address."
+          },
+          "payer": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$",
+            "description": "EVM address."
+          },
+          "recipient": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$",
+            "description": "EVM address."
+          },
+          "amountInRaw": {
+            "type": "string",
+            "pattern": "^(?:0|[1-9][0-9]*)$",
+            "description": "Unsigned integer encoded as a base-10 string."
+          },
+          "amountOutRaw": {
+            "type": "string",
+            "pattern": "^(?:0|[1-9][0-9]*)$",
+            "description": "Unsigned integer encoded as a base-10 string."
+          },
+          "publicationLane": {
+            "enum": [
+              "L1",
+              "L2",
+              "L3",
+              "L4"
+            ]
+          },
+          "serviceCategory": {
+            "type": "string"
+          },
+          "feeMode": {
+            "type": "string"
+          },
+          "serviceFeeBps": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "DirectExecution": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schema",
+          "target",
+          "function",
+          "transactionCount",
+          "inventory",
+          "pricing"
+        ],
+        "properties": {
+          "schema": {
+            "const": "NEXA_V6_DIRECT_EXECUTION_V1"
+          },
+          "target": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$",
+            "description": "EVM address."
+          },
+          "function": {
+            "const": "fillDirect"
+          },
+          "transactionCount": {
+            "const": 1
+          },
+          "inventory": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "source",
+                  "snapshotId",
+                  "capturedAt",
+                  "ageMs",
+                  "physicalRaw",
+                  "effectiveLiabilityRaw",
+                  "effectiveAccountingHoldRaw",
+                  "activeClearingCommitmentRaw"
+                ],
+                "properties": {
+                  "source": {
+                    "const": "V6_PERSISTED_INVENTORY_SNAPSHOT"
+                  },
+                  "snapshotId": {
+                    "type": "string"
+                  },
+                  "capturedAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "ageMs": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "physicalRaw": {
+                    "type": "string",
+                    "pattern": "^(?:0|[1-9][0-9]*)$",
+                    "description": "Unsigned integer encoded as a base-10 string."
+                  },
+                  "effectiveLiabilityRaw": {
+                    "type": "string",
+                    "pattern": "^(?:0|[1-9][0-9]*)$",
+                    "description": "Unsigned integer encoded as a base-10 string."
+                  },
+                  "effectiveAccountingHoldRaw": {
+                    "type": "string",
+                    "pattern": "^(?:0|[1-9][0-9]*)$",
+                    "description": "Unsigned integer encoded as a base-10 string."
+                  },
+                  "activeClearingCommitmentRaw": {
+                    "type": "string",
+                    "pattern": "^(?:0|[1-9][0-9]*)$",
+                    "description": "Unsigned integer encoded as a base-10 string."
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "pricing": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "pricingMode",
+              "modelVersion",
+              "pricingReferenceId",
+              "publicationLane",
+              "serviceCategory",
+              "feeMode",
+              "serviceFeeBps",
+              "snapshotId",
+              "routeSnapshotId",
+              "quoteObservedAt",
+              "pricingCycleId",
+              "pricingCycleObservedAt",
+              "pricingCycleValidUntil",
+              "payoutEconomicCeilingRequired",
+              "payoutEconomicCeiling",
+              "evidence",
+              "executionCapacity"
+            ],
+            "properties": {
+              "pricingMode": {
+                "const": "FRESH_AMOUNT_BOUND"
+              },
+              "modelVersion": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "pricingReferenceId": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{64}$",
+                "description": "32-byte hexadecimal value."
+              },
+              "publicationLane": {
+                "enum": [
+                  "L1",
+                  "L2",
+                  "L3",
+                  "L4"
+                ]
+              },
+              "serviceCategory": {
+                "type": "string"
+              },
+              "feeMode": {
+                "type": "string"
+              },
+              "serviceFeeBps": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "snapshotId": {
+                "type": "string"
+              },
+              "routeSnapshotId": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "quoteObservedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "pricingCycleId": {
+                "type": "string"
+              },
+              "pricingCycleObservedAt": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "pricingCycleValidUntil": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "payoutEconomicCeilingRequired": {
+                "type": "boolean"
+              },
+              "payoutEconomicCeiling": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": true
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "evidence": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "executionCapacity": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "ExecutionPermitEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "fillId",
+          "state",
+          "idempotencyKey",
+          "expiresAt",
+          "permit",
+          "permitDigest",
+          "permitSignature",
+          "execution",
+          "totalTransactionCount",
+          "sourceTxHash",
+          "payoutTxHash",
+          "publicationLane",
+          "serviceCategory",
+          "feeMode",
+          "serviceFeeBps"
+        ],
+        "properties": {
+          "fillId": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "state": {
+            "type": "string"
+          },
+          "idempotencyKey": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Unix timestamp in seconds."
+          },
+          "permit": {
+            "$ref": "#/components/schemas/ExecutionPermit"
+          },
+          "permitDigest": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "permitSignature": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{130}$"
+          },
+          "execution": {
+            "$ref": "#/components/schemas/DirectExecution"
+          },
+          "totalTransactionCount": {
+            "const": 2
+          },
+          "sourceTxHash": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{64}$",
+                "description": "32-byte hexadecimal value."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "payoutTxHash": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{64}$",
+                "description": "32-byte hexadecimal value."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "publicationLane": {
+            "enum": [
+              "L1",
+              "L2",
+              "L3",
+              "L4"
+            ]
+          },
+          "serviceCategory": {
+            "type": "string"
+          },
+          "feeMode": {
+            "type": "string"
+          },
+          "serviceFeeBps": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "ExecutionPermitResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "ok",
+          "idempotent",
+          "permit"
+        ],
+        "properties": {
+          "ok": {
+            "const": true
+          },
+          "idempotent": {
+            "type": "boolean"
+          },
+          "permit": {
+            "$ref": "#/components/schemas/ExecutionPermitEnvelope"
+          }
+        }
+      },
+      "PermitStatusResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "ok",
+          "permit"
+        ],
+        "properties": {
+          "ok": {
+            "const": true
+          },
+          "permit": {
+            "$ref": "#/components/schemas/ExecutionPermitEnvelope"
+          }
+        }
+      },
+      "ScannerHints": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schema",
+          "generatedFrom",
+          "protocol",
+          "releaseId",
+          "deploymentVersion",
+          "status",
+          "supportedChainIds",
+          "sameAddressAcrossChains",
+          "contracts",
+          "probe",
+          "eventDiscovery",
+          "deterministicDeployment",
+          "standards"
+        ],
+        "properties": {
+          "schema": {
+            "const": "NEXA_MAINNET_V6_SCANNER_HINTS_V1"
+          },
+          "generatedFrom": {
+            "const": "CANONICAL_ONCHAIN_DISCOVERY_FINGERPRINT"
+          },
+          "protocol": {
+            "const": "Nexa V6"
+          },
+          "releaseId": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "deploymentVersion": {
+            "const": 6
+          },
+          "status": {
+            "const": "ACTIVE"
+          },
+          "supportedChainIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "sameAddressAcrossChains": {
+            "const": true
+          },
+          "contracts": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "facade",
+              "registry",
+              "router",
+              "erc7683Resolver",
+              "oifModule"
+            ],
+            "properties": {
+              "facade": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "name",
+                  "role",
+                  "address",
+                  "expectedRuntimeCodeHash",
+                  "supportedChainIds",
+                  "sameAddressAcrossChains"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "type": "string"
+                  },
+                  "address": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "description": "EVM address."
+                  },
+                  "expectedRuntimeCodeHash": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{64}$",
+                    "description": "32-byte hexadecimal value."
+                  },
+                  "supportedChainIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "sameAddressAcrossChains": {
+                    "const": true
+                  }
+                }
+              },
+              "registry": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "name",
+                  "role",
+                  "address",
+                  "expectedRuntimeCodeHash",
+                  "supportedChainIds",
+                  "sameAddressAcrossChains"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "type": "string"
+                  },
+                  "address": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "description": "EVM address."
+                  },
+                  "expectedRuntimeCodeHash": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{64}$",
+                    "description": "32-byte hexadecimal value."
+                  },
+                  "supportedChainIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "sameAddressAcrossChains": {
+                    "const": true
+                  }
+                }
+              },
+              "router": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "name",
+                  "role",
+                  "address",
+                  "expectedRuntimeCodeHash",
+                  "supportedChainIds",
+                  "sameAddressAcrossChains"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "type": "string"
+                  },
+                  "address": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "description": "EVM address."
+                  },
+                  "expectedRuntimeCodeHash": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{64}$",
+                    "description": "32-byte hexadecimal value."
+                  },
+                  "supportedChainIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "sameAddressAcrossChains": {
+                    "const": true
+                  }
+                }
+              },
+              "erc7683Resolver": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "name",
+                  "role",
+                  "address",
+                  "expectedRuntimeCodeHash",
+                  "supportedChainIds",
+                  "sameAddressAcrossChains"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "type": "string"
+                  },
+                  "address": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "description": "EVM address."
+                  },
+                  "expectedRuntimeCodeHash": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{64}$",
+                    "description": "32-byte hexadecimal value."
+                  },
+                  "supportedChainIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "sameAddressAcrossChains": {
+                    "const": true
+                  }
+                }
+              },
+              "oifModule": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "name",
+                  "role",
+                  "address",
+                  "expectedRuntimeCodeHash",
+                  "supportedChainIds",
+                  "sameAddressAcrossChains"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "type": "string"
+                  },
+                  "address": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "description": "EVM address."
+                  },
+                  "expectedRuntimeCodeHash": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{64}$",
+                    "description": "32-byte hexadecimal value."
+                  },
+                  "supportedChainIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "sameAddressAcrossChains": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          },
+          "probe": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "mode",
+              "externalScannerOnly",
+              "executedByNexa",
+              "performsWrites",
+              "pollingRequired",
+              "methods",
+              "steps"
+            ],
+            "properties": {
+              "mode": {
+                "const": "EXTERNAL_SCANNER_READ_ONLY"
+              },
+              "externalScannerOnly": {
+                "const": true
+              },
+              "executedByNexa": {
+                "const": false
+              },
+              "performsWrites": {
+                "const": false
+              },
+              "pollingRequired": {
+                "const": false
+              },
+              "methods": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "discoveryURI",
+                  "isLive",
+                  "systemState",
+                  "routeCount"
+                ],
+                "properties": {
+                  "discoveryURI": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "contract",
+                      "address",
+                      "signature",
+                      "selector",
+                      "stateMutability",
+                      "returns"
+                    ],
+                    "properties": {
+                      "contract": {
+                        "type": "string"
+                      },
+                      "address": {
+                        "type": "string",
+                        "pattern": "^0x[0-9a-fA-F]{40}$",
+                        "description": "EVM address."
+                      },
+                      "signature": {
+                        "type": "string"
+                      },
+                      "selector": {
+                        "type": "string",
+                        "pattern": "^0x[0-9a-fA-F]{8}$",
+                        "description": "Four-byte function selector."
+                      },
+                      "stateMutability": {
+                        "enum": [
+                          "pure",
+                          "view"
+                        ]
+                      },
+                      "returns": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "name",
+                            "type"
+                          ],
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "type": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "isLive": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "contract",
+                      "address",
+                      "signature",
+                      "selector",
+                      "stateMutability",
+                      "returns"
+                    ],
+                    "properties": {
+                      "contract": {
+                        "type": "string"
+                      },
+                      "address": {
+                        "type": "string",
+                        "pattern": "^0x[0-9a-fA-F]{40}$",
+                        "description": "EVM address."
+                      },
+                      "signature": {
+                        "type": "string"
+                      },
+                      "selector": {
+                        "type": "string",
+                        "pattern": "^0x[0-9a-fA-F]{8}$",
+                        "description": "Four-byte function selector."
+                      },
+                      "stateMutability": {
+                        "enum": [
+                          "pure",
+                          "view"
+                        ]
+                      },
+                      "returns": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "name",
+                            "type"
+                          ],
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "type": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "systemState": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "contract",
+                      "address",
+                      "signature",
+                      "selector",
+                      "stateMutability",
+                      "returns"
+                    ],
+                    "properties": {
+                      "contract": {
+                        "type": "string"
+                      },
+                      "address": {
+                        "type": "string",
+                        "pattern": "^0x[0-9a-fA-F]{40}$",
+                        "description": "EVM address."
+                      },
+                      "signature": {
+                        "type": "string"
+                      },
+                      "selector": {
+                        "type": "string",
+                        "pattern": "^0x[0-9a-fA-F]{8}$",
+                        "description": "Four-byte function selector."
+                      },
+                      "stateMutability": {
+                        "enum": [
+                          "pure",
+                          "view"
+                        ]
+                      },
+                      "returns": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "name",
+                            "type"
+                          ],
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "type": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "routeCount": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "contract",
+                      "address",
+                      "signature",
+                      "selector",
+                      "stateMutability",
+                      "returns"
+                    ],
+                    "properties": {
+                      "contract": {
+                        "type": "string"
+                      },
+                      "address": {
+                        "type": "string",
+                        "pattern": "^0x[0-9a-fA-F]{40}$",
+                        "description": "EVM address."
+                      },
+                      "signature": {
+                        "type": "string"
+                      },
+                      "selector": {
+                        "type": "string",
+                        "pattern": "^0x[0-9a-fA-F]{8}$",
+                        "description": "Four-byte function selector."
+                      },
+                      "stateMutability": {
+                        "enum": [
+                          "pure",
+                          "view"
+                        ]
+                      },
+                      "returns": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "name",
+                            "type"
+                          ],
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "type": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "steps": {
+                "type": "array",
+                "minItems": 9,
+                "maxItems": 9,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "order",
+                    "id",
+                    "required"
+                  ],
+                  "properties": {
+                    "order": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "required": {
+                      "type": "boolean"
+                    },
+                    "optional": {
+                      "type": "boolean"
+                    },
+                    "transport": {
+                      "enum": [
+                        "JSON_RPC",
+                        "HTTPS"
+                      ]
+                    },
+                    "rpcMethod": {
+                      "enum": [
+                        "eth_getCode",
+                        "eth_call",
+                        "eth_getLogs"
+                      ]
+                    },
+                    "operation": {
+                      "type": "string"
+                    },
+                    "inputFromStep": {
+                      "type": "string"
+                    },
+                    "address": {
+                      "type": "string",
+                      "pattern": "^0x[0-9a-fA-F]{40}$",
+                      "description": "EVM address."
+                    },
+                    "supportedChainIds": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      }
+                    },
+                    "call": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "contract",
+                        "address",
+                        "signature",
+                        "selector",
+                        "stateMutability",
+                        "returns"
+                      ],
+                      "properties": {
+                        "contract": {
+                          "type": "string"
+                        },
+                        "address": {
+                          "type": "string",
+                          "pattern": "^0x[0-9a-fA-F]{40}$",
+                          "description": "EVM address."
+                        },
+                        "signature": {
+                          "type": "string"
+                        },
+                        "selector": {
+                          "type": "string",
+                          "pattern": "^0x[0-9a-fA-F]{8}$",
+                          "description": "Four-byte function selector."
+                        },
+                        "stateMutability": {
+                          "enum": [
+                            "pure",
+                            "view"
+                          ]
+                        },
+                        "returns": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "name",
+                              "type"
+                            ],
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "topics": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "pattern": "^0x[0-9a-fA-F]{64}$",
+                        "description": "32-byte hexadecimal value."
+                      }
+                    },
+                    "method": {
+                      "const": "GET"
+                    },
+                    "uriFromStep": {
+                      "type": "string"
+                    },
+                    "expected": {
+                      "type": "object",
+                      "additionalProperties": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "eventDiscovery": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "SourceFillV6"
+            ],
+            "properties": {
+              "SourceFillV6": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "emittingContract",
+                  "address",
+                  "supportedChainIds",
+                  "signature",
+                  "topic0",
+                  "indexedFields",
+                  "indexedTopicPositions",
+                  "nonIndexedFields",
+                  "discoveryMapping"
+                ],
+                "properties": {
+                  "emittingContract": {
+                    "type": "string"
+                  },
+                  "address": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "description": "EVM address."
+                  },
+                  "supportedChainIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "signature": {
+                    "type": "string"
+                  },
+                  "topic0": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{64}$",
+                    "description": "32-byte hexadecimal value."
+                  },
+                  "indexedFields": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "name",
+                        "type",
+                        "topicPosition"
+                      ],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "topicPosition": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 3
+                        }
+                      }
+                    }
+                  },
+                  "indexedTopicPositions": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 3
+                    }
+                  },
+                  "nonIndexedFields": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "discoveryMapping": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "router",
+                      "facade",
+                      "discoveryURI"
+                    ],
+                    "properties": {
+                      "router": {
+                        "type": "string",
+                        "pattern": "^0x[0-9a-fA-F]{40}$",
+                        "description": "EVM address."
+                      },
+                      "facade": {
+                        "type": "string",
+                        "pattern": "^0x[0-9a-fA-F]{40}$",
+                        "description": "EVM address."
+                      },
+                      "discoveryURI": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "deterministicDeployment": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "method",
+              "factory",
+              "salt",
+              "initCodeHash",
+              "expectedFacadeAddress",
+              "supportedChainIds",
+              "deploymentBlocks",
+              "deploymentTransactions",
+              "sameAddressAcrossChains"
+            ],
+            "properties": {
+              "method": {
+                "const": "CREATE2"
+              },
+              "factory": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$",
+                "description": "EVM address."
+              },
+              "salt": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{64}$",
+                "description": "32-byte hexadecimal value."
+              },
+              "initCodeHash": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{64}$",
+                "description": "32-byte hexadecimal value."
+              },
+              "expectedFacadeAddress": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$",
+                "description": "EVM address."
+              },
+              "supportedChainIds": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "deploymentBlocks": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "integer"
+                }
+              },
+              "deploymentTransactions": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "pattern": "^0x[0-9a-fA-F]{64}$",
+                  "description": "32-byte hexadecimal value."
+                }
+              },
+              "sameAddressAcrossChains": {
+                "const": true
+              }
+            }
+          },
+          "standards": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "erc7683",
+              "oif"
+            ],
+            "properties": {
+              "erc7683": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "supportedChainIds",
+                  "standardId",
+                  "erc165InterfaceIds",
+                  "selectors",
+                  "selectorSignatures",
+                  "router",
+                  "expectedRuntimeCodeHash"
+                ],
+                "properties": {
+                  "resolver": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "description": "EVM address."
+                  },
+                  "module": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "description": "EVM address."
+                  },
+                  "supportedChainIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "standardId": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{64}$",
+                    "description": "32-byte hexadecimal value."
+                  },
+                  "compatibilityLevel": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{64}$",
+                    "description": "32-byte hexadecimal value."
+                  },
+                  "compatibilityLevelName": {
+                    "type": "string"
+                  },
+                  "executable": {
+                    "type": "boolean"
+                  },
+                  "erc165InterfaceIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^0x[0-9a-fA-F]{8}$",
+                      "description": "Four-byte function selector."
+                    }
+                  },
+                  "selectors": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string",
+                      "pattern": "^0x[0-9a-fA-F]{8}$",
+                      "description": "Four-byte function selector."
+                    }
+                  },
+                  "selectorSignatures": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  },
+                  "router": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "description": "EVM address."
+                  },
+                  "expectedRuntimeCodeHash": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{64}$",
+                    "description": "32-byte hexadecimal value."
+                  }
+                }
+              },
+              "oif": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "supportedChainIds",
+                  "standardId",
+                  "erc165InterfaceIds",
+                  "selectors",
+                  "selectorSignatures",
+                  "router",
+                  "expectedRuntimeCodeHash"
+                ],
+                "properties": {
+                  "resolver": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "description": "EVM address."
+                  },
+                  "module": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "description": "EVM address."
+                  },
+                  "supportedChainIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "standardId": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{64}$",
+                    "description": "32-byte hexadecimal value."
+                  },
+                  "compatibilityLevel": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{64}$",
+                    "description": "32-byte hexadecimal value."
+                  },
+                  "compatibilityLevelName": {
+                    "type": "string"
+                  },
+                  "executable": {
+                    "type": "boolean"
+                  },
+                  "erc165InterfaceIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^0x[0-9a-fA-F]{8}$",
+                      "description": "Four-byte function selector."
+                    }
+                  },
+                  "selectors": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string",
+                      "pattern": "^0x[0-9a-fA-F]{8}$",
+                      "description": "Four-byte function selector."
+                    }
+                  },
+                  "selectorSignatures": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  },
+                  "router": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "description": "EVM address."
+                  },
+                  "expectedRuntimeCodeHash": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{64}$",
+                    "description": "32-byte hexadecimal value."
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "StandardPayloadEncoding": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "mediaType",
+          "solidity",
+          "tuple",
+          "source"
+        ],
+        "properties": {
+          "mediaType": {
+            "const": "application/vnd.nexa.execution-permit-v6+abi"
+          },
+          "solidity": {
+            "const": "abi.encode(ExecutionPermit,bytes)"
+          },
+          "tuple": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "const": "NexaMainnetV6Types.ExecutionPermit permit"
+              },
+              {
+                "const": "bytes permitSignature"
+              }
+            ],
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "source": {
             "type": "string"
           }
         }
-      }
-    },
-    "responses": {
-      "Error": {
-        "description": "Request rejected or publication gate closed.",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
+      },
+      "StandardsManifest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schema",
+          "protocol",
+          "status",
+          "deploymentVersion",
+          "releaseId",
+          "supportedChainIds",
+          "sameAddressAcrossChains",
+          "router",
+          "payloadEncoding",
+          "standards",
+          "executionInvariant"
+        ],
+        "properties": {
+          "schema": {
+            "const": "NEXA_MAINNET_V6_STANDARDS_MANIFEST_V1"
+          },
+          "protocol": {
+            "const": "Nexa V6"
+          },
+          "status": {
+            "const": "ACTIVE"
+          },
+          "deploymentVersion": {
+            "const": 6
+          },
+          "releaseId": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "supportedChainIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
             }
+          },
+          "sameAddressAcrossChains": {
+            "const": true
+          },
+          "router": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "address",
+              "expectedRuntimeCodeHash",
+              "sourceExecutionFunction",
+              "sourceTransactionCount"
+            ],
+            "properties": {
+              "address": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$",
+                "description": "EVM address."
+              },
+              "expectedRuntimeCodeHash": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{64}$",
+                "description": "32-byte hexadecimal value."
+              },
+              "sourceExecutionFunction": {
+                "const": "fillDirect"
+              },
+              "sourceTransactionCount": {
+                "const": 1
+              }
+            }
+          },
+          "payloadEncoding": {
+            "$ref": "#/components/schemas/StandardPayloadEncoding"
+          },
+          "standards": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "erc7683",
+              "oif"
+            ],
+            "properties": {
+              "erc7683": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "name",
+                  "standardId",
+                  "compatibilityLevel",
+                  "executable",
+                  "moduleAddress",
+                  "expectedRuntimeCodeHash",
+                  "supportedChainIds",
+                  "sameAddressAcrossChains",
+                  "router",
+                  "selectors",
+                  "selectorSignatures",
+                  "erc165",
+                  "payloadEncoding",
+                  "discoveryMethod",
+                  "resolutionTransport",
+                  "resolveExecution"
+                ],
+                "properties": {
+                  "name": {
+                    "enum": [
+                      "ERC-7683",
+                      "OIF"
+                    ]
+                  },
+                  "standardId": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{64}$",
+                    "description": "32-byte hexadecimal value."
+                  },
+                  "compatibilityLevel": {
+                    "enum": [
+                      "EXECUTABLE_RESOLVER",
+                      "DISCOVERY_DESCRIPTION_ONLY"
+                    ]
+                  },
+                  "compatibilityLevelId": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{64}$",
+                    "description": "32-byte hexadecimal value."
+                  },
+                  "executable": {
+                    "type": "boolean"
+                  },
+                  "moduleAddress": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "description": "EVM address."
+                  },
+                  "expectedRuntimeCodeHash": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{64}$",
+                    "description": "32-byte hexadecimal value."
+                  },
+                  "supportedChainIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "sameAddressAcrossChains": {
+                    "const": true
+                  },
+                  "router": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "description": "EVM address."
+                  },
+                  "selectors": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string",
+                      "pattern": "^0x[0-9a-fA-F]{8}$",
+                      "description": "Four-byte function selector."
+                    }
+                  },
+                  "selectorSignatures": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  },
+                  "erc165": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "supported",
+                      "interfaceIds"
+                    ],
+                    "properties": {
+                      "supported": {
+                        "const": true
+                      },
+                      "interfaceIds": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "pattern": "^0x[0-9a-fA-F]{8}$",
+                          "description": "Four-byte function selector."
+                        }
+                      }
+                    }
+                  },
+                  "payloadEncoding": {
+                    "$ref": "#/components/schemas/StandardPayloadEncoding"
+                  },
+                  "discoveryMethod": {
+                    "type": "string"
+                  },
+                  "resolutionTransport": {
+                    "enum": [
+                      "OFFCHAIN_ETH_CALL",
+                      "OFFCHAIN_ETH_CALL_DESCRIPTION_ONLY"
+                    ]
+                  },
+                  "resolve": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "signature",
+                      "selector",
+                      "stateMutability",
+                      "ethCallOnly",
+                      "transactionCount",
+                      "stepCount",
+                      "stepType",
+                      "target",
+                      "function",
+                      "sourceExecutionCallCount"
+                    ],
+                    "properties": {
+                      "signature": {
+                        "const": "resolve(bytes)"
+                      },
+                      "selector": {
+                        "type": "string",
+                        "pattern": "^0x[0-9a-fA-F]{8}$",
+                        "description": "Four-byte function selector."
+                      },
+                      "stateMutability": {
+                        "const": "view"
+                      },
+                      "ethCallOnly": {
+                        "const": true
+                      },
+                      "transactionCount": {
+                        "const": 0
+                      },
+                      "stepCount": {
+                        "const": 1
+                      },
+                      "stepType": {
+                        "const": "Call"
+                      },
+                      "target": {
+                        "type": "string",
+                        "pattern": "^0x[0-9a-fA-F]{40}$",
+                        "description": "EVM address."
+                      },
+                      "function": {
+                        "const": "fillDirect"
+                      },
+                      "sourceExecutionCallCount": {
+                        "const": 1
+                      }
+                    }
+                  },
+                  "describeMandate": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "supported",
+                      "signature",
+                      "selector",
+                      "stateMutability",
+                      "ethCallOnly",
+                      "transactionCount",
+                      "outputFields"
+                    ],
+                    "properties": {
+                      "supported": {
+                        "const": true
+                      },
+                      "signature": {
+                        "const": "describeMandate(bytes)"
+                      },
+                      "selector": {
+                        "type": "string",
+                        "pattern": "^0x[0-9a-fA-F]{8}$",
+                        "description": "Four-byte function selector."
+                      },
+                      "stateMutability": {
+                        "const": "pure"
+                      },
+                      "ethCallOnly": {
+                        "const": true
+                      },
+                      "transactionCount": {
+                        "const": 0
+                      },
+                      "outputFields": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "resolveExecution": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "supported",
+                      "signature",
+                      "selector",
+                      "stateMutability",
+                      "transactionCount"
+                    ],
+                    "properties": {
+                      "supported": {
+                        "type": "boolean"
+                      },
+                      "signature": {
+                        "type": "string"
+                      },
+                      "selector": {
+                        "type": "string",
+                        "pattern": "^0x[0-9a-fA-F]{8}$",
+                        "description": "Four-byte function selector."
+                      },
+                      "stateMutability": {
+                        "enum": [
+                          "pure",
+                          "view"
+                        ]
+                      },
+                      "ethCallOnly": {
+                        "type": "boolean"
+                      },
+                      "executable": {
+                        "type": "boolean"
+                      },
+                      "revertsWith": {
+                        "type": "string"
+                      },
+                      "transactionCount": {
+                        "const": 0
+                      },
+                      "outputFields": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "target": {
+                        "type": "string",
+                        "pattern": "^0x[0-9a-fA-F]{40}$",
+                        "description": "EVM address."
+                      },
+                      "function": {
+                        "const": "fillDirect"
+                      },
+                      "sourceTransactionCount": {
+                        "const": 1
+                      }
+                    }
+                  }
+                }
+              },
+              "oif": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "name",
+                  "standardId",
+                  "compatibilityLevel",
+                  "executable",
+                  "moduleAddress",
+                  "expectedRuntimeCodeHash",
+                  "supportedChainIds",
+                  "sameAddressAcrossChains",
+                  "router",
+                  "selectors",
+                  "selectorSignatures",
+                  "erc165",
+                  "payloadEncoding",
+                  "discoveryMethod",
+                  "resolutionTransport",
+                  "resolveExecution"
+                ],
+                "properties": {
+                  "name": {
+                    "enum": [
+                      "ERC-7683",
+                      "OIF"
+                    ]
+                  },
+                  "standardId": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{64}$",
+                    "description": "32-byte hexadecimal value."
+                  },
+                  "compatibilityLevel": {
+                    "enum": [
+                      "EXECUTABLE_RESOLVER",
+                      "DISCOVERY_DESCRIPTION_ONLY"
+                    ]
+                  },
+                  "compatibilityLevelId": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{64}$",
+                    "description": "32-byte hexadecimal value."
+                  },
+                  "executable": {
+                    "type": "boolean"
+                  },
+                  "moduleAddress": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "description": "EVM address."
+                  },
+                  "expectedRuntimeCodeHash": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{64}$",
+                    "description": "32-byte hexadecimal value."
+                  },
+                  "supportedChainIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "sameAddressAcrossChains": {
+                    "const": true
+                  },
+                  "router": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "description": "EVM address."
+                  },
+                  "selectors": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string",
+                      "pattern": "^0x[0-9a-fA-F]{8}$",
+                      "description": "Four-byte function selector."
+                    }
+                  },
+                  "selectorSignatures": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  },
+                  "erc165": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "supported",
+                      "interfaceIds"
+                    ],
+                    "properties": {
+                      "supported": {
+                        "const": true
+                      },
+                      "interfaceIds": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "pattern": "^0x[0-9a-fA-F]{8}$",
+                          "description": "Four-byte function selector."
+                        }
+                      }
+                    }
+                  },
+                  "payloadEncoding": {
+                    "$ref": "#/components/schemas/StandardPayloadEncoding"
+                  },
+                  "discoveryMethod": {
+                    "type": "string"
+                  },
+                  "resolutionTransport": {
+                    "enum": [
+                      "OFFCHAIN_ETH_CALL",
+                      "OFFCHAIN_ETH_CALL_DESCRIPTION_ONLY"
+                    ]
+                  },
+                  "resolve": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "signature",
+                      "selector",
+                      "stateMutability",
+                      "ethCallOnly",
+                      "transactionCount",
+                      "stepCount",
+                      "stepType",
+                      "target",
+                      "function",
+                      "sourceExecutionCallCount"
+                    ],
+                    "properties": {
+                      "signature": {
+                        "const": "resolve(bytes)"
+                      },
+                      "selector": {
+                        "type": "string",
+                        "pattern": "^0x[0-9a-fA-F]{8}$",
+                        "description": "Four-byte function selector."
+                      },
+                      "stateMutability": {
+                        "const": "view"
+                      },
+                      "ethCallOnly": {
+                        "const": true
+                      },
+                      "transactionCount": {
+                        "const": 0
+                      },
+                      "stepCount": {
+                        "const": 1
+                      },
+                      "stepType": {
+                        "const": "Call"
+                      },
+                      "target": {
+                        "type": "string",
+                        "pattern": "^0x[0-9a-fA-F]{40}$",
+                        "description": "EVM address."
+                      },
+                      "function": {
+                        "const": "fillDirect"
+                      },
+                      "sourceExecutionCallCount": {
+                        "const": 1
+                      }
+                    }
+                  },
+                  "describeMandate": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "supported",
+                      "signature",
+                      "selector",
+                      "stateMutability",
+                      "ethCallOnly",
+                      "transactionCount",
+                      "outputFields"
+                    ],
+                    "properties": {
+                      "supported": {
+                        "const": true
+                      },
+                      "signature": {
+                        "const": "describeMandate(bytes)"
+                      },
+                      "selector": {
+                        "type": "string",
+                        "pattern": "^0x[0-9a-fA-F]{8}$",
+                        "description": "Four-byte function selector."
+                      },
+                      "stateMutability": {
+                        "const": "pure"
+                      },
+                      "ethCallOnly": {
+                        "const": true
+                      },
+                      "transactionCount": {
+                        "const": 0
+                      },
+                      "outputFields": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "resolveExecution": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "supported",
+                      "signature",
+                      "selector",
+                      "stateMutability",
+                      "transactionCount"
+                    ],
+                    "properties": {
+                      "supported": {
+                        "type": "boolean"
+                      },
+                      "signature": {
+                        "type": "string"
+                      },
+                      "selector": {
+                        "type": "string",
+                        "pattern": "^0x[0-9a-fA-F]{8}$",
+                        "description": "Four-byte function selector."
+                      },
+                      "stateMutability": {
+                        "enum": [
+                          "pure",
+                          "view"
+                        ]
+                      },
+                      "ethCallOnly": {
+                        "type": "boolean"
+                      },
+                      "executable": {
+                        "type": "boolean"
+                      },
+                      "revertsWith": {
+                        "type": "string"
+                      },
+                      "transactionCount": {
+                        "const": 0
+                      },
+                      "outputFields": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "target": {
+                        "type": "string",
+                        "pattern": "^0x[0-9a-fA-F]{40}$",
+                        "description": "EVM address."
+                      },
+                      "function": {
+                        "const": "fillDirect"
+                      },
+                      "sourceTransactionCount": {
+                        "const": 1
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "executionInvariant": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "botSourceTransactions",
+              "nexaDestinationTransactions",
+              "totalTransactions"
+            ],
+            "properties": {
+              "botSourceTransactions": {
+                "const": 1
+              },
+              "nexaDestinationTransactions": {
+                "const": 1
+              },
+              "totalTransactions": {
+                "const": 2
+              }
+            }
+          }
+        }
+      },
+      "OnchainDiscoveryFingerprint": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schema",
+          "protocol",
+          "status",
+          "deploymentVersion",
+          "releaseId",
+          "discoveryURI",
+          "onchainDiscoveryURI",
+          "feedURI",
+          "publicIntegrationRepo",
+          "chains",
+          "sameAddressAcrossChains",
+          "facade",
+          "facadeRuntimeCodeHash",
+          "registry",
+          "registryRuntimeCodeHash",
+          "router",
+          "routerRuntimeCodeHash",
+          "selectors",
+          "selectorSignatures",
+          "events",
+          "erc7683",
+          "oif",
+          "deployment",
+          "chainEvidence",
+          "sourcify",
+          "discoveryPaths",
+          "scannerHints"
+        ],
+        "properties": {
+          "schema": {
+            "const": "NEXA_MAINNET_V6_ONCHAIN_DISCOVERY_FINGERPRINT_V1"
+          },
+          "protocol": {
+            "const": "Nexa V6"
+          },
+          "status": {
+            "const": "ACTIVE"
+          },
+          "deploymentVersion": {
+            "const": 6
+          },
+          "releaseId": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "discoveryURI": {
+            "type": "string",
+            "format": "uri"
+          },
+          "onchainDiscoveryURI": {
+            "type": "string",
+            "format": "uri"
+          },
+          "feedURI": {
+            "type": "string",
+            "format": "uri"
+          },
+          "publicIntegrationRepo": {
+            "type": "string",
+            "format": "uri"
+          },
+          "chains": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "sameAddressAcrossChains": {
+            "const": true
+          },
+          "facade": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$",
+            "description": "EVM address."
+          },
+          "facadeRuntimeCodeHash": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "registry": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$",
+            "description": "EVM address."
+          },
+          "registryRuntimeCodeHash": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "router": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$",
+            "description": "EVM address."
+          },
+          "routerRuntimeCodeHash": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "selectors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "pattern": "^0x[0-9a-fA-F]{8}$",
+              "description": "Four-byte function selector."
+            }
+          },
+          "selectorSignatures": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "events": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "SourceFillV6"
+            ],
+            "properties": {
+              "SourceFillV6": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "contract",
+                  "address",
+                  "sameAddressAcrossChains",
+                  "chains",
+                  "signature",
+                  "topic0",
+                  "indexed",
+                  "fields",
+                  "indexedFields",
+                  "indexedTopicPositions",
+                  "nonIndexed",
+                  "discoveryMapping"
+                ],
+                "properties": {
+                  "contract": {
+                    "type": "string"
+                  },
+                  "address": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "description": "EVM address."
+                  },
+                  "sameAddressAcrossChains": {
+                    "const": true
+                  },
+                  "chains": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "signature": {
+                    "type": "string"
+                  },
+                  "topic0": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{64}$",
+                    "description": "32-byte hexadecimal value."
+                  },
+                  "indexed": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "fields": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "indexedFields": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "name",
+                        "type",
+                        "topicPosition"
+                      ],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "topicPosition": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 3
+                        }
+                      }
+                    }
+                  },
+                  "indexedTopicPositions": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 3
+                    }
+                  },
+                  "nonIndexed": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "discoveryMapping": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "router",
+                      "facade",
+                      "discoveryURI"
+                    ],
+                    "properties": {
+                      "router": {
+                        "type": "string",
+                        "pattern": "^0x[0-9a-fA-F]{40}$",
+                        "description": "EVM address."
+                      },
+                      "facade": {
+                        "type": "string",
+                        "pattern": "^0x[0-9a-fA-F]{40}$",
+                        "description": "EVM address."
+                      },
+                      "discoveryURI": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "erc7683": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "sameAddressAcrossChains",
+              "chains",
+              "runtimeCodeHash",
+              "router",
+              "standardId",
+              "selectors",
+              "selectorSignatures",
+              "erc165"
+            ],
+            "properties": {
+              "resolver": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$",
+                "description": "EVM address."
+              },
+              "module": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$",
+                "description": "EVM address."
+              },
+              "sameAddressAcrossChains": {
+                "const": true
+              },
+              "chains": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "runtimeCodeHash": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{64}$",
+                "description": "32-byte hexadecimal value."
+              },
+              "router": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$",
+                "description": "EVM address."
+              },
+              "standardId": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{64}$",
+                "description": "32-byte hexadecimal value."
+              },
+              "compatibilityLevel": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{64}$",
+                "description": "32-byte hexadecimal value."
+              },
+              "compatibilityLevelName": {
+                "type": "string"
+              },
+              "executable": {
+                "type": "boolean"
+              },
+              "selectors": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "pattern": "^0x[0-9a-fA-F]{8}$",
+                  "description": "Four-byte function selector."
+                }
+              },
+              "selectorSignatures": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "erc165": {
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "supported",
+                  "erc165InterfaceId",
+                  "nexaStandardModuleV6InterfaceId"
+                ],
+                "properties": {
+                  "supported": {
+                    "const": true
+                  },
+                  "erc165InterfaceId": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{8}$",
+                    "description": "Four-byte function selector."
+                  },
+                  "nexaStandardModuleV6InterfaceId": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{8}$",
+                    "description": "Four-byte function selector."
+                  },
+                  "resolverDetection": {
+                    "type": "string"
+                  }
+                }
+              },
+              "discoveryMapping": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "resolver": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "description": "EVM address."
+                  },
+                  "router": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "description": "EVM address."
+                  },
+                  "facade": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "description": "EVM address."
+                  },
+                  "discoveryURI": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                }
+              }
+            }
+          },
+          "oif": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "sameAddressAcrossChains",
+              "chains",
+              "runtimeCodeHash",
+              "router",
+              "standardId",
+              "selectors",
+              "selectorSignatures",
+              "erc165"
+            ],
+            "properties": {
+              "resolver": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$",
+                "description": "EVM address."
+              },
+              "module": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$",
+                "description": "EVM address."
+              },
+              "sameAddressAcrossChains": {
+                "const": true
+              },
+              "chains": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "runtimeCodeHash": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{64}$",
+                "description": "32-byte hexadecimal value."
+              },
+              "router": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$",
+                "description": "EVM address."
+              },
+              "standardId": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{64}$",
+                "description": "32-byte hexadecimal value."
+              },
+              "compatibilityLevel": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{64}$",
+                "description": "32-byte hexadecimal value."
+              },
+              "compatibilityLevelName": {
+                "type": "string"
+              },
+              "executable": {
+                "type": "boolean"
+              },
+              "selectors": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "pattern": "^0x[0-9a-fA-F]{8}$",
+                  "description": "Four-byte function selector."
+                }
+              },
+              "selectorSignatures": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "erc165": {
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "supported",
+                  "erc165InterfaceId",
+                  "nexaStandardModuleV6InterfaceId"
+                ],
+                "properties": {
+                  "supported": {
+                    "const": true
+                  },
+                  "erc165InterfaceId": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{8}$",
+                    "description": "Four-byte function selector."
+                  },
+                  "nexaStandardModuleV6InterfaceId": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{8}$",
+                    "description": "Four-byte function selector."
+                  },
+                  "resolverDetection": {
+                    "type": "string"
+                  }
+                }
+              },
+              "discoveryMapping": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "resolver": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "description": "EVM address."
+                  },
+                  "router": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "description": "EVM address."
+                  },
+                  "facade": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$",
+                    "description": "EVM address."
+                  },
+                  "discoveryURI": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                }
+              }
+            }
+          },
+          "deployment": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "method",
+              "factory",
+              "salt",
+              "initCodeHash",
+              "expectedFacadeAddress",
+              "supportedChainIds",
+              "sameAddressAcrossChains",
+              "compiler",
+              "standardJsonInputHash",
+              "blocks",
+              "transactions"
+            ],
+            "properties": {
+              "method": {
+                "const": "CREATE2"
+              },
+              "factory": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$",
+                "description": "EVM address."
+              },
+              "salt": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{64}$",
+                "description": "32-byte hexadecimal value."
+              },
+              "initCodeHash": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{64}$",
+                "description": "32-byte hexadecimal value."
+              },
+              "expectedFacadeAddress": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$",
+                "description": "EVM address."
+              },
+              "supportedChainIds": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "sameAddressAcrossChains": {
+                "const": true
+              },
+              "compiler": {
+                "type": "string"
+              },
+              "standardJsonInputHash": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{64}$",
+                "description": "32-byte hexadecimal value."
+              },
+              "blocks": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "integer"
+                }
+              },
+              "transactions": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "pattern": "^0x[0-9a-fA-F]{64}$",
+                  "description": "32-byte hexadecimal value."
+                }
+              }
+            }
+          },
+          "chainEvidence": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "network",
+                "deploymentTransactionHash",
+                "deploymentBlockNumber",
+                "explorer",
+                "sourcify",
+                "sourcifyMatchId"
+              ],
+              "properties": {
+                "network": {
+                  "type": "string"
+                },
+                "deploymentTransactionHash": {
+                  "type": "string",
+                  "pattern": "^0x[0-9a-fA-F]{64}$",
+                  "description": "32-byte hexadecimal value."
+                },
+                "deploymentBlockNumber": {
+                  "type": "integer"
+                },
+                "explorer": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "sourcify": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "sourcifyMatchId": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "sourcify": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": [
+              "exactMatchOnEveryChain",
+              "allChainsLookup",
+              "contractLookupTemplate",
+              "verifiedContractsListTemplate",
+              "signatureLookup",
+              "sourceFillV6Signature"
+            ],
+            "properties": {
+              "exactMatchOnEveryChain": {
+                "const": true
+              },
+              "allChainsLookup": {
+                "type": "string",
+                "format": "uri"
+              },
+              "contractLookupTemplate": {
+                "type": "string"
+              },
+              "verifiedContractsListTemplate": {
+                "type": "string"
+              },
+              "signatureLookup": {
+                "type": "string",
+                "format": "uri"
+              },
+              "sourceFillV6Signature": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          },
+          "discoveryPaths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "scannerHints": {
+            "$ref": "#/components/schemas/ScannerHints"
+          }
+        }
+      },
+      "SolverDiscovery": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schema",
+          "deploymentVersion",
+          "deploymentStatus",
+          "releaseId",
+          "feedSigner",
+          "solverProfile",
+          "discoveryModel",
+          "executionModel",
+          "publication",
+          "feedTransport",
+          "authentication",
+          "permitRequestSigning",
+          "endpoints",
+          "standards",
+          "passiveOnchainDiscovery",
+          "activationRequired"
+        ],
+        "properties": {
+          "schema": {
+            "const": "NEXA_MAINNET_V6_SOLVER_DISCOVERY_V2"
+          },
+          "deploymentVersion": {
+            "const": 6
+          },
+          "deploymentStatus": {
+            "const": "ACTIVE"
+          },
+          "releaseId": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "feedSigner": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$",
+            "description": "EVM address."
+          },
+          "solverProfile": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "executionScopes",
+              "automatedDiscovery",
+              "variableSizeExecution",
+              "machineVerifiableState",
+              "accountlessDiscovery"
+            ],
+            "properties": {
+              "executionScopes": {
+                "type": "array",
+                "items": {
+                  "enum": [
+                    "INTRA_CHAIN",
+                    "CROSS_CHAIN"
+                  ]
+                }
+              },
+              "automatedDiscovery": {
+                "const": true
+              },
+              "variableSizeExecution": {
+                "const": true
+              },
+              "machineVerifiableState": {
+                "const": true
+              },
+              "accountlessDiscovery": {
+                "const": true
+              }
+            }
+          },
+          "discoveryModel": {
+            "const": "SIGNED_MACHINE_READABLE_FEED"
+          },
+          "executionModel": {
+            "const": "EXACTLY_ONE_BOT_SOURCE_TX_PLUS_ONE_NEXA_DESTINATION_TX"
+          },
+          "publication": {
+            "const": "SIGNED_OFFCHAIN_FEED_ZERO_PERIODIC_GAS"
+          },
+          "feedTransport": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "primary",
+              "recovery",
+              "reconnectWithLastEventId"
+            ],
+            "properties": {
+              "primary": {
+                "const": "SSE_CONFIRMED_ACTIVE_SET"
+              },
+              "recovery": {
+                "const": "HTTP_SIGNED_FEED"
+              },
+              "reconnectWithLastEventId": {
+                "const": true
+              }
+            }
+          },
+          "authentication": {
+            "const": "WALLET_OR_NATIVE_ACCOUNT_PROOF"
+          },
+          "permitRequestSigning": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "mode",
+              "domain",
+              "canonicalizer",
+              "messageBuilder",
+              "signatureScheme",
+              "canonicalJson",
+              "messageLines",
+              "requestMessageEndpointRequired"
+            ],
+            "properties": {
+              "mode": {
+                "const": "LOCAL_DETERMINISTIC_MESSAGE"
+              },
+              "domain": {
+                "type": "string"
+              },
+              "canonicalizer": {
+                "const": "canonicalPermitRequest"
+              },
+              "messageBuilder": {
+                "const": "permitRequestMessage"
+              },
+              "signatureScheme": {
+                "const": "EIP191_PERSONAL_SIGN_UTF8"
+              },
+              "canonicalJson": {
+                "const": "RECURSIVE_SORTED_OBJECT_KEYS_COMPACT_JSON"
+              },
+              "messageLines": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "requestMessageEndpointRequired": {
+                "const": false
+              }
+            }
+          },
+          "endpoints": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "manifest",
+              "onchainDiscovery",
+              "openapi",
+              "standards",
+              "solverDiscovery",
+              "solverFeed",
+              "solverFeedEvents",
+              "routeDetailTemplate",
+              "permitRequestMessage",
+              "executionPermits",
+              "permitStatusTemplate"
+            ],
+            "properties": {
+              "manifest": {
+                "type": "string",
+                "format": "uri"
+              },
+              "onchainDiscovery": {
+                "type": "string",
+                "format": "uri"
+              },
+              "openapi": {
+                "type": "string",
+                "format": "uri"
+              },
+              "standards": {
+                "type": "string",
+                "format": "uri"
+              },
+              "solverDiscovery": {
+                "type": "string",
+                "format": "uri"
+              },
+              "solverFeed": {
+                "type": "string",
+                "format": "uri"
+              },
+              "solverFeedEvents": {
+                "type": "string",
+                "format": "uri"
+              },
+              "routeDetailTemplate": {
+                "type": "string",
+                "format": "uri"
+              },
+              "permitRequestMessage": {
+                "type": "string",
+                "format": "uri"
+              },
+              "executionPermits": {
+                "type": "string",
+                "format": "uri"
+              },
+              "permitStatusTemplate": {
+                "type": "string",
+                "format": "uri"
+              }
+            }
+          },
+          "standards": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "standardId",
+                "name",
+                "compatibilityLevel",
+                "moduleAddress",
+                "executable"
+              ],
+              "properties": {
+                "standardId": {
+                  "type": "string",
+                  "pattern": "^0x[0-9a-fA-F]{64}$",
+                  "description": "32-byte hexadecimal value."
+                },
+                "name": {
+                  "enum": [
+                    "ERC-7683",
+                    "OIF"
+                  ]
+                },
+                "compatibilityLevel": {
+                  "type": "string"
+                },
+                "moduleAddress": {
+                  "type": "string",
+                  "pattern": "^0x[0-9a-fA-F]{40}$",
+                  "description": "EVM address."
+                },
+                "executable": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "passiveOnchainDiscovery": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "uri",
+              "facadeAddress",
+              "chains",
+              "sameAddressAcrossChains"
+            ],
+            "properties": {
+              "uri": {
+                "type": "string",
+                "format": "uri"
+              },
+              "facadeAddress": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$",
+                "description": "EVM address."
+              },
+              "chains": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "sameAddressAcrossChains": {
+                "const": true
+              }
+            }
+          },
+          "activationRequired": {
+            "const": false
           }
         }
       }

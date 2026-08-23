@@ -20,10 +20,20 @@ const provider = new JsonRpcProvider(rpcByNetwork[networkName], surface.network.
 });
 try {
   const module = new Contract(definition.address, definition.abi, provider);
-  const mandate = await module.describeMandate(payload);
+  // OIF is description-only. This is an explicit eth_call and never resolves
+  // an executable transaction.
+  const mandate = await module.describeMandate.staticCall(payload);
   console.log(JSON.stringify({
     module: definition.address,
     standardId: definition.standardId,
+    transport: "eth_call",
+    transactionCount: 0,
+    compatibilityLevel: "DISCOVERY_DESCRIPTION_ONLY",
+    executable: false,
+    resolveExecution: {
+      supported: false,
+      revertsWith: "OIFExecutionUnsupported()",
+    },
     mandate: {
       oracle: mandate.oracle,
       settler: mandate.settler,

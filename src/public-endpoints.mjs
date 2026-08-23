@@ -3,6 +3,8 @@ export const PUBLIC_BASE_URL = "https://solver.vsnexa.com";
 export const PUBLIC_PATHS = Object.freeze({
   manifest: "/.well-known/nexa-solver.json",
   onchainDiscovery: "/.well-known/nexa-onchain-discovery.json",
+  openapi: "/openapi.json",
+  standards: "/.well-known/nexa-standards.json",
   solverDiscovery: "/api/v6/solver-discovery",
   solverFeed: "/api/v6/solver-feed",
   solverFeedEvents: "/api/v6/solver-feed/events",
@@ -15,6 +17,8 @@ export const PUBLIC_PATHS = Object.freeze({
 export const PUBLIC_ENDPOINTS = Object.freeze({
   manifest: PUBLIC_BASE_URL + PUBLIC_PATHS.manifest,
   onchainDiscovery: PUBLIC_BASE_URL + PUBLIC_PATHS.onchainDiscovery,
+  openapi: PUBLIC_BASE_URL + PUBLIC_PATHS.openapi,
+  standards: PUBLIC_BASE_URL + PUBLIC_PATHS.standards,
   solverDiscovery: PUBLIC_BASE_URL + PUBLIC_PATHS.solverDiscovery,
   solverFeed: PUBLIC_BASE_URL + PUBLIC_PATHS.solverFeed,
   solverFeedEvents: PUBLIC_BASE_URL + PUBLIC_PATHS.solverFeedEvents,
@@ -43,8 +47,13 @@ export function isDynamicApiPath(pathname) {
 }
 
 export function allowedMethodsForPath(pathname) {
-  if (pathname === PUBLIC_PATHS.manifest || pathname === PUBLIC_PATHS.onchainDiscovery) {
-    return new Set(["GET", "HEAD"]);
+  if ([
+    PUBLIC_PATHS.manifest,
+    PUBLIC_PATHS.onchainDiscovery,
+    PUBLIC_PATHS.openapi,
+    PUBLIC_PATHS.standards,
+  ].includes(pathname)) {
+    return new Set(["GET"]);
   }
   if (!isDynamicApiPath(pathname)) return new Set();
   if (pathname === PUBLIC_PATHS.permitRequestMessage || pathname === PUBLIC_PATHS.executionPermits) {

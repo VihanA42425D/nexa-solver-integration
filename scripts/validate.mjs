@@ -8,6 +8,11 @@ import { buildNexaSolverManifest, serializeNexaSolverManifest } from "./generate
 import { buildOnboardingPackage, serializeOnboardingPackage } from "./generate-onboarding-package.mjs";
 import { buildOpenApi } from "./generate-openapi.mjs";
 import { buildOnchainDiscovery, serializeOnchainDiscovery } from "./generate-onchain-discovery.mjs";
+import {
+  buildStandardsManifest,
+  serializeStandardsManifest,
+} from "./generate-standards-manifest.mjs";
+import { buildStandardVectors } from "./generate-standard-vectors.mjs";
 import { auditRepositoryForSecrets } from "./repo-secret-audit.mjs";
 import { PUBLIC_ENDPOINTS, PUBLIC_PATHS } from "../src/public-endpoints.mjs";
 
@@ -21,12 +26,15 @@ const hash = (value, code) => {
   if (!/^0x[0-9a-f]{64}$/i.test(String(value ?? ""))) throw new Error(code);
 };
 
-const [manifest, integration, standards, events, networkIds, abi, facadeEvidence,
+const [manifest, integration, standards, standardsManifest, standardVectors,
+  events, networkIds, abi, facadeEvidence,
   inputEvidence, ownershipEvidence, identityEvidence, resolverVetting, openapi, onchainDiscovery,
   onboarding, packageJson] = await Promise.all([
   readJson("manifest.json"),
   readJson("nexa-mainnet-v6.json"),
   readJson("standards/standard-ids.json"),
+  readJson("standards/nexa-standards.json"),
+  readJson("standards/test-vectors.json"),
   readJson("events/events.json"),
   readJson("networks/network-ids.json"),
   readJson("abi/solver-facing.json"),
@@ -159,6 +167,21 @@ if (onchainDiscovery.status !== "ACTIVE"
     || onchainDiscovery.sourcify.sourceFillV6Signature.hasVerifiedContractAssociation !== false) {
   throw new Error("Passive onchain discovery identity drift");
 }
+const scannerHints = onchainDiscovery.scannerHints;
+if (scannerHints?.schema !== "NEXA_MAINNET_V6_SCANNER_HINTS_V1"
+    || scannerHints.generatedFrom !== "CANONICAL_ONCHAIN_DISCOVERY_FINGERPRINT"
+    || scannerHints.probe?.externalScannerOnly !== true
+    || scannerHints.probe?.executedByNexa !== false
+    || scannerHints.probe?.performsWrites !== false
+    || scannerHints.probe?.pollingRequired !== false
+    || scannerHints.probe?.steps?.length !== 9
+    || scannerHints.eventDiscovery?.SourceFillV6?.topic0 !== sourceFill.topic0
+    || scannerHints.contracts?.facade?.expectedRuntimeCodeHash !== facade.runtimeCodeHash
+    || scannerHints.contracts?.router?.expectedRuntimeCodeHash !== router.runtimeCodeHash
+    || scannerHints.standards?.erc7683?.resolver !== standards.standards.erc7683.moduleAddress
+    || scannerHints.standards?.oif?.module !== standards.standards.oif.moduleAddress) {
+  throw new Error("Scanner hints projection drift");
+}
 for (const [slug, chainId] of Object.entries(expectedNetworks)) {
   const chain = onchainDiscovery.chainEvidence[String(chainId)];
   const evidence = facadeEvidence.networks[slug];
@@ -199,6 +222,65 @@ for (const [name, value] of Object.entries(identityEvidence.contracts)) {
 
 same(await buildAbiBundle(root), abi, "Generated ABI is stale");
 same(buildOpenApi(), openapi, "Generated OpenAPI is stale");
+for (const schema of [
+  "SolverDiscovery",
+  "OnchainDiscoveryFingerprint",
+  "ScannerHints",
+  "StandardsManifest",
+  "SignedFeed",
+  "SignedFeedPayload",
+  "FeedResponse",
+  "Route",
+  "RouteDetailResponse",
+  "PermitRequest",
+  "PermitRequestMessageResponse",
+  "ExecutionPermitResponse",
+  "PermitStatusResponse",
+  "ErrorResponse",
+]) {
+  if (!openapi.components?.schemas?.[schema]) throw new Error(`OpenAPI schema missing: ${schema}`);
+}
+if (openapi.openapi !== "3.1.0"
+    || openapi.components.schemas.SignedFeed.properties.signedPayload.$ref
+      !== "#/components/schemas/SignedFeedPayload"
+    || openapi.components.schemas.DirectExecution.properties.transactionCount.const !== 1
+    || openapi.components.schemas.ExecutionPermitEnvelope.properties.totalTransactionCount.const !== 2
+    || !openapi.paths[PUBLIC_PATHS.solverFeedEvents].get.description.includes("no replay")
+    || !openapi.paths[PUBLIC_PATHS.solverFeedEvents].get.description.includes(
+      "equal to current suppresses the initial event",
+    )
+    || !openapi.paths[PUBLIC_PATHS.executionPermits].post.responses["201"]
+    || !openapi.paths[PUBLIC_PATHS.executionPermits].post.responses["429"]) {
+  throw new Error("OpenAPI runtime semantics drift");
+}
+const generatedStandardsManifest = await buildStandardsManifest(root);
+same(generatedStandardsManifest, standardsManifest, "Generated standards manifest is stale");
+if (await read("standards/nexa-standards.json")
+      !== serializeStandardsManifest(generatedStandardsManifest)
+    || await read("public/.well-known/nexa-standards.json")
+      !== serializeStandardsManifest(generatedStandardsManifest)) {
+  throw new Error("Serialized standards manifest is stale");
+}
+same(await buildStandardVectors(root), standardVectors, "Generated standard vectors are stale");
+if (standardsManifest.standards.erc7683.resolve.stepCount !== 1
+    || standardsManifest.standards.erc7683.resolve.stepType !== "Call"
+    || standardsManifest.standards.erc7683.resolve.target !== router.address
+    || standardsManifest.standards.erc7683.resolve.function !== "fillDirect"
+    || standardsManifest.standards.erc7683.resolve.transactionCount !== 0
+    || standardsManifest.standards.erc7683.resolveExecution.outputFields.join(",")
+      !== "routeId,quoteId,target,value,callData"
+    || standardsManifest.standards.oif.executable !== false
+    || standardsManifest.standards.oif.resolveExecution.supported !== false
+    || standardsManifest.standards.oif.resolveExecution.revertsWith
+      !== "OIFExecutionUnsupported()"
+    || standardVectors.erc7683.resolve.expected.stepCount !== 1
+    || standardVectors.erc7683.resolveExecution.expected.target !== router.address
+    || !/^0x[0-9a-f]+$/i.test(standardVectors.erc7683.resolveExecution.expected.callData)
+    || standardVectors.oif.executable !== false
+    || standardVectors.oif.resolveExecution.expected.supported !== false
+    || standardVectors.executionInvariant.totalTransactions !== 2) {
+  throw new Error("Standards machine semantics drift");
+}
 same(await buildOnboardingPackage(root), onboarding, "Generated onboarding package is stale");
 if (await read("onboarding/nexa-v6-solver-operator.json")
     !== serializeOnboardingPackage(await buildOnboardingPackage(root))) {
@@ -211,6 +293,8 @@ if (onboarding.protocol !== "Nexa V6"
     || onboarding.contracts.erc7683Resolver.address !== standards.standards.erc7683.moduleAddress
     || onboarding.endpoints.feed !== PUBLIC_ENDPOINTS.solverFeed
     || onboarding.endpoints.onchainDiscovery !== PUBLIC_ENDPOINTS.onchainDiscovery
+    || onboarding.endpoints.openapi !== PUBLIC_ENDPOINTS.openapi
+    || onboarding.endpoints.standards !== PUBLIC_ENDPOINTS.standards
     || onboarding.endpoints.sse !== PUBLIC_ENDPOINTS.solverFeedEvents
     || JSON.stringify(onboarding.chainIds) !== JSON.stringify([8453, 56, 999])) {
   throw new Error("Zero-touch onboarding identity drift");
@@ -228,6 +312,10 @@ if (await read("public/.well-known/nexa-solver.json") !== generatedDiscovery) {
   throw new Error("Generated Solver discovery is stale");
 }
 same(JSON.parse(generatedDiscovery).endpoints, PUBLIC_ENDPOINTS, "Discovery endpoint drift");
+if (packageJson.exports["./standards"] !== "./standards/nexa-standards.json"
+    || packageJson.exports["./standards/test-vectors"] !== "./standards/test-vectors.json") {
+  throw new Error("Standards package exports missing");
+}
 if (await read("verification/checksums.sha256") !== await buildChecksums(root)) {
   throw new Error("Public artifact checksums are stale");
 }

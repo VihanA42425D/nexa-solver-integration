@@ -1,0 +1,189 @@
+{
+  "schema": "NEXA_MAINNET_V6_STANDARDS_MANIFEST_V1",
+  "protocol": "Nexa V6",
+  "status": "ACTIVE",
+  "deploymentVersion": 6,
+  "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
+  "supportedChainIds": [
+    8453,
+    56,
+    999
+  ],
+  "sameAddressAcrossChains": true,
+  "router": {
+    "address": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+    "expectedRuntimeCodeHash": "0xcdda1b571b317479c6d297aa4354c406d4709f83562e2b6b29bd0e1268e4af70",
+    "sourceExecutionFunction": "fillDirect",
+    "sourceTransactionCount": 1
+  },
+  "payloadEncoding": {
+    "mediaType": "application/vnd.nexa.execution-permit-v6+abi",
+    "solidity": "abi.encode(ExecutionPermit,bytes)",
+    "tuple": [
+      "NexaMainnetV6Types.ExecutionPermit permit",
+      "bytes permitSignature"
+    ],
+    "source": "ExecutionPermitResponse.permit.permit + ExecutionPermitResponse.permit.permitSignature"
+  },
+  "standards": {
+    "erc7683": {
+      "name": "ERC-7683",
+      "standardId": "0x27ecffeeec898dbaf864fc095016ad6212d7a27e32a3069234a4a1da23f50993",
+      "compatibilityLevel": "EXECUTABLE_RESOLVER",
+      "executable": true,
+      "moduleAddress": "0x534A0f500A7270b9b19d2AFa18DE24DCE93eb522",
+      "expectedRuntimeCodeHash": "0xea99f0e1e33a9a9e1ae926e8f15fd09bf1b7b9cecf81a2ef294cd4820e26d392",
+      "supportedChainIds": [
+        8453,
+        56,
+        999
+      ],
+      "sameAddressAcrossChains": true,
+      "router": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+      "selectors": {
+        "standardId": "0x6838c23c",
+        "supportsInterface": "0x01ffc9a7",
+        "resolve": "0xe4056186",
+        "resolveExecution": "0xe55814c5",
+        "router": "0xf887ea40"
+      },
+      "selectorSignatures": {
+        "standardId": "standardId()",
+        "supportsInterface": "supportsInterface(bytes4)",
+        "resolve": "resolve(bytes)",
+        "resolveExecution": "resolveExecution(bytes)",
+        "router": "router()"
+      },
+      "erc165": {
+        "supported": true,
+        "interfaceIds": [
+          "0x01ffc9a7",
+          "0x8d60d6f9"
+        ]
+      },
+      "payloadEncoding": {
+        "mediaType": "application/vnd.nexa.execution-permit-v6+abi",
+        "solidity": "abi.encode(ExecutionPermit,bytes)",
+        "tuple": [
+          "NexaMainnetV6Types.ExecutionPermit permit",
+          "bytes permitSignature"
+        ],
+        "source": "ExecutionPermitResponse.permit.permit + ExecutionPermitResponse.permit.permitSignature"
+      },
+      "discoveryMethod": "standardId()+supportsInterface(bytes4)+router()",
+      "resolutionTransport": "OFFCHAIN_ETH_CALL",
+      "resolve": {
+        "signature": "resolve(bytes)",
+        "selector": "0xe4056186",
+        "stateMutability": "view",
+        "ethCallOnly": true,
+        "transactionCount": 0,
+        "stepCount": 1,
+        "stepType": "Call",
+        "target": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+        "function": "fillDirect",
+        "sourceExecutionCallCount": 1
+      },
+      "resolveExecution": {
+        "supported": true,
+        "signature": "resolveExecution(bytes)",
+        "selector": "0xe55814c5",
+        "stateMutability": "view",
+        "ethCallOnly": true,
+        "transactionCount": 0,
+        "outputFields": [
+          "routeId",
+          "quoteId",
+          "target",
+          "value",
+          "callData"
+        ],
+        "target": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+        "function": "fillDirect",
+        "sourceTransactionCount": 1
+      }
+    },
+    "oif": {
+      "name": "OIF",
+      "standardId": "0x3de00a2eccd5b86df839b3747bda483b2de2a855d640eb3d4938d6d43cb162c0",
+      "compatibilityLevel": "DISCOVERY_DESCRIPTION_ONLY",
+      "compatibilityLevelId": "0x733ae58d730378b55d837e45d20e05882481ab7715890fd971ee75f1cd63643c",
+      "executable": false,
+      "moduleAddress": "0x4f81426fE8999E982aE6b771536a4093879F6A20",
+      "expectedRuntimeCodeHash": "0x103c954e71ec79abefc0f8e1ef745787649edb91742a4d4a7b0d2a4646925cba",
+      "supportedChainIds": [
+        8453,
+        56,
+        999
+      ],
+      "sameAddressAcrossChains": true,
+      "router": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+      "selectors": {
+        "standardId": "0x6838c23c",
+        "supportsInterface": "0x01ffc9a7",
+        "resolveExecution": "0xe55814c5",
+        "router": "0xf887ea40",
+        "compatibilityLevel": "0x4658e14b",
+        "describeMandate": "0xd3528a0f"
+      },
+      "selectorSignatures": {
+        "standardId": "standardId()",
+        "supportsInterface": "supportsInterface(bytes4)",
+        "resolveExecution": "resolveExecution(bytes)",
+        "router": "router()",
+        "compatibilityLevel": "compatibilityLevel()",
+        "describeMandate": "describeMandate(bytes)"
+      },
+      "erc165": {
+        "supported": true,
+        "interfaceIds": [
+          "0x01ffc9a7",
+          "0x8d60d6f9"
+        ]
+      },
+      "payloadEncoding": {
+        "mediaType": "application/vnd.nexa.execution-permit-v6+abi",
+        "solidity": "abi.encode(ExecutionPermit,bytes)",
+        "tuple": [
+          "NexaMainnetV6Types.ExecutionPermit permit",
+          "bytes permitSignature"
+        ],
+        "source": "ExecutionPermitResponse.permit.permit + ExecutionPermitResponse.permit.permitSignature"
+      },
+      "discoveryMethod": "standardId()+supportsInterface(bytes4)+router()+compatibilityLevel()",
+      "resolutionTransport": "OFFCHAIN_ETH_CALL_DESCRIPTION_ONLY",
+      "describeMandate": {
+        "supported": true,
+        "signature": "describeMandate(bytes)",
+        "selector": "0xd3528a0f",
+        "stateMutability": "pure",
+        "ethCallOnly": true,
+        "transactionCount": 0,
+        "outputFields": [
+          "oracle",
+          "settler",
+          "chainId",
+          "token",
+          "amount",
+          "recipient",
+          "callbackData",
+          "context"
+        ]
+      },
+      "resolveExecution": {
+        "supported": false,
+        "signature": "resolveExecution(bytes)",
+        "selector": "0xe55814c5",
+        "stateMutability": "pure",
+        "executable": false,
+        "revertsWith": "OIFExecutionUnsupported()",
+        "transactionCount": 0
+      }
+    }
+  },
+  "executionInvariant": {
+    "botSourceTransactions": 1,
+    "nexaDestinationTransactions": 1,
+    "totalTransactions": 2
+  }
+}

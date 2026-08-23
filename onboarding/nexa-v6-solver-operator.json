@@ -1,6 +1,6 @@
 {
   "schema": "NEXA_V6_SOLVER_OPERATOR_ONBOARDING_V1",
-  "packageVersion": "6.2.0",
+  "packageVersion": "6.3.0",
   "protocol": "Nexa V6",
   "protocolVersion": 6,
   "environment": "mainnet",
@@ -83,6 +83,8 @@
   "endpoints": {
     "discovery": "https://solver.vsnexa.com/.well-known/nexa-solver.json",
     "onchainDiscovery": "https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json",
+    "openapi": "https://solver.vsnexa.com/openapi.json",
+    "standards": "https://solver.vsnexa.com/.well-known/nexa-standards.json",
     "solverDiscovery": "https://solver.vsnexa.com/api/v6/solver-discovery",
     "feed": "https://solver.vsnexa.com/api/v6/solver-feed",
     "sse": "https://solver.vsnexa.com/api/v6/solver-feed/events",
@@ -120,19 +122,21 @@
   },
   "integration": {
     "repository": "https://github.com/VihanA42425D/nexa-solver-integration",
-    "release": "https://github.com/VihanA42425D/nexa-solver-integration/releases/tag/v6.2.0",
+    "release": "https://github.com/VihanA42425D/nexa-solver-integration/releases/tag/v6.3.0",
     "canonicalBundle": "https://github.com/VihanA42425D/nexa-solver-integration/blob/main/nexa-mainnet-v6.json",
     "manifest": "https://github.com/VihanA42425D/nexa-solver-integration/blob/main/manifest.json",
     "onchainDiscovery": "https://github.com/VihanA42425D/nexa-solver-integration/blob/main/public/.well-known/nexa-onchain-discovery.json",
     "abi": "https://github.com/VihanA42425D/nexa-solver-integration/blob/main/abi/solver-facing.json",
     "openapi": "https://github.com/VihanA42425D/nexa-solver-integration/blob/main/openapi/openapi.json",
+    "standardsManifest": "https://github.com/VihanA42425D/nexa-solver-integration/blob/main/standards/nexa-standards.json",
+    "standardTestVectors": "https://github.com/VihanA42425D/nexa-solver-integration/blob/main/standards/test-vectors.json",
     "events": "https://github.com/VihanA42425D/nexa-solver-integration/blob/main/events/events.json",
     "networkIds": "https://github.com/VihanA42425D/nexa-solver-integration/blob/main/networks/network-ids.json",
     "verificationEvidence": "https://github.com/VihanA42425D/nexa-solver-integration/tree/main/verification",
     "checksums": "https://github.com/VihanA42425D/nexa-solver-integration/blob/main/verification/checksums.sha256"
   },
   "zeroTouch": {
-    "bootstrapCommand": "npx --yes github:VihanA42425D/nexa-solver-integration#v6.2.0",
+    "bootstrapCommand": "npx --yes github:VihanA42425D/nexa-solver-integration#v6.3.0",
     "localVerificationCommand": "npm run onboard:verify",
     "sequence": [
       "FETCH_AND_PIN_PACKAGE",

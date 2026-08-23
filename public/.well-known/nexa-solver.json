@@ -44,6 +44,8 @@
   "endpoints": {
     "manifest": "https://solver.vsnexa.com/.well-known/nexa-solver.json",
     "onchainDiscovery": "https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json",
+    "openapi": "https://solver.vsnexa.com/openapi.json",
+    "standards": "https://solver.vsnexa.com/.well-known/nexa-standards.json",
     "solverDiscovery": "https://solver.vsnexa.com/api/v6/solver-discovery",
     "solverFeed": "https://solver.vsnexa.com/api/v6/solver-feed",
     "solverFeedEvents": "https://solver.vsnexa.com/api/v6/solver-feed/events",

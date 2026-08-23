@@ -39,7 +39,7 @@ const sources = {
   python: await read("sdks/python/src/nexa_v6_sdk/client.py"),
   rust: await read("sdks/rust/src/lib.rs"),
   go: (await read("sdks/go/client.go")) + await read("sdks/go/core.go"),
-  jvm: await read("sdks/jvm/src/main/java/com/vsnexa/v6/NexaV6Client.java"),
+  jvm: await read("sdks/jvm/src/main/java/io/github/vihana42425d/nexa/v6/NexaV6Client.java"),
   dotnet: await read("sdks/dotnet/src/Nexa.V6.Sdk/NexaV6Client.cs"),
 };
 for (const [language, methods] of Object.entries(spec.languageBindings)) {

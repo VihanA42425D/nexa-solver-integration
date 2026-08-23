@@ -1,4 +1,4 @@
-package com.vsnexa.v6;
+package io.github.vihana42425d.nexa.v6;
 
 public final class NexaSdkException extends RuntimeException {
   private final String code;

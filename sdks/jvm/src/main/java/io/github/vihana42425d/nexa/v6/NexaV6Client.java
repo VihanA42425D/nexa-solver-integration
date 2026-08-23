@@ -1,4 +1,4 @@
-package com.vsnexa.v6;
+package io.github.vihana42425d.nexa.v6;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;

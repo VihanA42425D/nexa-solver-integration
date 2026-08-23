@@ -133,7 +133,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: sdk-v1.0.0
+          ref: sdks/jvm/v1.0.0
       - uses: actions/setup-java@v5
         with:
           distribution: temurin

@@ -1,4 +1,4 @@
-package com.vsnexa.v6;
+package io.github.vihana42425d.nexa.v6;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

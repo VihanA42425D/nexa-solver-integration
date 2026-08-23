@@ -90,7 +90,7 @@ The same ten behavioral operations are implemented for:
 | Python | [nexa-v6-sdk 1.0.0 on PyPI](https://pypi.org/project/nexa-v6-sdk/1.0.0/) |
 | Rust | [nexa-v6-sdk 1.0.0 on crates.io](https://crates.io/crates/nexa-v6-sdk/1.0.0) |
 | Go | github.com/VihanA42425D/nexa-solver-integration/sdks/go |
-| Java / Kotlin | com.vsnexa:nexa-v6-sdk on Maven Central |
+| Java / Kotlin | io.github.vihana42425d:nexa-v6-sdk on Maven Central |
 | .NET | Nexa.V6.Sdk on NuGet |
 
 Go and .NET use their exported PascalCase naming convention; the behavioral

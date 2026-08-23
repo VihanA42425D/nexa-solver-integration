@@ -1,6 +1,6 @@
-package com.vsnexa.v6;
+package io.github.vihana42425d.nexa.v6;
 
-import static com.vsnexa.v6.NexaV6Core.DEFAULT_RESOLVER;
+import static io.github.vihana42425d.nexa.v6.NexaV6Core.DEFAULT_RESOLVER;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.math.BigInteger;

@@ -168,8 +168,13 @@ jobs:
           dotnet-version: "8.0.x"
       - run: dotnet test sdks/dotnet/tests/Nexa.V6.Sdk.Tests/Nexa.V6.Sdk.Tests.csproj --configuration Release
       - run: dotnet pack sdks/dotnet/src/Nexa.V6.Sdk/Nexa.V6.Sdk.csproj --configuration Release --output artifacts/nuget
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Nexa.Solver.V6.Sdk-1.0.0
+          path: artifacts/nuget/Nexa.Solver.V6.Sdk.1.0.0.nupkg
+          if-no-files-found: error
       - uses: NuGet/login@v1
         id: login
         with:
           user: ${{ vars.NUGET_USER }}
-      - run: dotnet nuget push "artifacts/nuget/*.nupkg" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+      - run: dotnet nuget push "artifacts/nuget/*.nupkg" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json

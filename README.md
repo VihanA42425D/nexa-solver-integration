@@ -17,6 +17,12 @@ Canonical discovery URI:
 https://solver.vsnexa.com/.well-known/nexa-solver.json
 ```
 
+Passive onchain fingerprint for scanners and indexers:
+
+```text
+https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json
+```
+
 ```bash
 npm install
 npm run discover
@@ -29,6 +35,15 @@ The Facade exposes the same URI through `discoveryURI()`. A solver can resolve:
 ```text
 onchain Facade -> .well-known -> discovery -> signed Feed -> ERC-7683 resolver -> Router
 ```
+
+The fingerprint also pins the Facade selectors, CREATE2 evidence, Sourcify v2
+lookups, `SourceFillV6` topic, ERC-165/7683 identifiers and the same-address
+probe across chains 8453, 56 and 999. Reading or indexing it never requires an
+onchain transaction.
+
+The `SourceFillV6` text signature is registered in the Sourcify Signature
+Database. Its record is a direct signature import and does not claim a verified
+Router-source association; the Facade itself is an Exact Match on every chain.
 
 ## Verified mainnet contracts
 
@@ -65,6 +80,7 @@ Each Router has `sourceIntakeEnabled() == true`, is bound to the published Regis
 The [OpenAPI 3.1 document](openapi/openapi.json) covers:
 
 - `GET /.well-known/nexa-solver.json`
+- `GET /.well-known/nexa-onchain-discovery.json`
 - `GET /api/v6/solver-discovery`
 - `GET /api/v6/solver-feed`
 - `GET /api/v6/solver-feed/events`
@@ -128,6 +144,7 @@ other EVM wallets with bridge routing.
 | --- | --- |
 | [manifest.json](manifest.json) | final ACTIVE artifact index |
 | [nexa-mainnet-v6.json](nexa-mainnet-v6.json) | canonical public integration bundle |
+| [public/.well-known/nexa-onchain-discovery.json](public/.well-known/nexa-onchain-discovery.json) | passive onchain selectors, events, CREATE2 and Sourcify fingerprint |
 | [onboarding/nexa-v6-solver-operator.json](onboarding/nexa-v6-solver-operator.json) | fixed Solver/Aggregator onboarding record |
 | [abi/solver-facing.json](abi/solver-facing.json) | Facade, Registry, Router and module ABI |
 | [networks/network-ids.json](networks/network-ids.json) | chain and Nexa network identities |
@@ -143,6 +160,7 @@ other EVM wallets with bridge routing.
 
 ```bash
 npm run generate:solver-manifest
+npm run generate:onchain-discovery
 npm run generate:abi
 npm run generate:openapi
 npm run generate:onboarding

@@ -55,6 +55,8 @@ test("active V6 bundle exposes only the Solver-facing contract surface", async (
   );
   assert.equal(surface.verification.sourceVerificationComplete, true);
   assert.equal(surface.openapi.openapi, "3.1.0");
+  assert.equal(surface.onchainDiscovery.status, "ACTIVE");
+  assert.equal(surface.onchainDiscovery.sameAddressAcrossChains, true);
 });
 
 test("deployed-awaiting-cutover status cannot be promoted by partial activation fields", () => {
@@ -117,6 +119,7 @@ test("static public files contain no forbidden internal deployment details", asy
     "../openapi/openapi.json",
     "../verification/facade-deployment.json",
     "../public/.well-known/nexa-solver.json",
+    "../public/.well-known/nexa-onchain-discovery.json",
   ];
   const forbidden = [
     "0x13D8881F30985A0CeE8c24F897CE8B37F4299255",
@@ -136,6 +139,7 @@ test("static public files contain no forbidden internal deployment details", asy
 test("only V6 public endpoint catalog is exported", () => {
   assert.deepEqual(Object.values(PUBLIC_ENDPOINTS), [
     "https://solver.vsnexa.com/.well-known/nexa-solver.json",
+    "https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json",
     "https://solver.vsnexa.com/api/v6/solver-discovery",
     "https://solver.vsnexa.com/api/v6/solver-feed",
     "https://solver.vsnexa.com/api/v6/solver-feed/events",
@@ -144,6 +148,38 @@ test("only V6 public endpoint catalog is exported", () => {
     "https://solver.vsnexa.com/api/v6/execution-permits",
     "https://solver.vsnexa.com/api/v6/execution-permits/{fillId}"
   ]);
+});
+
+test("passive onchain fingerprint pins both discovery beacons without a transaction", async () => {
+  const surface = await loadPublicSurface();
+  const fingerprint = surface.onchainDiscovery;
+  assert.equal(fingerprint.schema, "NEXA_MAINNET_V6_ONCHAIN_DISCOVERY_FINGERPRINT_V1");
+  assert.deepEqual(fingerprint.chains, [8453, 56, 999]);
+  assert.equal(fingerprint.sameAddressAcrossChains, true);
+  assert.equal(fingerprint.facade, surface.integration.contracts.NexaSolverDiscoveryV6.address);
+  assert.equal(fingerprint.discoveryURI, PUBLIC_ENDPOINTS.manifest);
+  assert.equal(fingerprint.onchainDiscoveryURI, PUBLIC_ENDPOINTS.onchainDiscovery);
+  assert.equal(fingerprint.selectors.discoveryURI, id("discoveryURI()").slice(0, 10));
+  assert.equal(
+    fingerprint.events.SourceFillV6.topic0,
+    surface.events.events.SourceFillV6.topic0,
+  );
+  assert.equal(
+    fingerprint.erc7683.standardId,
+    surface.standards.standards.erc7683.id,
+  );
+  assert.equal(fingerprint.erc7683.erc165.erc165InterfaceId, "0x01ffc9a7");
+  assert.equal(fingerprint.erc7683.erc165.nexaStandardModuleV6InterfaceId, "0x8d60d6f9");
+  assert.equal(fingerprint.sourcify.sourceFillV6Signature.status, "REGISTERED");
+  assert.equal(
+    fingerprint.sourcify.sourceFillV6Signature.hasVerifiedContractAssociation,
+    false,
+  );
+  assert.deepEqual(
+    Object.fromEntries(Object.entries(fingerprint.chainEvidence)
+      .map(([chainId, evidence]) => [chainId, evidence.deploymentBlockNumber])),
+    { "56": 117488361, "8453": 50320644, "999": 43894134 },
+  );
 });
 
 test("zero-touch operator package pins the canonical Facade, Resolver and transports", async () => {

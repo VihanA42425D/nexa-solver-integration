@@ -31,6 +31,26 @@
         }
       }
     },
+    "/.well-known/nexa-onchain-discovery.json": {
+      "get": {
+        "operationId": "getOnchainDiscoveryFingerprint",
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnchainDiscoveryFingerprint"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/api/v6/solver-discovery": {
       "get": {
         "operationId": "getSolverDiscovery",
@@ -290,6 +310,65 @@
             }
           }
         }
+      },
+      "OnchainDiscoveryFingerprint": {
+        "type": "object",
+        "required": [
+          "schema",
+          "protocol",
+          "chains",
+          "sameAddressAcrossChains",
+          "facade",
+          "facadeRuntimeCodeHash",
+          "selectors",
+          "events",
+          "erc7683",
+          "deployment"
+        ],
+        "properties": {
+          "schema": {
+            "const": "NEXA_MAINNET_V6_ONCHAIN_DISCOVERY_FINGERPRINT_V1"
+          },
+          "protocol": {
+            "const": "Nexa V6"
+          },
+          "chains": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "const": 8453
+              },
+              {
+                "const": 56
+              },
+              {
+                "const": 999
+              }
+            ]
+          },
+          "sameAddressAcrossChains": {
+            "const": true
+          },
+          "facade": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "facadeRuntimeCodeHash": {
+            "$ref": "#/components/schemas/Bytes32"
+          },
+          "selectors": {
+            "$ref": "#/components/schemas/JsonObject"
+          },
+          "events": {
+            "$ref": "#/components/schemas/JsonObject"
+          },
+          "erc7683": {
+            "$ref": "#/components/schemas/JsonObject"
+          },
+          "deployment": {
+            "$ref": "#/components/schemas/JsonObject"
+          }
+        },
+        "additionalProperties": true
       },
       "Route": {
         "type": "object",

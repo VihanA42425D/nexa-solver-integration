@@ -7,6 +7,7 @@ import { buildChecksums } from "./generate-checksums.mjs";
 import { buildNexaSolverManifest, serializeNexaSolverManifest } from "./generate-nexa-solver-manifest.mjs";
 import { buildOnboardingPackage, serializeOnboardingPackage } from "./generate-onboarding-package.mjs";
 import { buildOpenApi } from "./generate-openapi.mjs";
+import { buildOnchainDiscovery, serializeOnchainDiscovery } from "./generate-onchain-discovery.mjs";
 import { auditRepositoryForSecrets } from "./repo-secret-audit.mjs";
 import { PUBLIC_ENDPOINTS, PUBLIC_PATHS } from "../src/public-endpoints.mjs";
 
@@ -21,7 +22,8 @@ const hash = (value, code) => {
 };
 
 const [manifest, integration, standards, events, networkIds, abi, facadeEvidence,
-  inputEvidence, ownershipEvidence, identityEvidence, resolverVetting, openapi, onboarding, packageJson] = await Promise.all([
+  inputEvidence, ownershipEvidence, identityEvidence, resolverVetting, openapi, onchainDiscovery,
+  onboarding, packageJson] = await Promise.all([
   readJson("manifest.json"),
   readJson("nexa-mainnet-v6.json"),
   readJson("standards/standard-ids.json"),
@@ -34,6 +36,7 @@ const [manifest, integration, standards, events, networkIds, abi, facadeEvidence
   readJson("verification/onchain-identity.json"),
   readJson("verification/erc7683-resolver-vetting.json"),
   readJson("openapi/openapi.json"),
+  readJson("public/.well-known/nexa-onchain-discovery.json"),
   readJson("onboarding/nexa-v6-solver-operator.json"),
   readJson("package.json"),
 ]);
@@ -75,7 +78,8 @@ if (getAddress(facade.registry) !== getAddress(registry.address)
     || facade.address !== facade.facadeAddress
     || facade.discoveryURI !== PUBLIC_ENDPOINTS.manifest
     || manifest.facadeAddress !== facade.address
-    || manifest.discoveryURI !== facade.discoveryURI) {
+    || manifest.discoveryURI !== facade.discoveryURI
+    || manifest.onchainDiscovery !== "./public/.well-known/nexa-onchain-discovery.json") {
   throw new Error("Facade immutable binding or discovery URI drift");
 }
 
@@ -123,6 +127,51 @@ for (const event of Object.values(events.events)) {
   new Interface([event.abi]);
 }
 
+const expectedOnchainDiscovery = await buildOnchainDiscovery(root);
+same(expectedOnchainDiscovery, onchainDiscovery, "Generated onchain discovery fingerprint is stale");
+if (await read("public/.well-known/nexa-onchain-discovery.json")
+    !== serializeOnchainDiscovery(expectedOnchainDiscovery)) {
+  throw new Error("Serialized onchain discovery fingerprint is stale");
+}
+const sourceFill = events.events.SourceFillV6;
+if (onchainDiscovery.status !== "ACTIVE"
+    || onchainDiscovery.releaseId !== integration.releaseId
+    || onchainDiscovery.discoveryURI !== facade.discoveryURI
+    || onchainDiscovery.onchainDiscoveryURI !== PUBLIC_ENDPOINTS.onchainDiscovery
+    || onchainDiscovery.facade !== facade.address
+    || onchainDiscovery.facadeRuntimeCodeHash !== facade.runtimeCodeHash
+    || onchainDiscovery.registry !== registry.address
+    || onchainDiscovery.registryRuntimeCodeHash !== registry.runtimeCodeHash
+    || onchainDiscovery.router !== router.address
+    || onchainDiscovery.routerRuntimeCodeHash !== router.runtimeCodeHash
+    || onchainDiscovery.sameAddressAcrossChains !== true
+    || JSON.stringify(onchainDiscovery.chains) !== JSON.stringify([8453, 56, 999])
+    || onchainDiscovery.selectors.discoveryURI !== id("discoveryURI()").slice(0, 10)
+    || onchainDiscovery.events.SourceFillV6.topic0 !== sourceFill.topic0
+    || onchainDiscovery.events.SourceFillV6.signature !== sourceFill.signature
+    || onchainDiscovery.erc7683.resolver !== standards.standards.erc7683.moduleAddress
+    || onchainDiscovery.erc7683.standardId !== standards.standards.erc7683.id
+    || onchainDiscovery.erc7683.erc165.nexaStandardModuleV6InterfaceId !== "0x8d60d6f9"
+    || onchainDiscovery.deployment.initCodeHash !== facadeEvidence.initCodeHash
+    || onchainDiscovery.sourcify.exactMatchOnEveryChain !== true
+    || onchainDiscovery.sourcify.sourceFillV6Signature.status !== "REGISTERED"
+    || onchainDiscovery.sourcify.sourceFillV6Signature.topic0 !== sourceFill.topic0
+    || onchainDiscovery.sourcify.sourceFillV6Signature.hasVerifiedContractAssociation !== false) {
+  throw new Error("Passive onchain discovery identity drift");
+}
+for (const [slug, chainId] of Object.entries(expectedNetworks)) {
+  const chain = onchainDiscovery.chainEvidence[String(chainId)];
+  const evidence = facadeEvidence.networks[slug];
+  if (chain.network !== slug
+      || chain.deploymentTransactionHash !== evidence.deploymentTransactionHash
+      || chain.deploymentBlockNumber !== evidence.deploymentBlockNumber
+      || chain.explorer !== evidence.explorer.url
+      || chain.sourcify !== evidence.sourcify.url
+      || chain.sourcifyMatchId !== evidence.sourcify.reference) {
+    throw new Error(`Passive discovery evidence mismatch: ${slug}`);
+  }
+}
+
 if (facadeEvidence.sourceVerificationComplete !== true
     || facadeEvidence.facadeAddress !== facade.address
     || facadeEvidence.runtimeCodeHash !== facade.runtimeCodeHash
@@ -161,6 +210,7 @@ if (onboarding.protocol !== "Nexa V6"
     || onboarding.discoveryFacade.address !== facade.address
     || onboarding.contracts.erc7683Resolver.address !== standards.standards.erc7683.moduleAddress
     || onboarding.endpoints.feed !== PUBLIC_ENDPOINTS.solverFeed
+    || onboarding.endpoints.onchainDiscovery !== PUBLIC_ENDPOINTS.onchainDiscovery
     || onboarding.endpoints.sse !== PUBLIC_ENDPOINTS.solverFeedEvents
     || JSON.stringify(onboarding.chainIds) !== JSON.stringify([8453, 56, 999])) {
   throw new Error("Zero-touch onboarding identity drift");

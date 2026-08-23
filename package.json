@@ -1,6 +1,6 @@
 {
   "name": "@nexa/solver-integration",
-  "version": "6.1.0",
+  "version": "6.2.0",
   "description": "Public Nexa V6 Solver discovery and execution integration surface for intra-chain and cross-chain opportunities.",
   "type": "module",
   "private": false,
@@ -76,6 +76,7 @@
     "describe:oif": "node examples/describe-oif-mandate.mjs",
     "generate:abi": "node scripts/generate-abi.mjs",
     "generate:solver-manifest": "node scripts/generate-nexa-solver-manifest.mjs",
+    "generate:onchain-discovery": "node scripts/generate-onchain-discovery.mjs",
     "generate:checksums": "node scripts/generate-checksums.mjs",
     "generate:openapi": "node scripts/generate-openapi.mjs",
     "generate:onboarding": "node scripts/generate-onboarding-package.mjs",
@@ -117,6 +118,7 @@
     "./endpoints": "./src/public-endpoints.mjs",
     "./manifest.json": "./manifest.json",
     "./nexa-mainnet-v6.json": "./nexa-mainnet-v6.json",
+    "./onchain-discovery": "./public/.well-known/nexa-onchain-discovery.json",
     "./abi": "./abi/solver-facing.json",
     "./contracts/NexaSolverDiscoveryV6.sol": "./contracts/NexaSolverDiscoveryV6.sol",
     "./events": "./events/events.json",

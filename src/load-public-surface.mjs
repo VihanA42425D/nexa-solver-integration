@@ -25,7 +25,8 @@ export function isActiveV6Bundle(bundle) {
 }
 
 export async function loadPublicSurface(networkName = null, options = {}) {
-  const [manifest, integration, standards, events, networkIds, abi, verification, openapi] = await Promise.all([
+  const [manifest, integration, standards, events, networkIds, abi, verification, openapi,
+    onchainDiscovery] = await Promise.all([
     readJson("manifest.json"),
     readJson("nexa-mainnet-v6.json"),
     readJson("standards/standard-ids.json"),
@@ -34,6 +35,7 @@ export async function loadPublicSurface(networkName = null, options = {}) {
     readJson("abi/solver-facing.json"),
     readJson("verification/facade-deployment.json"),
     readJson("openapi/openapi.json"),
+    readJson("public/.well-known/nexa-onchain-discovery.json"),
   ]);
   const active = isActiveV6Bundle(integration);
   if (options.requireActive !== false && !active) {
@@ -52,6 +54,7 @@ export async function loadPublicSurface(networkName = null, options = {}) {
     abi,
     verification,
     openapi,
+    onchainDiscovery,
     active,
     network,
   });

@@ -9,6 +9,7 @@ Protocol: Nexa V6
 Chains: 8453 / 56 / 999
 DiscoveryFacade: 0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6
 DiscoveryURI: https://solver.vsnexa.com/.well-known/nexa-solver.json
+OnchainDiscovery: https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json
 ERC7683Resolver: 0x534A0f500A7270b9b19d2AFa18DE24DCE93eb522
 Feed: https://solver.vsnexa.com/api/v6/solver-feed
 SSE: https://solver.vsnexa.com/api/v6/solver-feed/events

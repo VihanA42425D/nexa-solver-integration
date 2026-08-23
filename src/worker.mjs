@@ -3,6 +3,7 @@ const APP_HOST = "vsnexa.com";
 
 const PUBLIC_ROUTES = Object.freeze([
   Object.freeze({ method: "GET", pattern: /^\/\.well-known\/nexa-solver\.json$/ }),
+  Object.freeze({ method: "GET", pattern: /^\/\.well-known\/nexa-onchain-discovery\.json$/ }),
   Object.freeze({ method: "GET", pattern: /^\/api\/v6\/solver-discovery$/ }),
   Object.freeze({ method: "GET", pattern: /^\/api\/v6\/solver-feed$/ }),
   Object.freeze({ method: "GET", pattern: /^\/api\/v6\/solver-feed\/events$/ }),

@@ -45,6 +45,12 @@ export const buildNexaSolverManifest = async (root = repositoryRoot) => {
         executable: false
       }
     ],
+    passiveOnchainDiscovery: {
+      uri: PUBLIC_ENDPOINTS.onchainDiscovery,
+      facadeAddress: integration.contracts.NexaSolverDiscoveryV6.address,
+      chains: [8453, 56, 999],
+      sameAddressAcrossChains: true,
+    },
     activationRequired: !active
   };
 };

@@ -9,6 +9,7 @@ export const CHECKSUM_FILES = Object.freeze([
   "manifest.json",
   "nexa-mainnet-v6.json",
   "public/.well-known/nexa-solver.json",
+  "public/.well-known/nexa-onchain-discovery.json",
   "abi/solver-facing.json",
   "contracts/NexaSolverDiscoveryV6.sol",
   "events/events.json",

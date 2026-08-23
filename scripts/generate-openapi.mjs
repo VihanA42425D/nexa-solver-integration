@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const operations = [
   ["GET", "/.well-known/nexa-solver.json", "getWellKnownDiscovery", "Discovery"],
+  ["GET", "/.well-known/nexa-onchain-discovery.json", "getOnchainDiscoveryFingerprint", "OnchainDiscoveryFingerprint"],
   ["GET", "/api/v6/solver-discovery", "getSolverDiscovery", "Discovery"],
   ["GET", "/api/v6/solver-feed", "getSignedSolverFeed", "FeedResponse"],
   ["GET", "/api/v6/solver-feed/events", "streamSignedSolverFeed", "SSE"],
@@ -81,6 +82,26 @@ export function buildOpenApi() {
             endpoints: ref("JsonObject"),
             standards: { type: "array", items: ref("JsonObject") },
           },
+        },
+        OnchainDiscoveryFingerprint: {
+          type: "object",
+          required: [
+            "schema", "protocol", "chains", "sameAddressAcrossChains", "facade",
+            "facadeRuntimeCodeHash", "selectors", "events", "erc7683", "deployment",
+          ],
+          properties: {
+            schema: { const: "NEXA_MAINNET_V6_ONCHAIN_DISCOVERY_FINGERPRINT_V1" },
+            protocol: { const: "Nexa V6" },
+            chains: { type: "array", prefixItems: [{ const: 8453 }, { const: 56 }, { const: 999 }] },
+            sameAddressAcrossChains: { const: true },
+            facade: ref("Address"),
+            facadeRuntimeCodeHash: ref("Bytes32"),
+            selectors: ref("JsonObject"),
+            events: ref("JsonObject"),
+            erc7683: ref("JsonObject"),
+            deployment: ref("JsonObject"),
+          },
+          additionalProperties: true,
         },
         Route: {
           type: "object",

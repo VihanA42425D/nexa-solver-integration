@@ -72,6 +72,7 @@ export async function buildOnboardingPackage(repositoryRoot = root) {
     },
     endpoints: {
       discovery: integration.discovery.endpoints.manifest,
+      onchainDiscovery: integration.discovery.endpoints.onchainDiscovery,
       solverDiscovery: integration.discovery.endpoints.solverDiscovery,
       feed: integration.discovery.endpoints.solverFeed,
       sse: integration.discovery.endpoints.solverFeedEvents,
@@ -112,6 +113,7 @@ export async function buildOnboardingPackage(repositoryRoot = root) {
       release: `${REPOSITORY}/releases/tag/v${packageVersion}`,
       canonicalBundle: `${REPOSITORY}/blob/main/nexa-mainnet-v6.json`,
       manifest: `${REPOSITORY}/blob/main/manifest.json`,
+      onchainDiscovery: `${REPOSITORY}/blob/main/public/.well-known/nexa-onchain-discovery.json`,
       abi: `${REPOSITORY}/blob/main/abi/solver-facing.json`,
       openapi: `${REPOSITORY}/blob/main/openapi/openapi.json`,
       events: `${REPOSITORY}/blob/main/events/events.json`,

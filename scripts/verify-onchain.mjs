@@ -1,4 +1,4 @@
-import { Contract, JsonRpcProvider, keccak256 } from "ethers";
+import { Contract, JsonRpcProvider, id, keccak256 } from "ethers";
 import { loadPublicSurface } from "../src/load-public-surface.mjs";
 
 const rpcByNetwork = {
@@ -25,8 +25,22 @@ const surface = await loadPublicSurface(null, { requireActive: true });
 const registryDefinition = surface.integration.contracts.NexaMainnetRegistryV6;
 const routerDefinition = surface.integration.contracts.NexaMainnetRouterV6;
 const facadeDefinition = surface.integration.contracts.NexaSolverDiscoveryV6;
+const fingerprint = surface.onchainDiscovery;
 if (!registryDefinition || !routerDefinition || !facadeDefinition) {
   throw new Error("V6 public Facade/Registry/Router surface missing");
+}
+if (fingerprint.facade !== facadeDefinition.address
+    || fingerprint.facadeRuntimeCodeHash !== facadeDefinition.runtimeCodeHash
+    || fingerprint.registry !== registryDefinition.address
+    || fingerprint.registryRuntimeCodeHash !== registryDefinition.runtimeCodeHash
+    || fingerprint.router !== routerDefinition.address
+    || fingerprint.routerRuntimeCodeHash !== routerDefinition.runtimeCodeHash
+    || fingerprint.discoveryURI !== surface.integration.discovery.endpoints.manifest
+    || fingerprint.sameAddressAcrossChains !== true
+    || fingerprint.events.SourceFillV6.topic0 !== id(
+      fingerprint.events.SourceFillV6.signature,
+    )) {
+  throw new Error("Passive onchain fingerprint does not match the public surface");
 }
 
 const expectedHashes = new Map();
@@ -42,6 +56,15 @@ for (const [networkName, rpcUrl] of Object.entries(rpcByNetwork)) {
   if (!network) throw new Error(`V6 bundle missing network ${networkName}`);
   if (network.networkId !== surface.networkIds.networks[networkName].networkId) {
     throw new Error(`${networkName}: network ID mismatch`);
+  }
+  const chainFingerprint = fingerprint.chainEvidence[String(network.chainId)];
+  if (!chainFingerprint
+      || chainFingerprint.network !== networkName
+      || chainFingerprint.deploymentBlockNumber
+        !== network.verification.onchainIdentity.blockNumber
+      || chainFingerprint.deploymentTransactionHash
+        !== network.verification.onchainIdentity.transactionHash) {
+    throw new Error(`${networkName}: passive deployment evidence mismatch`);
   }
   const provider = new JsonRpcProvider(rpcUrl, network.chainId, { staticNetwork: true });
   try {
@@ -123,6 +146,7 @@ for (const [networkName, rpcUrl] of Object.entries(rpcByNetwork)) {
       const module = new Contract(standard.moduleAddress, [
         "function standardId() view returns (bytes32)",
         "function router() view returns (address)",
+        "function supportsInterface(bytes4 interfaceId) view returns (bool)",
       ], provider);
       const standardId = await retry(() => module.standardId());
       const moduleRouter = await retry(() => module.router());
@@ -132,10 +156,26 @@ for (const [networkName, rpcUrl] of Object.entries(rpcByNetwork)) {
       if (String(moduleRouter).toLowerCase() !== String(routerDefinition.address).toLowerCase()) {
         throw new Error(`${networkName}: Router binding mismatch at ${standardName} module`);
       }
+      let erc165 = null;
+      if (standardName === "erc7683") {
+        const [supportsErc165, supportsNexaModule] = await Promise.all([
+          retry(() => module.supportsInterface(fingerprint.erc7683.erc165.erc165InterfaceId)),
+          retry(() => module.supportsInterface(
+            fingerprint.erc7683.erc165.nexaStandardModuleV6InterfaceId,
+          )),
+        ]);
+        if (supportsErc165 !== true || supportsNexaModule !== true
+            || standard.moduleAddress !== fingerprint.erc7683.resolver
+            || standard.id !== fingerprint.erc7683.standardId) {
+          throw new Error(`${networkName}: ERC-7683 passive fingerprint mismatch`);
+        }
+        erc165 = { supportsErc165, supportsNexaModule };
+      }
       modules[standardName] = {
         address: standard.moduleAddress,
         runtimeCodeHash,
         router: moduleRouter,
+        ...(erc165 ? { erc165 } : {}),
       };
     }
 

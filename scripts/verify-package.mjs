@@ -24,6 +24,7 @@ const required = [
   "onboarding/nexa-v6-solver-operator.json",
   "scripts/verify-onboarding.mjs",
   "public/.well-known/nexa-solver.json",
+  "public/.well-known/nexa-onchain-discovery.json",
   "standards/standard-ids.json",
   "verification/checksums.sha256",
   "verification/erc7683-resolver-vetting.json",

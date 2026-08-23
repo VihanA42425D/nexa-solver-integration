@@ -10,6 +10,7 @@
   "publicSurfaceOnly": true,
   "canonicalBundle": "./nexa-mainnet-v6.json",
   "discoveryURI": "https://solver.vsnexa.com/.well-known/nexa-solver.json",
+  "onchainDiscovery": "./public/.well-known/nexa-onchain-discovery.json",
   "facadeAddress": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
   "solverProfile": {
     "executionScopes": [

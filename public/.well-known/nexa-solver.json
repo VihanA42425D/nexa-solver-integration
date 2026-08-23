@@ -43,6 +43,7 @@
   },
   "endpoints": {
     "manifest": "https://solver.vsnexa.com/.well-known/nexa-solver.json",
+    "onchainDiscovery": "https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json",
     "solverDiscovery": "https://solver.vsnexa.com/api/v6/solver-discovery",
     "solverFeed": "https://solver.vsnexa.com/api/v6/solver-feed",
     "solverFeedEvents": "https://solver.vsnexa.com/api/v6/solver-feed/events",
@@ -67,5 +68,15 @@
       "executable": false
     }
   ],
+  "passiveOnchainDiscovery": {
+    "uri": "https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json",
+    "facadeAddress": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+    "chains": [
+      8453,
+      56,
+      999
+    ],
+    "sameAddressAcrossChains": true
+  },
   "activationRequired": false
 }

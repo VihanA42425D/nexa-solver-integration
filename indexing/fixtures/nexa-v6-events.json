@@ -1,0 +1,285 @@
+{
+  "schema": "NEXA_V6_INDEXING_CANONICAL_FIXTURES_V1",
+  "generatedFrom": "CANONICAL_INDEXING_EVENTS_AND_STANDARDS",
+  "fixtures": [
+    {
+      "fixtureId": "network-registered",
+      "eventName": "NetworkRegisteredV6",
+      "address": "0x3db7752f052acfecb3da99bee7c6a34d22367141",
+      "topics": [
+        "0x7db7c63b9c8adfae81472453f63167980ece11baca7a8b5b2ed405ea50493dfa",
+        "0x1111111111111111111111111111111111111111111111111111111111111111",
+        "0x2222222222222222222222222222222222222222222222222222222222222222"
+      ],
+      "data": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "provenance": {
+        "chainId": "8453",
+        "blockNumber": "51000000",
+        "blockTimestamp": "2000000100",
+        "transactionHash": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "logIndex": 0
+      },
+      "expectedNormalized": {
+        "networkId": "0x1111111111111111111111111111111111111111111111111111111111111111",
+        "vmType": "0x2222222222222222222222222222222222222222222222222222222222222222",
+        "networkReference": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "metadataHash": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      }
+    },
+    {
+      "fixtureId": "network-status-registered",
+      "eventName": "NetworkStatusChangedV6",
+      "address": "0x3db7752f052acfecb3da99bee7c6a34d22367141",
+      "topics": [
+        "0xd5f27b4ae4ca578a1e386feb956fcaeb583af6e56feeccfd6bfbfa3768b89488",
+        "0x1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "data": "0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001",
+      "provenance": {
+        "chainId": "8453",
+        "blockNumber": "51000001",
+        "blockTimestamp": "2000000101",
+        "transactionHash": "0x0000000000000000000000000000000000000000000000000000000000000002",
+        "logIndex": 1
+      },
+      "expectedNormalized": {
+        "networkId": "0x1111111111111111111111111111111111111111111111111111111111111111",
+        "previousStatus": "0",
+        "status": "1",
+        "generation": "1"
+      }
+    },
+    {
+      "fixtureId": "asset-registered",
+      "eventName": "AssetRegisteredV6",
+      "address": "0x3db7752f052acfecb3da99bee7c6a34d22367141",
+      "topics": [
+        "0xfa44e2cbe942f5fe60e49608f55b65783f700e447d7bcb499ab6337d84c64aaa",
+        "0x3333333333333333333333333333333333333333333333333333333333333333",
+        "0x1111111111111111111111111111111111111111111111111111111111111111",
+        "0x4444444444444444444444444444444444444444444444444444444444444444"
+      ],
+      "data": "0x00000000000000000000000012121212121212121212121212121212121212120000000000000000000000000000000000000000000000000000000000000001cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "provenance": {
+        "chainId": "8453",
+        "blockNumber": "51000002",
+        "blockTimestamp": "2000000102",
+        "transactionHash": "0x0000000000000000000000000000000000000000000000000000000000000003",
+        "logIndex": 2
+      },
+      "expectedNormalized": {
+        "assetKey": "0x3333333333333333333333333333333333333333333333333333333333333333",
+        "networkId": "0x1111111111111111111111111111111111111111111111111111111111111111",
+        "assetId": "0x4444444444444444444444444444444444444444444444444444444444444444",
+        "localAddress": "0x1212121212121212121212121212121212121212",
+        "hasLocalBinding": true,
+        "metadataHash": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      }
+    },
+    {
+      "fixtureId": "asset-status-registered",
+      "eventName": "AssetStatusChangedV6",
+      "address": "0x3db7752f052acfecb3da99bee7c6a34d22367141",
+      "topics": [
+        "0x4f814da937563817e731ffa6ac77f581c6bb578c83d4bcdd756f43dcede51926",
+        "0x3333333333333333333333333333333333333333333333333333333333333333"
+      ],
+      "data": "0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001",
+      "provenance": {
+        "chainId": "8453",
+        "blockNumber": "51000003",
+        "blockTimestamp": "2000000103",
+        "transactionHash": "0x0000000000000000000000000000000000000000000000000000000000000004",
+        "logIndex": 3
+      },
+      "expectedNormalized": {
+        "assetKey": "0x3333333333333333333333333333333333333333333333333333333333333333",
+        "previousStatus": "0",
+        "status": "1",
+        "generation": "1"
+      }
+    },
+    {
+      "fixtureId": "route-registered",
+      "eventName": "RouteRegisteredV6",
+      "address": "0x3db7752f052acfecb3da99bee7c6a34d22367141",
+      "topics": [
+        "0x5db26c69982e7b4490d75895dd8589193a8704a98c879382a6caf0fa3ac60c12",
+        "0x5555555555555555555555555555555555555555555555555555555555555555",
+        "0x1111111111111111111111111111111111111111111111111111111111111111",
+        "0xdededededededededededededededededededededededededededededededede"
+      ],
+      "data": "0x4444444444444444444444444444444444444444444444444444444444444444efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef",
+      "provenance": {
+        "chainId": "8453",
+        "blockNumber": "51000004",
+        "blockTimestamp": "2000000104",
+        "transactionHash": "0x0000000000000000000000000000000000000000000000000000000000000005",
+        "logIndex": 4
+      },
+      "expectedNormalized": {
+        "routeId": "0x5555555555555555555555555555555555555555555555555555555555555555",
+        "sourceNetworkId": "0x1111111111111111111111111111111111111111111111111111111111111111",
+        "destinationNetworkId": "0xdededededededededededededededededededededededededededededededede",
+        "sourceAssetId": "0x4444444444444444444444444444444444444444444444444444444444444444",
+        "destinationAssetId": "0xefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef"
+      }
+    },
+    {
+      "fixtureId": "route-status-registered",
+      "eventName": "RouteStatusChangedV6",
+      "address": "0x3db7752f052acfecb3da99bee7c6a34d22367141",
+      "topics": [
+        "0x771e9b8d4c1d52f53e432497b0cc8f7a4ede4172b67909caecc5f3c1f7cc4188",
+        "0x5555555555555555555555555555555555555555555555555555555555555555",
+        "0x0000000000000000000000003434343434343434343434343434343434343434"
+      ],
+      "data": "0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001",
+      "provenance": {
+        "chainId": "8453",
+        "blockNumber": "51000005",
+        "blockTimestamp": "2000000105",
+        "transactionHash": "0x0000000000000000000000000000000000000000000000000000000000000006",
+        "logIndex": 5
+      },
+      "expectedNormalized": {
+        "routeId": "0x5555555555555555555555555555555555555555555555555555555555555555",
+        "previousStatus": "0",
+        "status": "1",
+        "actor": "0x3434343434343434343434343434343434343434",
+        "generation": "1"
+      }
+    },
+    {
+      "fixtureId": "route-status-active",
+      "eventName": "RouteStatusChangedV6",
+      "address": "0x3db7752f052acfecb3da99bee7c6a34d22367141",
+      "topics": [
+        "0x771e9b8d4c1d52f53e432497b0cc8f7a4ede4172b67909caecc5f3c1f7cc4188",
+        "0x5555555555555555555555555555555555555555555555555555555555555555",
+        "0x0000000000000000000000003434343434343434343434343434343434343434"
+      ],
+      "data": "0x000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002",
+      "provenance": {
+        "chainId": "8453",
+        "blockNumber": "51000006",
+        "blockTimestamp": "2000000106",
+        "transactionHash": "0x0000000000000000000000000000000000000000000000000000000000000007",
+        "logIndex": 6
+      },
+      "expectedNormalized": {
+        "routeId": "0x5555555555555555555555555555555555555555555555555555555555555555",
+        "previousStatus": "1",
+        "status": "2",
+        "actor": "0x3434343434343434343434343434343434343434",
+        "generation": "2"
+      }
+    },
+    {
+      "fixtureId": "router-intake",
+      "eventName": "SourceIntakeConfigured",
+      "address": "0x9ea675a496b6a2d13b3091f6e6eb3f87183c3938",
+      "topics": [
+        "0x9359764deaafda5ba9ff799a2c3eac775403a15fd633618438d7b011f3e775af",
+        "0x0000000000000000000000003434343434343434343434343434343434343434"
+      ],
+      "data": "0x0000000000000000000000000000000000000000000000000000000000000001",
+      "provenance": {
+        "chainId": "8453",
+        "blockNumber": "51000007",
+        "blockTimestamp": "2000000107",
+        "transactionHash": "0x0000000000000000000000000000000000000000000000000000000000000008",
+        "logIndex": 7
+      },
+      "expectedNormalized": {
+        "enabled": true,
+        "actor": "0x3434343434343434343434343434343434343434"
+      }
+    },
+    {
+      "fixtureId": "source-fill",
+      "eventName": "SourceFillV6",
+      "address": "0x9ea675a496b6a2d13b3091f6e6eb3f87183c3938",
+      "topics": [
+        "0x77d880254b141dedc64867f6d2d253eedfc609837b892c4ddfe154a43ea80561",
+        "0x6666666666666666666666666666666666666666666666666666666666666666",
+        "0x5555555555555555555555555555555555555555555555555555555555555555",
+        "0x7777777777777777777777777777777777777777777777777777777777777777"
+      ],
+      "data": "0x000000000000000000000000565656565656565656565656565656565656565600000000000000000000000078787878787878787878787878787878787878780000000000000000000000009a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a000000000000000000000000bcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc000000000000000000000000000000000000000000000000000000000000003800000000000000000000000000000000000000000000000000000000000f424000000000000000000000000000000000000000000000000000000000000f2eb8000000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000007735940088888888888888888888888888888888888888888888888888888888888888889999999999999999999999999999999999999999999999999999999999999999",
+      "provenance": {
+        "chainId": "8453",
+        "blockNumber": "51000008",
+        "blockTimestamp": "2000000108",
+        "transactionHash": "0x0000000000000000000000000000000000000000000000000000000000000009",
+        "logIndex": 8
+      },
+      "expectedNormalized": {
+        "fillId": "0x6666666666666666666666666666666666666666666666666666666666666666",
+        "routeId": "0x5555555555555555555555555555555555555555555555555555555555555555",
+        "quoteId": "0x7777777777777777777777777777777777777777777777777777777777777777",
+        "payer": "0x5656565656565656565656565656565656565656",
+        "recipient": "0x7878787878787878787878787878787878787878",
+        "sourceAsset": "0x9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a",
+        "destinationAsset": "0xbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc",
+        "destinationChainId": "56",
+        "amountInRaw": "1000000",
+        "amountOutRaw": "995000",
+        "sourceFinalityBlocks": "12",
+        "settlementDeadline": "2000000000",
+        "permitNonce": "0x8888888888888888888888888888888888888888888888888888888888888888",
+        "executionGeneration": "0x9999999999999999999999999999999999999999999999999999999999999999"
+      }
+    },
+    {
+      "fixtureId": "standard-erc7683",
+      "eventName": "StandardModuleConfiguredV6",
+      "address": "0xa149c756e611d0315bcb2d469aa642d6be32f765",
+      "topics": [
+        "0x0be5a3783c0f7a412c4a0d5e60bc8f9ff4cac6397e3f700053ae74965f109fdd",
+        "0x27ecffeeec898dbaf864fc095016ad6212d7a27e32a3069234a4a1da23f50993",
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "0x000000000000000000000000534a0f500a7270b9b19d2afa18de24dce93eb522"
+      ],
+      "data": "0x",
+      "provenance": {
+        "chainId": "8453",
+        "blockNumber": "51000009",
+        "blockTimestamp": "2000000109",
+        "transactionHash": "0x000000000000000000000000000000000000000000000000000000000000000a",
+        "logIndex": 9
+      },
+      "expectedNormalized": {
+        "standardId": "0x27ecffeeec898dbaf864fc095016ad6212d7a27e32a3069234a4a1da23f50993",
+        "previousModule": "0x0000000000000000000000000000000000000000",
+        "module": "0x534a0f500a7270b9b19d2afa18de24dce93eb522",
+        "standardKind": "ERC_7683_EXECUTABLE"
+      }
+    },
+    {
+      "fixtureId": "standard-oif",
+      "eventName": "StandardModuleConfiguredV6",
+      "address": "0xa149c756e611d0315bcb2d469aa642d6be32f765",
+      "topics": [
+        "0x0be5a3783c0f7a412c4a0d5e60bc8f9ff4cac6397e3f700053ae74965f109fdd",
+        "0x3de00a2eccd5b86df839b3747bda483b2de2a855d640eb3d4938d6d43cb162c0",
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "0x0000000000000000000000004f81426fe8999e982ae6b771536a4093879f6a20"
+      ],
+      "data": "0x",
+      "provenance": {
+        "chainId": "8453",
+        "blockNumber": "51000010",
+        "blockTimestamp": "2000000110",
+        "transactionHash": "0x000000000000000000000000000000000000000000000000000000000000000b",
+        "logIndex": 10
+      },
+      "expectedNormalized": {
+        "standardId": "0x3de00a2eccd5b86df839b3747bda483b2de2a855d640eb3d4938d6d43cb162c0",
+        "previousModule": "0x0000000000000000000000000000000000000000",
+        "module": "0x4f81426fe8999e982ae6b771536a4093879f6a20",
+        "standardKind": "OIF_DISCOVERY_DESCRIPTION_ONLY"
+      }
+    }
+  ]
+}

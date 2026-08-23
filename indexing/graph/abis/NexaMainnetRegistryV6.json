@@ -1,0 +1,168 @@
+[
+  {
+    "type": "event",
+    "anonymous": false,
+    "name": "NetworkRegisteredV6",
+    "inputs": [
+      {
+        "type": "bytes32",
+        "name": "networkId",
+        "indexed": true
+      },
+      {
+        "type": "bytes32",
+        "name": "vmType",
+        "indexed": true
+      },
+      {
+        "type": "bytes32",
+        "name": "networkReference"
+      },
+      {
+        "type": "bytes32",
+        "name": "metadataHash"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "name": "NetworkStatusChangedV6",
+    "inputs": [
+      {
+        "type": "bytes32",
+        "name": "networkId",
+        "indexed": true
+      },
+      {
+        "type": "uint8",
+        "name": "previousStatus"
+      },
+      {
+        "type": "uint8",
+        "name": "status"
+      },
+      {
+        "type": "uint64",
+        "name": "generation"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "name": "AssetRegisteredV6",
+    "inputs": [
+      {
+        "type": "bytes32",
+        "name": "assetKey",
+        "indexed": true
+      },
+      {
+        "type": "bytes32",
+        "name": "networkId",
+        "indexed": true
+      },
+      {
+        "type": "bytes32",
+        "name": "assetId",
+        "indexed": true
+      },
+      {
+        "type": "address",
+        "name": "localAddress"
+      },
+      {
+        "type": "bool",
+        "name": "hasLocalBinding"
+      },
+      {
+        "type": "bytes32",
+        "name": "metadataHash"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "name": "AssetStatusChangedV6",
+    "inputs": [
+      {
+        "type": "bytes32",
+        "name": "assetKey",
+        "indexed": true
+      },
+      {
+        "type": "uint8",
+        "name": "previousStatus"
+      },
+      {
+        "type": "uint8",
+        "name": "status"
+      },
+      {
+        "type": "uint64",
+        "name": "generation"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "name": "RouteRegisteredV6",
+    "inputs": [
+      {
+        "type": "bytes32",
+        "name": "routeId",
+        "indexed": true
+      },
+      {
+        "type": "bytes32",
+        "name": "sourceNetworkId",
+        "indexed": true
+      },
+      {
+        "type": "bytes32",
+        "name": "destinationNetworkId",
+        "indexed": true
+      },
+      {
+        "type": "bytes32",
+        "name": "sourceAssetId"
+      },
+      {
+        "type": "bytes32",
+        "name": "destinationAssetId"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "name": "RouteStatusChangedV6",
+    "inputs": [
+      {
+        "type": "bytes32",
+        "name": "routeId",
+        "indexed": true
+      },
+      {
+        "type": "uint8",
+        "name": "previousStatus"
+      },
+      {
+        "type": "uint8",
+        "name": "status"
+      },
+      {
+        "type": "address",
+        "name": "actor",
+        "indexed": true
+      },
+      {
+        "type": "uint64",
+        "name": "generation"
+      }
+    ]
+  }
+]

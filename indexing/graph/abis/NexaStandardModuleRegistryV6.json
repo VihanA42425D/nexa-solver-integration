@@ -1,0 +1,24 @@
+[
+  {
+    "type": "event",
+    "anonymous": false,
+    "name": "StandardModuleConfiguredV6",
+    "inputs": [
+      {
+        "type": "bytes32",
+        "name": "standardId",
+        "indexed": true
+      },
+      {
+        "type": "address",
+        "name": "previousModule",
+        "indexed": true
+      },
+      {
+        "type": "address",
+        "name": "module",
+        "indexed": true
+      }
+    ]
+  }
+]

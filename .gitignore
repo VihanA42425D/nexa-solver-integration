@@ -21,3 +21,9 @@ sdks/go/bin/
 sdks/jvm/target/
 sdks/dotnet/**/bin/
 sdks/dotnet/**/obj/
+
+# Isolated indexing workspace outputs
+indexing/graph/build/
+indexing/graph/generated/
+indexing/substreams/target/
+indexing/substreams/*.spkg

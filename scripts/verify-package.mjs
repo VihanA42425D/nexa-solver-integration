@@ -19,6 +19,18 @@ const required = [
   "abi/solver-facing.json",
   "contracts/NexaSolverDiscoveryV6.sol",
   "events/events.json",
+  "indexing/nexa-v6-indexing.json",
+  "indexing/indexing-manifest.json",
+  "indexing/graph/schema.graphql",
+  "indexing/graph/src/mapping.ts",
+  "indexing/graph/subgraph.base.yaml",
+  "indexing/graph/subgraph.bsc.yaml",
+  "indexing/graph/subgraph.hyper-evm.yaml",
+  "indexing/substreams/src/lib.rs",
+  "indexing/substreams/proto/nexa/v6/indexing.proto",
+  "indexing/substreams/substreams.base.yaml",
+  "indexing/substreams/substreams.bsc.yaml",
+  "indexing/substreams/substreams.hyper-evm.yaml",
   "networks/network-ids.json",
   "openapi/openapi.json",
   "onboarding/nexa-v6-solver-operator.json",
@@ -29,6 +41,7 @@ const required = [
   "verification/checksums.sha256",
   "verification/erc7683-resolver-vetting.json",
   "verification/facade-deployment.json",
+  "verification/indexing-deployment-evidence.json",
   "sdk-spec/nexa-v6-sdk-contract.json",
   "sdk-spec/test-vectors.json",
   "sdks/typescript/package.json",
@@ -46,6 +59,11 @@ for (const file of files) {
   if (/(^|\/)(?:\.env|\.git)(?:\/|$)/.test(file)
       || /private[-_]?key|mnemonic|credential/i.test(file)) {
     throw new Error("Forbidden package file: " + file);
+  }
+  if (/^indexing\/graph\/(?:node_modules|build|generated)\//.test(file)
+      || /^indexing\/substreams\/target\//.test(file)
+      || /\.spkg$/i.test(file)) {
+    throw new Error("Indexing build output leaked into package: " + file);
   }
 }
 console.log(JSON.stringify({

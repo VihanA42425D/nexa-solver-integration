@@ -1,0 +1,156 @@
+syntax = "proto3";
+
+package nexa.v6;
+
+message Provenance {
+  uint64 chain_id = 1;
+  uint64 block_number = 2;
+  uint64 block_timestamp = 3;
+  bytes transaction_hash = 4;
+  uint32 log_index = 5;
+  bytes contract_address = 6;
+  uint64 ordinal = 7;
+}
+
+message NetworkRegistered {
+  bytes network_id = 1;
+  bytes vm_type = 2;
+  bytes network_reference = 3;
+  bytes metadata_hash = 4;
+}
+
+message NetworkStatusChanged {
+  bytes network_id = 1;
+  uint32 previous_status = 2;
+  uint32 status = 3;
+  uint64 generation = 4;
+}
+
+message AssetRegistered {
+  bytes asset_key = 1;
+  bytes network_id = 2;
+  bytes asset_id = 3;
+  bytes local_address = 4;
+  bool has_local_binding = 5;
+  bytes metadata_hash = 6;
+}
+
+message AssetStatusChanged {
+  bytes asset_key = 1;
+  uint32 previous_status = 2;
+  uint32 status = 3;
+  uint64 generation = 4;
+}
+
+message RouteRegistered {
+  bytes route_id = 1;
+  bytes source_network_id = 2;
+  bytes destination_network_id = 3;
+  bytes source_asset_id = 4;
+  bytes destination_asset_id = 5;
+}
+
+message RouteStatusChanged {
+  bytes route_id = 1;
+  uint32 previous_status = 2;
+  uint32 status = 3;
+  bytes actor = 4;
+  uint64 generation = 5;
+}
+
+message SourceIntakeChanged {
+  bool enabled = 1;
+  bytes actor = 2;
+}
+
+message SourceFill {
+  bytes fill_id = 1;
+  bytes route_id = 2;
+  bytes quote_id = 3;
+  bytes payer = 4;
+  bytes recipient = 5;
+  bytes source_asset = 6;
+  bytes destination_asset = 7;
+  string destination_chain_id = 8;
+  string amount_in_raw = 9;
+  string amount_out_raw = 10;
+  uint32 source_finality_blocks = 11;
+  uint64 settlement_deadline = 12;
+  bytes permit_nonce = 13;
+  bytes execution_generation = 14;
+}
+
+message StandardModuleChanged {
+  bytes standard_id = 1;
+  bytes previous_module = 2;
+  bytes module = 3;
+  bool enabled = 4;
+  string standard_kind = 5;
+}
+
+message NexaV6Event {
+  Provenance provenance = 1;
+  oneof event {
+    NetworkRegistered network_registered = 10;
+    NetworkStatusChanged network_status_changed = 11;
+    AssetRegistered asset_registered = 12;
+    AssetStatusChanged asset_status_changed = 13;
+    RouteRegistered route_registered = 14;
+    RouteStatusChanged route_status_changed = 15;
+    SourceIntakeChanged source_intake_changed = 16;
+    SourceFill source_fill = 17;
+    StandardModuleChanged standard_module_changed = 18;
+  }
+}
+
+message NexaV6Events {
+  repeated NexaV6Event events = 1;
+}
+
+message NetworkState {
+  Provenance provenance = 1;
+  bytes network_id = 2;
+  bytes vm_type = 3;
+  bytes network_reference = 4;
+  bytes metadata_hash = 5;
+  uint32 status = 6;
+  uint64 generation = 7;
+}
+
+message AssetState {
+  Provenance provenance = 1;
+  bytes asset_key = 2;
+  bytes network_id = 3;
+  bytes asset_id = 4;
+  bytes local_address = 5;
+  bool has_local_binding = 6;
+  bytes metadata_hash = 7;
+  uint32 status = 8;
+  uint64 generation = 9;
+}
+
+message RouteState {
+  Provenance provenance = 1;
+  bytes route_id = 2;
+  bytes source_network_id = 3;
+  bytes source_asset_id = 4;
+  bytes destination_network_id = 5;
+  bytes destination_asset_id = 6;
+  uint32 status = 7;
+  uint64 generation = 8;
+}
+
+message RouterState {
+  Provenance provenance = 1;
+  bytes router = 2;
+  bool source_intake_enabled = 3;
+  bytes actor = 4;
+}
+
+message StandardModuleState {
+  Provenance provenance = 1;
+  bytes standard_id = 2;
+  bytes module = 3;
+  bool enabled = 4;
+  string standard_kind = 5;
+}

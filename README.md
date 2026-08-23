@@ -147,6 +147,24 @@ Maven Central artifacts are signed with OpenPGP fingerprint
 
 Examples never require a private key to be committed. Signing stays in the integrating wallet or bot.
 
+## Passive Graph and Substreams indexing
+
+The [indexing package](indexing/README.md) supplies one generated canonical
+configuration, one shared Graph schema/mapping, and one shared Substreams
+Rust/protobuf implementation for Base (8453), BSC (56), and HyperEVM (999).
+All projections consume public on-chain events only. They are non-authoritative,
+have no Nexa runtime dependency, do not ingest the Signed Feed, and are not
+externally published yet.
+
+    npm run indexing:generate
+    npm run indexing:validate
+    npm run indexing:check
+
+Exact per-contract start blocks come from committed offline
+[deployment evidence](verification/indexing-deployment-evidence.json). External
+Graph Studio/Network and Substreams Registry actions are documented separately
+in the [deployment handoff](indexing/DEPLOYMENT_HANDOFF.md).
+
 ## Zero-touch Solver onboarding
 
 The fixed [Solver operator onboarding package](onboarding/nexa-v6-solver-operator.json) contains the chain IDs, same-address Facade, Registry and Router bindings, ERC-7683 Resolver, Feed, SSE, OpenAPI, ABI and verification references required by an automated operator.
@@ -175,7 +193,8 @@ other EVM wallets with bridge routing.
 | [standards/standard-ids.json](standards/standard-ids.json) | ERC-7683 and OIF compatibility |
 | [standards/nexa-standards.json](standards/nexa-standards.json) | canonical standards machine manifest |
 | [standards/test-vectors.json](standards/test-vectors.json) | deterministic ERC-7683 and OIF vectors |
-| [events/events.json](events/events.json) | onchain Fill event signature and topic |
+| [events/events.json](events/events.json) | canonical indexed V6 event signatures and topics |
+| [indexing](indexing) | passive Graph/Substreams package, canonical config and deployment handoff |
 | [verification](verification) | source, deployment, identity, signature and checksums |
 | [examples](examples) | discovery, Permit, Facade and resolution clients |
 | [sdk-spec](sdk-spec) | frozen cross-language behavior and byte-level vectors |
@@ -193,9 +212,11 @@ npm run generate:abi
 npm run generate:openapi
 npm run generate:onboarding
 npm run generate:sdk-vectors
+npm run indexing:generate
 npm run generate:checksums
 npm run validate
 npm test
+npm run indexing:check
 npm run sdk:conformance
 npm run worker:check
 npm run verify:onchain

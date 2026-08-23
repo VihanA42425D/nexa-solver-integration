@@ -1,0 +1,84 @@
+[
+  {
+    "type": "event",
+    "anonymous": false,
+    "name": "SourceIntakeConfigured",
+    "inputs": [
+      {
+        "type": "bool",
+        "name": "enabled"
+      },
+      {
+        "type": "address",
+        "name": "actor",
+        "indexed": true
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "name": "SourceFillV6",
+    "inputs": [
+      {
+        "type": "bytes32",
+        "name": "fillId",
+        "indexed": true
+      },
+      {
+        "type": "bytes32",
+        "name": "routeId",
+        "indexed": true
+      },
+      {
+        "type": "bytes32",
+        "name": "quoteId",
+        "indexed": true
+      },
+      {
+        "type": "address",
+        "name": "payer"
+      },
+      {
+        "type": "address",
+        "name": "recipient"
+      },
+      {
+        "type": "address",
+        "name": "sourceAsset"
+      },
+      {
+        "type": "address",
+        "name": "destinationAsset"
+      },
+      {
+        "type": "uint256",
+        "name": "destinationChainId"
+      },
+      {
+        "type": "uint128",
+        "name": "amountInRaw"
+      },
+      {
+        "type": "uint128",
+        "name": "amountOutRaw"
+      },
+      {
+        "type": "uint32",
+        "name": "sourceFinalityBlocks"
+      },
+      {
+        "type": "uint64",
+        "name": "settlementDeadline"
+      },
+      {
+        "type": "bytes32",
+        "name": "permitNonce"
+      },
+      {
+        "type": "bytes32",
+        "name": "executionGeneration"
+      }
+    ]
+  }
+]

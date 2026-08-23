@@ -118,7 +118,17 @@ test("standard IDs, public modules and Solver event topics are self-consistent",
   for (const event of Object.values(surface.events.events)) {
     assert.equal(id(event.signature), event.topic0);
   }
-  assert.deepEqual(Object.keys(surface.events.events), ["SourceFillV6"]);
+  assert.deepEqual(Object.keys(surface.events.events), [
+    "NetworkRegisteredV6",
+    "NetworkStatusChangedV6",
+    "AssetRegisteredV6",
+    "AssetStatusChangedV6",
+    "RouteRegisteredV6",
+    "RouteStatusChangedV6",
+    "SourceIntakeConfigured",
+    "SourceFillV6",
+    "StandardModuleConfiguredV6",
+  ]);
   assert.equal(
     surface.standards.standards.erc7683.moduleAddress,
     "0x534A0f500A7270b9b19d2AFa18DE24DCE93eb522",

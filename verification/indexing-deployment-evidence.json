@@ -1,0 +1,116 @@
+{
+  "schema": "NEXA_MAINNET_V6_INDEXING_DEPLOYMENT_EVIDENCE_V1",
+  "protocol": "Nexa V6",
+  "deploymentVersion": 6,
+  "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
+  "purpose": "PASSIVE_INDEXER_EXACT_START_BLOCKS",
+  "source": "OFFLINE_CONFIRMED_DEPLOYMENT_RECEIPTS",
+  "liveRpcUsedDuringExport": false,
+  "networks": {
+    "base": {
+      "graphNetwork": "base",
+      "deploymentSlug": "base",
+      "chainId": 8453,
+      "contracts": {
+        "registry": {
+          "contract": "NexaMainnetRegistryV6",
+          "address": "0x3db7752f052ACFECB3DA99BeE7c6a34D22367141",
+          "deploymentTransactionHash": "0xd617afd71183385e627071317232a0dd3e51d9075ed555182361554fd8551197",
+          "startBlock": 50143186,
+          "runtimeCodeHash": "0x5e766be0eb7a9b75f0b38c8509a15ac261209f06b0c993e8904a9f38633c790a"
+        },
+        "router": {
+          "contract": "NexaMainnetRouterV6",
+          "address": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+          "deploymentTransactionHash": "0xdf4888d056c7b2d32a57ecd868f56565d0fbf3aa7c115640867ce4fef4533c9a",
+          "startBlock": 50143190,
+          "runtimeCodeHash": "0xcdda1b571b317479c6d297aa4354c406d4709f83562e2b6b29bd0e1268e4af70"
+        },
+        "standardModuleRegistry": {
+          "contract": "NexaStandardModuleRegistryV6",
+          "address": "0xA149C756E611D0315bCB2d469aA642d6Be32F765",
+          "deploymentTransactionHash": "0x363474097a74e9b32d6f09bc4aa633bfc52020b5f180e5856675ae483ced7d83",
+          "startBlock": 50143193,
+          "runtimeCodeHash": "0x05fa79f4d000710c433044f4e91462e99af1caee1d85b2a84a72f9687d8b1f22"
+        },
+        "facade": {
+          "contract": "NexaSolverDiscoveryV6",
+          "address": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+          "deploymentTransactionHash": "0x334767284d7041afb92f807a8a762f16ce6dd3e9af1b95f2231c5f79e1de9cc4",
+          "startBlock": 50320644,
+          "runtimeCodeHash": "0x57cb853a995215d352eb64ab9ec33aed60f4ef5f8a38575bc2dd018b38babfc1"
+        }
+      }
+    },
+    "bsc": {
+      "graphNetwork": "bsc",
+      "deploymentSlug": "bsc",
+      "chainId": 56,
+      "contracts": {
+        "registry": {
+          "contract": "NexaMainnetRegistryV6",
+          "address": "0x3db7752f052ACFECB3DA99BeE7c6a34D22367141",
+          "deploymentTransactionHash": "0xd4ebcd3bb119163b65aa2c80f8ddbff5b7715b9d79d6b2620fbaaf06ac3c0365",
+          "startBlock": 116699981,
+          "runtimeCodeHash": "0x5e766be0eb7a9b75f0b38c8509a15ac261209f06b0c993e8904a9f38633c790a"
+        },
+        "router": {
+          "contract": "NexaMainnetRouterV6",
+          "address": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+          "deploymentTransactionHash": "0xb1619a5ee38c0c3fab9739946c5de0dd80f239699ee3d85df760b72ce5649a41",
+          "startBlock": 116699987,
+          "runtimeCodeHash": "0xcdda1b571b317479c6d297aa4354c406d4709f83562e2b6b29bd0e1268e4af70"
+        },
+        "standardModuleRegistry": {
+          "contract": "NexaStandardModuleRegistryV6",
+          "address": "0xA149C756E611D0315bCB2d469aA642d6Be32F765",
+          "deploymentTransactionHash": "0x19cc7dbc1046a990a55f639155dadb75968ec11629a4dbe110540e66856d57ed",
+          "startBlock": 116699998,
+          "runtimeCodeHash": "0x05fa79f4d000710c433044f4e91462e99af1caee1d85b2a84a72f9687d8b1f22"
+        },
+        "facade": {
+          "contract": "NexaSolverDiscoveryV6",
+          "address": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+          "deploymentTransactionHash": "0x416cf6de4552414be42fd5a1a9e75fdf2c9c0466c64fda6e1e66bb1aa8fbf1c8",
+          "startBlock": 117488361,
+          "runtimeCodeHash": "0x57cb853a995215d352eb64ab9ec33aed60f4ef5f8a38575bc2dd018b38babfc1"
+        }
+      }
+    },
+    "hyper-evm": {
+      "graphNetwork": "hyper-evm",
+      "deploymentSlug": "hyperevm",
+      "chainId": 999,
+      "contracts": {
+        "registry": {
+          "contract": "NexaMainnetRegistryV6",
+          "address": "0x3db7752f052ACFECB3DA99BeE7c6a34D22367141",
+          "deploymentTransactionHash": "0xe02a09967dac6dfe420ecfb839b1511cad0af5525649a90ef51b5886195d3a25",
+          "startBlock": 43533441,
+          "runtimeCodeHash": "0x5e766be0eb7a9b75f0b38c8509a15ac261209f06b0c993e8904a9f38633c790a"
+        },
+        "router": {
+          "contract": "NexaMainnetRouterV6",
+          "address": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+          "deploymentTransactionHash": "0xbba15ef7ba7c6326bacc2eb62ce5bb406d2272b86fed5b4b88e8d3cbf9d6734c",
+          "startBlock": 43533563,
+          "runtimeCodeHash": "0xcdda1b571b317479c6d297aa4354c406d4709f83562e2b6b29bd0e1268e4af70"
+        },
+        "standardModuleRegistry": {
+          "contract": "NexaStandardModuleRegistryV6",
+          "address": "0xA149C756E611D0315bCB2d469aA642d6Be32F765",
+          "deploymentTransactionHash": "0xfb0d3115eb10bb8f5bcb258a37a08ba6e1db4a41c7730123d8963fe7847a3e87",
+          "startBlock": 43533624,
+          "runtimeCodeHash": "0x05fa79f4d000710c433044f4e91462e99af1caee1d85b2a84a72f9687d8b1f22"
+        },
+        "facade": {
+          "contract": "NexaSolverDiscoveryV6",
+          "address": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+          "deploymentTransactionHash": "0x504b9d54c686248d98a7b610c41de76f7c8077e8f592546dbd063c1b52ae3617",
+          "startBlock": 43894134,
+          "runtimeCodeHash": "0x57cb853a995215d352eb64ab9ec33aed60f4ef5f8a38575bc2dd018b38babfc1"
+        }
+      }
+    }
+  }
+}

@@ -32,6 +32,7 @@
   "standardsManifest": "./standards/nexa-standards.json",
   "standardTestVectors": "./standards/test-vectors.json",
   "events": "./events/events.json",
+  "indexing": "./indexing/indexing-manifest.json",
   "networkIds": "./networks/network-ids.json",
   "abi": "./abi/solver-facing.json",
   "openapi": "./openapi/openapi.json",
@@ -53,6 +54,7 @@
   "distribution": "./distribution/targets.json",
   "verification": {
     "facadeDeployment": "./verification/facade-deployment.json",
+    "indexingDeploymentEvidence": "./verification/indexing-deployment-evidence.json",
     "standardJsonInput": "./verification/NexaSolverDiscoveryV6.standard-input.json",
     "ownershipStatements": "./verification/explorer-ownership-signatures.json",
     "onchainIdentity": "./verification/onchain-identity.json",

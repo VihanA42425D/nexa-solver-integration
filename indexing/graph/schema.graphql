@@ -1,0 +1,175 @@
+type ProtocolDeployment @entity(immutable: true) {
+  id: ID!
+  chainId: BigInt!
+  releaseId: Bytes!
+  contractName: String!
+  contractAddress: Bytes!
+  startBlock: BigInt!
+  runtimeCodeHash: Bytes!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type Network @entity(immutable: false) {
+  id: ID!
+  chainId: BigInt!
+  networkId: Bytes!
+  vmType: Bytes!
+  networkReference: Bytes!
+  metadataHash: Bytes!
+  status: Int!
+  generation: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type NetworkStatusChange @entity(immutable: true) {
+  id: ID!
+  chainId: BigInt!
+  networkId: Bytes!
+  previousStatus: Int!
+  status: Int!
+  generation: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type Asset @entity(immutable: false) {
+  id: ID!
+  chainId: BigInt!
+  assetKey: Bytes!
+  networkId: Bytes!
+  assetId: Bytes!
+  localAddress: Bytes!
+  hasLocalBinding: Boolean!
+  metadataHash: Bytes!
+  status: Int!
+  generation: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type AssetStatusChange @entity(immutable: true) {
+  id: ID!
+  chainId: BigInt!
+  assetKey: Bytes!
+  previousStatus: Int!
+  status: Int!
+  generation: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type Route @entity(immutable: false) {
+  id: ID!
+  chainId: BigInt!
+  routeId: Bytes!
+  sourceNetworkId: Bytes!
+  sourceAssetId: Bytes!
+  destinationNetworkId: Bytes!
+  destinationAssetId: Bytes!
+  status: Int!
+  generation: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type RouteStatusChange @entity(immutable: true) {
+  id: ID!
+  chainId: BigInt!
+  routeId: Bytes!
+  previousStatus: Int!
+  status: Int!
+  actor: Bytes!
+  generation: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type RouterState @entity(immutable: false) {
+  id: ID!
+  chainId: BigInt!
+  router: Bytes!
+  sourceIntakeEnabled: Boolean!
+  actor: Bytes!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type SourceIntakeChange @entity(immutable: true) {
+  id: ID!
+  chainId: BigInt!
+  router: Bytes!
+  enabled: Boolean!
+  actor: Bytes!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type SourceFill @entity(immutable: true) {
+  id: ID!
+  chainId: BigInt!
+  fillId: Bytes!
+  routeId: Bytes!
+  quoteId: Bytes!
+  payer: Bytes!
+  recipient: Bytes!
+  sourceAsset: Bytes!
+  destinationAsset: Bytes!
+  destinationChainId: BigInt!
+  amountInRaw: BigInt!
+  amountOutRaw: BigInt!
+  sourceFinalityBlocks: BigInt!
+  settlementDeadline: BigInt!
+  permitNonce: Bytes!
+  executionGeneration: Bytes!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type StandardModule @entity(immutable: false) {
+  id: ID!
+  chainId: BigInt!
+  standardId: Bytes!
+  module: Bytes!
+  enabled: Boolean!
+  standardKind: String!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type StandardModuleChange @entity(immutable: true) {
+  id: ID!
+  chainId: BigInt!
+  standardId: Bytes!
+  previousModule: Bytes!
+  module: Bytes!
+  enabled: Boolean!
+  standardKind: String!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}

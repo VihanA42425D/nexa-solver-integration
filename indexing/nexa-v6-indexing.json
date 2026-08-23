@@ -1,0 +1,1570 @@
+{
+  "schema": "NEXA_V6_CANONICAL_INDEXING_CONFIG_V1",
+  "version": "1.0.0",
+  "protocol": "Nexa V6",
+  "status": "PACKAGE_READY",
+  "authoritative": false,
+  "source": "ONCHAIN_EVENTS",
+  "generatedFrom": [
+    "nexa-mainnet-v6.json",
+    "verification/indexing-deployment-evidence.json",
+    "events/events.json",
+    "standards/nexa-standards.json"
+  ],
+  "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
+  "networks": [
+    {
+      "graphNetwork": "base",
+      "deploymentSlug": "base",
+      "chainId": 8453,
+      "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
+      "contracts": {
+        "registry": {
+          "contract": "NexaMainnetRegistryV6",
+          "address": "0x3db7752f052ACFECB3DA99BeE7c6a34D22367141",
+          "deploymentTransactionHash": "0xd617afd71183385e627071317232a0dd3e51d9075ed555182361554fd8551197",
+          "startBlock": 50143186,
+          "runtimeCodeHash": "0x5e766be0eb7a9b75f0b38c8509a15ac261209f06b0c993e8904a9f38633c790a",
+          "events": [
+            {
+              "name": "NetworkRegisteredV6",
+              "contract": "NexaMainnetRegistryV6",
+              "signature": "NetworkRegisteredV6(bytes32,bytes32,bytes32,bytes32)",
+              "topic0": "0x7db7c63b9c8adfae81472453f63167980ece11baca7a8b5b2ed405ea50493dfa",
+              "abi": "event NetworkRegisteredV6(bytes32 indexed networkId,bytes32 indexed vmType,bytes32 networkReference,bytes32 metadataHash)",
+              "indexed": [
+                "networkId",
+                "vmType"
+              ],
+              "fields": [
+                {
+                  "name": "networkId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "vmType",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "networkReference",
+                  "type": "bytes32",
+                  "indexed": false
+                },
+                {
+                  "name": "metadataHash",
+                  "type": "bytes32",
+                  "indexed": false
+                }
+              ]
+            },
+            {
+              "name": "NetworkStatusChangedV6",
+              "contract": "NexaMainnetRegistryV6",
+              "signature": "NetworkStatusChangedV6(bytes32,uint8,uint8,uint64)",
+              "topic0": "0xd5f27b4ae4ca578a1e386feb956fcaeb583af6e56feeccfd6bfbfa3768b89488",
+              "abi": "event NetworkStatusChangedV6(bytes32 indexed networkId,uint8 previousStatus,uint8 status,uint64 generation)",
+              "indexed": [
+                "networkId"
+              ],
+              "fields": [
+                {
+                  "name": "networkId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "previousStatus",
+                  "type": "uint8",
+                  "indexed": false
+                },
+                {
+                  "name": "status",
+                  "type": "uint8",
+                  "indexed": false
+                },
+                {
+                  "name": "generation",
+                  "type": "uint64",
+                  "indexed": false
+                }
+              ]
+            },
+            {
+              "name": "AssetRegisteredV6",
+              "contract": "NexaMainnetRegistryV6",
+              "signature": "AssetRegisteredV6(bytes32,bytes32,bytes32,address,bool,bytes32)",
+              "topic0": "0xfa44e2cbe942f5fe60e49608f55b65783f700e447d7bcb499ab6337d84c64aaa",
+              "abi": "event AssetRegisteredV6(bytes32 indexed assetKey,bytes32 indexed networkId,bytes32 indexed assetId,address localAddress,bool hasLocalBinding,bytes32 metadataHash)",
+              "indexed": [
+                "assetKey",
+                "networkId",
+                "assetId"
+              ],
+              "fields": [
+                {
+                  "name": "assetKey",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "networkId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "assetId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "localAddress",
+                  "type": "address",
+                  "indexed": false
+                },
+                {
+                  "name": "hasLocalBinding",
+                  "type": "bool",
+                  "indexed": false
+                },
+                {
+                  "name": "metadataHash",
+                  "type": "bytes32",
+                  "indexed": false
+                }
+              ]
+            },
+            {
+              "name": "AssetStatusChangedV6",
+              "contract": "NexaMainnetRegistryV6",
+              "signature": "AssetStatusChangedV6(bytes32,uint8,uint8,uint64)",
+              "topic0": "0x4f814da937563817e731ffa6ac77f581c6bb578c83d4bcdd756f43dcede51926",
+              "abi": "event AssetStatusChangedV6(bytes32 indexed assetKey,uint8 previousStatus,uint8 status,uint64 generation)",
+              "indexed": [
+                "assetKey"
+              ],
+              "fields": [
+                {
+                  "name": "assetKey",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "previousStatus",
+                  "type": "uint8",
+                  "indexed": false
+                },
+                {
+                  "name": "status",
+                  "type": "uint8",
+                  "indexed": false
+                },
+                {
+                  "name": "generation",
+                  "type": "uint64",
+                  "indexed": false
+                }
+              ]
+            },
+            {
+              "name": "RouteRegisteredV6",
+              "contract": "NexaMainnetRegistryV6",
+              "signature": "RouteRegisteredV6(bytes32,bytes32,bytes32,bytes32,bytes32)",
+              "topic0": "0x5db26c69982e7b4490d75895dd8589193a8704a98c879382a6caf0fa3ac60c12",
+              "abi": "event RouteRegisteredV6(bytes32 indexed routeId,bytes32 indexed sourceNetworkId,bytes32 indexed destinationNetworkId,bytes32 sourceAssetId,bytes32 destinationAssetId)",
+              "indexed": [
+                "routeId",
+                "sourceNetworkId",
+                "destinationNetworkId"
+              ],
+              "fields": [
+                {
+                  "name": "routeId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "sourceNetworkId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "destinationNetworkId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "sourceAssetId",
+                  "type": "bytes32",
+                  "indexed": false
+                },
+                {
+                  "name": "destinationAssetId",
+                  "type": "bytes32",
+                  "indexed": false
+                }
+              ]
+            },
+            {
+              "name": "RouteStatusChangedV6",
+              "contract": "NexaMainnetRegistryV6",
+              "signature": "RouteStatusChangedV6(bytes32,uint8,uint8,address,uint64)",
+              "topic0": "0x771e9b8d4c1d52f53e432497b0cc8f7a4ede4172b67909caecc5f3c1f7cc4188",
+              "abi": "event RouteStatusChangedV6(bytes32 indexed routeId,uint8 previousStatus,uint8 status,address indexed actor,uint64 generation)",
+              "indexed": [
+                "routeId",
+                "actor"
+              ],
+              "fields": [
+                {
+                  "name": "routeId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "previousStatus",
+                  "type": "uint8",
+                  "indexed": false
+                },
+                {
+                  "name": "status",
+                  "type": "uint8",
+                  "indexed": false
+                },
+                {
+                  "name": "actor",
+                  "type": "address",
+                  "indexed": true
+                },
+                {
+                  "name": "generation",
+                  "type": "uint64",
+                  "indexed": false
+                }
+              ]
+            }
+          ]
+        },
+        "router": {
+          "contract": "NexaMainnetRouterV6",
+          "address": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+          "deploymentTransactionHash": "0xdf4888d056c7b2d32a57ecd868f56565d0fbf3aa7c115640867ce4fef4533c9a",
+          "startBlock": 50143190,
+          "runtimeCodeHash": "0xcdda1b571b317479c6d297aa4354c406d4709f83562e2b6b29bd0e1268e4af70",
+          "events": [
+            {
+              "name": "SourceIntakeConfigured",
+              "contract": "NexaMainnetRouterV6",
+              "signature": "SourceIntakeConfigured(bool,address)",
+              "topic0": "0x9359764deaafda5ba9ff799a2c3eac775403a15fd633618438d7b011f3e775af",
+              "abi": "event SourceIntakeConfigured(bool enabled,address indexed actor)",
+              "indexed": [
+                "actor"
+              ],
+              "fields": [
+                {
+                  "name": "enabled",
+                  "type": "bool",
+                  "indexed": false
+                },
+                {
+                  "name": "actor",
+                  "type": "address",
+                  "indexed": true
+                }
+              ]
+            },
+            {
+              "name": "SourceFillV6",
+              "contract": "NexaMainnetRouterV6",
+              "signature": "SourceFillV6(bytes32,bytes32,bytes32,address,address,address,address,uint256,uint128,uint128,uint32,uint64,bytes32,bytes32)",
+              "topic0": "0x77d880254b141dedc64867f6d2d253eedfc609837b892c4ddfe154a43ea80561",
+              "abi": "event SourceFillV6(bytes32 indexed fillId,bytes32 indexed routeId,bytes32 indexed quoteId,address payer,address recipient,address sourceAsset,address destinationAsset,uint256 destinationChainId,uint128 amountInRaw,uint128 amountOutRaw,uint32 sourceFinalityBlocks,uint64 settlementDeadline,bytes32 permitNonce,bytes32 executionGeneration)",
+              "indexed": [
+                "fillId",
+                "routeId",
+                "quoteId"
+              ],
+              "fields": [
+                {
+                  "name": "fillId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "routeId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "quoteId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "payer",
+                  "type": "address",
+                  "indexed": false
+                },
+                {
+                  "name": "recipient",
+                  "type": "address",
+                  "indexed": false
+                },
+                {
+                  "name": "sourceAsset",
+                  "type": "address",
+                  "indexed": false
+                },
+                {
+                  "name": "destinationAsset",
+                  "type": "address",
+                  "indexed": false
+                },
+                {
+                  "name": "destinationChainId",
+                  "type": "uint256",
+                  "indexed": false
+                },
+                {
+                  "name": "amountInRaw",
+                  "type": "uint128",
+                  "indexed": false
+                },
+                {
+                  "name": "amountOutRaw",
+                  "type": "uint128",
+                  "indexed": false
+                },
+                {
+                  "name": "sourceFinalityBlocks",
+                  "type": "uint32",
+                  "indexed": false
+                },
+                {
+                  "name": "settlementDeadline",
+                  "type": "uint64",
+                  "indexed": false
+                },
+                {
+                  "name": "permitNonce",
+                  "type": "bytes32",
+                  "indexed": false
+                },
+                {
+                  "name": "executionGeneration",
+                  "type": "bytes32",
+                  "indexed": false
+                }
+              ]
+            }
+          ]
+        },
+        "standardModuleRegistry": {
+          "contract": "NexaStandardModuleRegistryV6",
+          "address": "0xA149C756E611D0315bCB2d469aA642d6Be32F765",
+          "deploymentTransactionHash": "0x363474097a74e9b32d6f09bc4aa633bfc52020b5f180e5856675ae483ced7d83",
+          "startBlock": 50143193,
+          "runtimeCodeHash": "0x05fa79f4d000710c433044f4e91462e99af1caee1d85b2a84a72f9687d8b1f22",
+          "events": [
+            {
+              "name": "StandardModuleConfiguredV6",
+              "contract": "NexaStandardModuleRegistryV6",
+              "signature": "StandardModuleConfiguredV6(bytes32,address,address)",
+              "topic0": "0x0be5a3783c0f7a412c4a0d5e60bc8f9ff4cac6397e3f700053ae74965f109fdd",
+              "abi": "event StandardModuleConfiguredV6(bytes32 indexed standardId,address indexed previousModule,address indexed module)",
+              "indexed": [
+                "standardId",
+                "previousModule",
+                "module"
+              ],
+              "fields": [
+                {
+                  "name": "standardId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "previousModule",
+                  "type": "address",
+                  "indexed": true
+                },
+                {
+                  "name": "module",
+                  "type": "address",
+                  "indexed": true
+                }
+              ]
+            }
+          ]
+        },
+        "facade": {
+          "contract": "NexaSolverDiscoveryV6",
+          "address": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+          "deploymentTransactionHash": "0x334767284d7041afb92f807a8a762f16ce6dd3e9af1b95f2231c5f79e1de9cc4",
+          "startBlock": 50320644,
+          "runtimeCodeHash": "0x57cb853a995215d352eb64ab9ec33aed60f4ef5f8a38575bc2dd018b38babfc1",
+          "events": []
+        }
+      }
+    },
+    {
+      "graphNetwork": "bsc",
+      "deploymentSlug": "bsc",
+      "chainId": 56,
+      "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
+      "contracts": {
+        "registry": {
+          "contract": "NexaMainnetRegistryV6",
+          "address": "0x3db7752f052ACFECB3DA99BeE7c6a34D22367141",
+          "deploymentTransactionHash": "0xd4ebcd3bb119163b65aa2c80f8ddbff5b7715b9d79d6b2620fbaaf06ac3c0365",
+          "startBlock": 116699981,
+          "runtimeCodeHash": "0x5e766be0eb7a9b75f0b38c8509a15ac261209f06b0c993e8904a9f38633c790a",
+          "events": [
+            {
+              "name": "NetworkRegisteredV6",
+              "contract": "NexaMainnetRegistryV6",
+              "signature": "NetworkRegisteredV6(bytes32,bytes32,bytes32,bytes32)",
+              "topic0": "0x7db7c63b9c8adfae81472453f63167980ece11baca7a8b5b2ed405ea50493dfa",
+              "abi": "event NetworkRegisteredV6(bytes32 indexed networkId,bytes32 indexed vmType,bytes32 networkReference,bytes32 metadataHash)",
+              "indexed": [
+                "networkId",
+                "vmType"
+              ],
+              "fields": [
+                {
+                  "name": "networkId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "vmType",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "networkReference",
+                  "type": "bytes32",
+                  "indexed": false
+                },
+                {
+                  "name": "metadataHash",
+                  "type": "bytes32",
+                  "indexed": false
+                }
+              ]
+            },
+            {
+              "name": "NetworkStatusChangedV6",
+              "contract": "NexaMainnetRegistryV6",
+              "signature": "NetworkStatusChangedV6(bytes32,uint8,uint8,uint64)",
+              "topic0": "0xd5f27b4ae4ca578a1e386feb956fcaeb583af6e56feeccfd6bfbfa3768b89488",
+              "abi": "event NetworkStatusChangedV6(bytes32 indexed networkId,uint8 previousStatus,uint8 status,uint64 generation)",
+              "indexed": [
+                "networkId"
+              ],
+              "fields": [
+                {
+                  "name": "networkId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "previousStatus",
+                  "type": "uint8",
+                  "indexed": false
+                },
+                {
+                  "name": "status",
+                  "type": "uint8",
+                  "indexed": false
+                },
+                {
+                  "name": "generation",
+                  "type": "uint64",
+                  "indexed": false
+                }
+              ]
+            },
+            {
+              "name": "AssetRegisteredV6",
+              "contract": "NexaMainnetRegistryV6",
+              "signature": "AssetRegisteredV6(bytes32,bytes32,bytes32,address,bool,bytes32)",
+              "topic0": "0xfa44e2cbe942f5fe60e49608f55b65783f700e447d7bcb499ab6337d84c64aaa",
+              "abi": "event AssetRegisteredV6(bytes32 indexed assetKey,bytes32 indexed networkId,bytes32 indexed assetId,address localAddress,bool hasLocalBinding,bytes32 metadataHash)",
+              "indexed": [
+                "assetKey",
+                "networkId",
+                "assetId"
+              ],
+              "fields": [
+                {
+                  "name": "assetKey",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "networkId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "assetId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "localAddress",
+                  "type": "address",
+                  "indexed": false
+                },
+                {
+                  "name": "hasLocalBinding",
+                  "type": "bool",
+                  "indexed": false
+                },
+                {
+                  "name": "metadataHash",
+                  "type": "bytes32",
+                  "indexed": false
+                }
+              ]
+            },
+            {
+              "name": "AssetStatusChangedV6",
+              "contract": "NexaMainnetRegistryV6",
+              "signature": "AssetStatusChangedV6(bytes32,uint8,uint8,uint64)",
+              "topic0": "0x4f814da937563817e731ffa6ac77f581c6bb578c83d4bcdd756f43dcede51926",
+              "abi": "event AssetStatusChangedV6(bytes32 indexed assetKey,uint8 previousStatus,uint8 status,uint64 generation)",
+              "indexed": [
+                "assetKey"
+              ],
+              "fields": [
+                {
+                  "name": "assetKey",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "previousStatus",
+                  "type": "uint8",
+                  "indexed": false
+                },
+                {
+                  "name": "status",
+                  "type": "uint8",
+                  "indexed": false
+                },
+                {
+                  "name": "generation",
+                  "type": "uint64",
+                  "indexed": false
+                }
+              ]
+            },
+            {
+              "name": "RouteRegisteredV6",
+              "contract": "NexaMainnetRegistryV6",
+              "signature": "RouteRegisteredV6(bytes32,bytes32,bytes32,bytes32,bytes32)",
+              "topic0": "0x5db26c69982e7b4490d75895dd8589193a8704a98c879382a6caf0fa3ac60c12",
+              "abi": "event RouteRegisteredV6(bytes32 indexed routeId,bytes32 indexed sourceNetworkId,bytes32 indexed destinationNetworkId,bytes32 sourceAssetId,bytes32 destinationAssetId)",
+              "indexed": [
+                "routeId",
+                "sourceNetworkId",
+                "destinationNetworkId"
+              ],
+              "fields": [
+                {
+                  "name": "routeId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "sourceNetworkId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "destinationNetworkId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "sourceAssetId",
+                  "type": "bytes32",
+                  "indexed": false
+                },
+                {
+                  "name": "destinationAssetId",
+                  "type": "bytes32",
+                  "indexed": false
+                }
+              ]
+            },
+            {
+              "name": "RouteStatusChangedV6",
+              "contract": "NexaMainnetRegistryV6",
+              "signature": "RouteStatusChangedV6(bytes32,uint8,uint8,address,uint64)",
+              "topic0": "0x771e9b8d4c1d52f53e432497b0cc8f7a4ede4172b67909caecc5f3c1f7cc4188",
+              "abi": "event RouteStatusChangedV6(bytes32 indexed routeId,uint8 previousStatus,uint8 status,address indexed actor,uint64 generation)",
+              "indexed": [
+                "routeId",
+                "actor"
+              ],
+              "fields": [
+                {
+                  "name": "routeId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "previousStatus",
+                  "type": "uint8",
+                  "indexed": false
+                },
+                {
+                  "name": "status",
+                  "type": "uint8",
+                  "indexed": false
+                },
+                {
+                  "name": "actor",
+                  "type": "address",
+                  "indexed": true
+                },
+                {
+                  "name": "generation",
+                  "type": "uint64",
+                  "indexed": false
+                }
+              ]
+            }
+          ]
+        },
+        "router": {
+          "contract": "NexaMainnetRouterV6",
+          "address": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+          "deploymentTransactionHash": "0xb1619a5ee38c0c3fab9739946c5de0dd80f239699ee3d85df760b72ce5649a41",
+          "startBlock": 116699987,
+          "runtimeCodeHash": "0xcdda1b571b317479c6d297aa4354c406d4709f83562e2b6b29bd0e1268e4af70",
+          "events": [
+            {
+              "name": "SourceIntakeConfigured",
+              "contract": "NexaMainnetRouterV6",
+              "signature": "SourceIntakeConfigured(bool,address)",
+              "topic0": "0x9359764deaafda5ba9ff799a2c3eac775403a15fd633618438d7b011f3e775af",
+              "abi": "event SourceIntakeConfigured(bool enabled,address indexed actor)",
+              "indexed": [
+                "actor"
+              ],
+              "fields": [
+                {
+                  "name": "enabled",
+                  "type": "bool",
+                  "indexed": false
+                },
+                {
+                  "name": "actor",
+                  "type": "address",
+                  "indexed": true
+                }
+              ]
+            },
+            {
+              "name": "SourceFillV6",
+              "contract": "NexaMainnetRouterV6",
+              "signature": "SourceFillV6(bytes32,bytes32,bytes32,address,address,address,address,uint256,uint128,uint128,uint32,uint64,bytes32,bytes32)",
+              "topic0": "0x77d880254b141dedc64867f6d2d253eedfc609837b892c4ddfe154a43ea80561",
+              "abi": "event SourceFillV6(bytes32 indexed fillId,bytes32 indexed routeId,bytes32 indexed quoteId,address payer,address recipient,address sourceAsset,address destinationAsset,uint256 destinationChainId,uint128 amountInRaw,uint128 amountOutRaw,uint32 sourceFinalityBlocks,uint64 settlementDeadline,bytes32 permitNonce,bytes32 executionGeneration)",
+              "indexed": [
+                "fillId",
+                "routeId",
+                "quoteId"
+              ],
+              "fields": [
+                {
+                  "name": "fillId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "routeId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "quoteId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "payer",
+                  "type": "address",
+                  "indexed": false
+                },
+                {
+                  "name": "recipient",
+                  "type": "address",
+                  "indexed": false
+                },
+                {
+                  "name": "sourceAsset",
+                  "type": "address",
+                  "indexed": false
+                },
+                {
+                  "name": "destinationAsset",
+                  "type": "address",
+                  "indexed": false
+                },
+                {
+                  "name": "destinationChainId",
+                  "type": "uint256",
+                  "indexed": false
+                },
+                {
+                  "name": "amountInRaw",
+                  "type": "uint128",
+                  "indexed": false
+                },
+                {
+                  "name": "amountOutRaw",
+                  "type": "uint128",
+                  "indexed": false
+                },
+                {
+                  "name": "sourceFinalityBlocks",
+                  "type": "uint32",
+                  "indexed": false
+                },
+                {
+                  "name": "settlementDeadline",
+                  "type": "uint64",
+                  "indexed": false
+                },
+                {
+                  "name": "permitNonce",
+                  "type": "bytes32",
+                  "indexed": false
+                },
+                {
+                  "name": "executionGeneration",
+                  "type": "bytes32",
+                  "indexed": false
+                }
+              ]
+            }
+          ]
+        },
+        "standardModuleRegistry": {
+          "contract": "NexaStandardModuleRegistryV6",
+          "address": "0xA149C756E611D0315bCB2d469aA642d6Be32F765",
+          "deploymentTransactionHash": "0x19cc7dbc1046a990a55f639155dadb75968ec11629a4dbe110540e66856d57ed",
+          "startBlock": 116699998,
+          "runtimeCodeHash": "0x05fa79f4d000710c433044f4e91462e99af1caee1d85b2a84a72f9687d8b1f22",
+          "events": [
+            {
+              "name": "StandardModuleConfiguredV6",
+              "contract": "NexaStandardModuleRegistryV6",
+              "signature": "StandardModuleConfiguredV6(bytes32,address,address)",
+              "topic0": "0x0be5a3783c0f7a412c4a0d5e60bc8f9ff4cac6397e3f700053ae74965f109fdd",
+              "abi": "event StandardModuleConfiguredV6(bytes32 indexed standardId,address indexed previousModule,address indexed module)",
+              "indexed": [
+                "standardId",
+                "previousModule",
+                "module"
+              ],
+              "fields": [
+                {
+                  "name": "standardId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "previousModule",
+                  "type": "address",
+                  "indexed": true
+                },
+                {
+                  "name": "module",
+                  "type": "address",
+                  "indexed": true
+                }
+              ]
+            }
+          ]
+        },
+        "facade": {
+          "contract": "NexaSolverDiscoveryV6",
+          "address": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+          "deploymentTransactionHash": "0x416cf6de4552414be42fd5a1a9e75fdf2c9c0466c64fda6e1e66bb1aa8fbf1c8",
+          "startBlock": 117488361,
+          "runtimeCodeHash": "0x57cb853a995215d352eb64ab9ec33aed60f4ef5f8a38575bc2dd018b38babfc1",
+          "events": []
+        }
+      }
+    },
+    {
+      "graphNetwork": "hyper-evm",
+      "deploymentSlug": "hyperevm",
+      "chainId": 999,
+      "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
+      "contracts": {
+        "registry": {
+          "contract": "NexaMainnetRegistryV6",
+          "address": "0x3db7752f052ACFECB3DA99BeE7c6a34D22367141",
+          "deploymentTransactionHash": "0xe02a09967dac6dfe420ecfb839b1511cad0af5525649a90ef51b5886195d3a25",
+          "startBlock": 43533441,
+          "runtimeCodeHash": "0x5e766be0eb7a9b75f0b38c8509a15ac261209f06b0c993e8904a9f38633c790a",
+          "events": [
+            {
+              "name": "NetworkRegisteredV6",
+              "contract": "NexaMainnetRegistryV6",
+              "signature": "NetworkRegisteredV6(bytes32,bytes32,bytes32,bytes32)",
+              "topic0": "0x7db7c63b9c8adfae81472453f63167980ece11baca7a8b5b2ed405ea50493dfa",
+              "abi": "event NetworkRegisteredV6(bytes32 indexed networkId,bytes32 indexed vmType,bytes32 networkReference,bytes32 metadataHash)",
+              "indexed": [
+                "networkId",
+                "vmType"
+              ],
+              "fields": [
+                {
+                  "name": "networkId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "vmType",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "networkReference",
+                  "type": "bytes32",
+                  "indexed": false
+                },
+                {
+                  "name": "metadataHash",
+                  "type": "bytes32",
+                  "indexed": false
+                }
+              ]
+            },
+            {
+              "name": "NetworkStatusChangedV6",
+              "contract": "NexaMainnetRegistryV6",
+              "signature": "NetworkStatusChangedV6(bytes32,uint8,uint8,uint64)",
+              "topic0": "0xd5f27b4ae4ca578a1e386feb956fcaeb583af6e56feeccfd6bfbfa3768b89488",
+              "abi": "event NetworkStatusChangedV6(bytes32 indexed networkId,uint8 previousStatus,uint8 status,uint64 generation)",
+              "indexed": [
+                "networkId"
+              ],
+              "fields": [
+                {
+                  "name": "networkId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "previousStatus",
+                  "type": "uint8",
+                  "indexed": false
+                },
+                {
+                  "name": "status",
+                  "type": "uint8",
+                  "indexed": false
+                },
+                {
+                  "name": "generation",
+                  "type": "uint64",
+                  "indexed": false
+                }
+              ]
+            },
+            {
+              "name": "AssetRegisteredV6",
+              "contract": "NexaMainnetRegistryV6",
+              "signature": "AssetRegisteredV6(bytes32,bytes32,bytes32,address,bool,bytes32)",
+              "topic0": "0xfa44e2cbe942f5fe60e49608f55b65783f700e447d7bcb499ab6337d84c64aaa",
+              "abi": "event AssetRegisteredV6(bytes32 indexed assetKey,bytes32 indexed networkId,bytes32 indexed assetId,address localAddress,bool hasLocalBinding,bytes32 metadataHash)",
+              "indexed": [
+                "assetKey",
+                "networkId",
+                "assetId"
+              ],
+              "fields": [
+                {
+                  "name": "assetKey",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "networkId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "assetId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "localAddress",
+                  "type": "address",
+                  "indexed": false
+                },
+                {
+                  "name": "hasLocalBinding",
+                  "type": "bool",
+                  "indexed": false
+                },
+                {
+                  "name": "metadataHash",
+                  "type": "bytes32",
+                  "indexed": false
+                }
+              ]
+            },
+            {
+              "name": "AssetStatusChangedV6",
+              "contract": "NexaMainnetRegistryV6",
+              "signature": "AssetStatusChangedV6(bytes32,uint8,uint8,uint64)",
+              "topic0": "0x4f814da937563817e731ffa6ac77f581c6bb578c83d4bcdd756f43dcede51926",
+              "abi": "event AssetStatusChangedV6(bytes32 indexed assetKey,uint8 previousStatus,uint8 status,uint64 generation)",
+              "indexed": [
+                "assetKey"
+              ],
+              "fields": [
+                {
+                  "name": "assetKey",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "previousStatus",
+                  "type": "uint8",
+                  "indexed": false
+                },
+                {
+                  "name": "status",
+                  "type": "uint8",
+                  "indexed": false
+                },
+                {
+                  "name": "generation",
+                  "type": "uint64",
+                  "indexed": false
+                }
+              ]
+            },
+            {
+              "name": "RouteRegisteredV6",
+              "contract": "NexaMainnetRegistryV6",
+              "signature": "RouteRegisteredV6(bytes32,bytes32,bytes32,bytes32,bytes32)",
+              "topic0": "0x5db26c69982e7b4490d75895dd8589193a8704a98c879382a6caf0fa3ac60c12",
+              "abi": "event RouteRegisteredV6(bytes32 indexed routeId,bytes32 indexed sourceNetworkId,bytes32 indexed destinationNetworkId,bytes32 sourceAssetId,bytes32 destinationAssetId)",
+              "indexed": [
+                "routeId",
+                "sourceNetworkId",
+                "destinationNetworkId"
+              ],
+              "fields": [
+                {
+                  "name": "routeId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "sourceNetworkId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "destinationNetworkId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "sourceAssetId",
+                  "type": "bytes32",
+                  "indexed": false
+                },
+                {
+                  "name": "destinationAssetId",
+                  "type": "bytes32",
+                  "indexed": false
+                }
+              ]
+            },
+            {
+              "name": "RouteStatusChangedV6",
+              "contract": "NexaMainnetRegistryV6",
+              "signature": "RouteStatusChangedV6(bytes32,uint8,uint8,address,uint64)",
+              "topic0": "0x771e9b8d4c1d52f53e432497b0cc8f7a4ede4172b67909caecc5f3c1f7cc4188",
+              "abi": "event RouteStatusChangedV6(bytes32 indexed routeId,uint8 previousStatus,uint8 status,address indexed actor,uint64 generation)",
+              "indexed": [
+                "routeId",
+                "actor"
+              ],
+              "fields": [
+                {
+                  "name": "routeId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "previousStatus",
+                  "type": "uint8",
+                  "indexed": false
+                },
+                {
+                  "name": "status",
+                  "type": "uint8",
+                  "indexed": false
+                },
+                {
+                  "name": "actor",
+                  "type": "address",
+                  "indexed": true
+                },
+                {
+                  "name": "generation",
+                  "type": "uint64",
+                  "indexed": false
+                }
+              ]
+            }
+          ]
+        },
+        "router": {
+          "contract": "NexaMainnetRouterV6",
+          "address": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+          "deploymentTransactionHash": "0xbba15ef7ba7c6326bacc2eb62ce5bb406d2272b86fed5b4b88e8d3cbf9d6734c",
+          "startBlock": 43533563,
+          "runtimeCodeHash": "0xcdda1b571b317479c6d297aa4354c406d4709f83562e2b6b29bd0e1268e4af70",
+          "events": [
+            {
+              "name": "SourceIntakeConfigured",
+              "contract": "NexaMainnetRouterV6",
+              "signature": "SourceIntakeConfigured(bool,address)",
+              "topic0": "0x9359764deaafda5ba9ff799a2c3eac775403a15fd633618438d7b011f3e775af",
+              "abi": "event SourceIntakeConfigured(bool enabled,address indexed actor)",
+              "indexed": [
+                "actor"
+              ],
+              "fields": [
+                {
+                  "name": "enabled",
+                  "type": "bool",
+                  "indexed": false
+                },
+                {
+                  "name": "actor",
+                  "type": "address",
+                  "indexed": true
+                }
+              ]
+            },
+            {
+              "name": "SourceFillV6",
+              "contract": "NexaMainnetRouterV6",
+              "signature": "SourceFillV6(bytes32,bytes32,bytes32,address,address,address,address,uint256,uint128,uint128,uint32,uint64,bytes32,bytes32)",
+              "topic0": "0x77d880254b141dedc64867f6d2d253eedfc609837b892c4ddfe154a43ea80561",
+              "abi": "event SourceFillV6(bytes32 indexed fillId,bytes32 indexed routeId,bytes32 indexed quoteId,address payer,address recipient,address sourceAsset,address destinationAsset,uint256 destinationChainId,uint128 amountInRaw,uint128 amountOutRaw,uint32 sourceFinalityBlocks,uint64 settlementDeadline,bytes32 permitNonce,bytes32 executionGeneration)",
+              "indexed": [
+                "fillId",
+                "routeId",
+                "quoteId"
+              ],
+              "fields": [
+                {
+                  "name": "fillId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "routeId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "quoteId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "payer",
+                  "type": "address",
+                  "indexed": false
+                },
+                {
+                  "name": "recipient",
+                  "type": "address",
+                  "indexed": false
+                },
+                {
+                  "name": "sourceAsset",
+                  "type": "address",
+                  "indexed": false
+                },
+                {
+                  "name": "destinationAsset",
+                  "type": "address",
+                  "indexed": false
+                },
+                {
+                  "name": "destinationChainId",
+                  "type": "uint256",
+                  "indexed": false
+                },
+                {
+                  "name": "amountInRaw",
+                  "type": "uint128",
+                  "indexed": false
+                },
+                {
+                  "name": "amountOutRaw",
+                  "type": "uint128",
+                  "indexed": false
+                },
+                {
+                  "name": "sourceFinalityBlocks",
+                  "type": "uint32",
+                  "indexed": false
+                },
+                {
+                  "name": "settlementDeadline",
+                  "type": "uint64",
+                  "indexed": false
+                },
+                {
+                  "name": "permitNonce",
+                  "type": "bytes32",
+                  "indexed": false
+                },
+                {
+                  "name": "executionGeneration",
+                  "type": "bytes32",
+                  "indexed": false
+                }
+              ]
+            }
+          ]
+        },
+        "standardModuleRegistry": {
+          "contract": "NexaStandardModuleRegistryV6",
+          "address": "0xA149C756E611D0315bCB2d469aA642d6Be32F765",
+          "deploymentTransactionHash": "0xfb0d3115eb10bb8f5bcb258a37a08ba6e1db4a41c7730123d8963fe7847a3e87",
+          "startBlock": 43533624,
+          "runtimeCodeHash": "0x05fa79f4d000710c433044f4e91462e99af1caee1d85b2a84a72f9687d8b1f22",
+          "events": [
+            {
+              "name": "StandardModuleConfiguredV6",
+              "contract": "NexaStandardModuleRegistryV6",
+              "signature": "StandardModuleConfiguredV6(bytes32,address,address)",
+              "topic0": "0x0be5a3783c0f7a412c4a0d5e60bc8f9ff4cac6397e3f700053ae74965f109fdd",
+              "abi": "event StandardModuleConfiguredV6(bytes32 indexed standardId,address indexed previousModule,address indexed module)",
+              "indexed": [
+                "standardId",
+                "previousModule",
+                "module"
+              ],
+              "fields": [
+                {
+                  "name": "standardId",
+                  "type": "bytes32",
+                  "indexed": true
+                },
+                {
+                  "name": "previousModule",
+                  "type": "address",
+                  "indexed": true
+                },
+                {
+                  "name": "module",
+                  "type": "address",
+                  "indexed": true
+                }
+              ]
+            }
+          ]
+        },
+        "facade": {
+          "contract": "NexaSolverDiscoveryV6",
+          "address": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+          "deploymentTransactionHash": "0x504b9d54c686248d98a7b610c41de76f7c8077e8f592546dbd063c1b52ae3617",
+          "startBlock": 43894134,
+          "runtimeCodeHash": "0x57cb853a995215d352eb64ab9ec33aed60f4ef5f8a38575bc2dd018b38babfc1",
+          "events": []
+        }
+      }
+    }
+  ],
+  "events": {
+    "NetworkRegisteredV6": {
+      "contract": "NexaMainnetRegistryV6",
+      "signature": "NetworkRegisteredV6(bytes32,bytes32,bytes32,bytes32)",
+      "topic0": "0x7db7c63b9c8adfae81472453f63167980ece11baca7a8b5b2ed405ea50493dfa",
+      "abi": "event NetworkRegisteredV6(bytes32 indexed networkId,bytes32 indexed vmType,bytes32 networkReference,bytes32 metadataHash)",
+      "indexed": [
+        "networkId",
+        "vmType"
+      ],
+      "fields": [
+        {
+          "name": "networkId",
+          "type": "bytes32",
+          "indexed": true
+        },
+        {
+          "name": "vmType",
+          "type": "bytes32",
+          "indexed": true
+        },
+        {
+          "name": "networkReference",
+          "type": "bytes32",
+          "indexed": false
+        },
+        {
+          "name": "metadataHash",
+          "type": "bytes32",
+          "indexed": false
+        }
+      ]
+    },
+    "NetworkStatusChangedV6": {
+      "contract": "NexaMainnetRegistryV6",
+      "signature": "NetworkStatusChangedV6(bytes32,uint8,uint8,uint64)",
+      "topic0": "0xd5f27b4ae4ca578a1e386feb956fcaeb583af6e56feeccfd6bfbfa3768b89488",
+      "abi": "event NetworkStatusChangedV6(bytes32 indexed networkId,uint8 previousStatus,uint8 status,uint64 generation)",
+      "indexed": [
+        "networkId"
+      ],
+      "fields": [
+        {
+          "name": "networkId",
+          "type": "bytes32",
+          "indexed": true
+        },
+        {
+          "name": "previousStatus",
+          "type": "uint8",
+          "indexed": false
+        },
+        {
+          "name": "status",
+          "type": "uint8",
+          "indexed": false
+        },
+        {
+          "name": "generation",
+          "type": "uint64",
+          "indexed": false
+        }
+      ]
+    },
+    "AssetRegisteredV6": {
+      "contract": "NexaMainnetRegistryV6",
+      "signature": "AssetRegisteredV6(bytes32,bytes32,bytes32,address,bool,bytes32)",
+      "topic0": "0xfa44e2cbe942f5fe60e49608f55b65783f700e447d7bcb499ab6337d84c64aaa",
+      "abi": "event AssetRegisteredV6(bytes32 indexed assetKey,bytes32 indexed networkId,bytes32 indexed assetId,address localAddress,bool hasLocalBinding,bytes32 metadataHash)",
+      "indexed": [
+        "assetKey",
+        "networkId",
+        "assetId"
+      ],
+      "fields": [
+        {
+          "name": "assetKey",
+          "type": "bytes32",
+          "indexed": true
+        },
+        {
+          "name": "networkId",
+          "type": "bytes32",
+          "indexed": true
+        },
+        {
+          "name": "assetId",
+          "type": "bytes32",
+          "indexed": true
+        },
+        {
+          "name": "localAddress",
+          "type": "address",
+          "indexed": false
+        },
+        {
+          "name": "hasLocalBinding",
+          "type": "bool",
+          "indexed": false
+        },
+        {
+          "name": "metadataHash",
+          "type": "bytes32",
+          "indexed": false
+        }
+      ]
+    },
+    "AssetStatusChangedV6": {
+      "contract": "NexaMainnetRegistryV6",
+      "signature": "AssetStatusChangedV6(bytes32,uint8,uint8,uint64)",
+      "topic0": "0x4f814da937563817e731ffa6ac77f581c6bb578c83d4bcdd756f43dcede51926",
+      "abi": "event AssetStatusChangedV6(bytes32 indexed assetKey,uint8 previousStatus,uint8 status,uint64 generation)",
+      "indexed": [
+        "assetKey"
+      ],
+      "fields": [
+        {
+          "name": "assetKey",
+          "type": "bytes32",
+          "indexed": true
+        },
+        {
+          "name": "previousStatus",
+          "type": "uint8",
+          "indexed": false
+        },
+        {
+          "name": "status",
+          "type": "uint8",
+          "indexed": false
+        },
+        {
+          "name": "generation",
+          "type": "uint64",
+          "indexed": false
+        }
+      ]
+    },
+    "RouteRegisteredV6": {
+      "contract": "NexaMainnetRegistryV6",
+      "signature": "RouteRegisteredV6(bytes32,bytes32,bytes32,bytes32,bytes32)",
+      "topic0": "0x5db26c69982e7b4490d75895dd8589193a8704a98c879382a6caf0fa3ac60c12",
+      "abi": "event RouteRegisteredV6(bytes32 indexed routeId,bytes32 indexed sourceNetworkId,bytes32 indexed destinationNetworkId,bytes32 sourceAssetId,bytes32 destinationAssetId)",
+      "indexed": [
+        "routeId",
+        "sourceNetworkId",
+        "destinationNetworkId"
+      ],
+      "fields": [
+        {
+          "name": "routeId",
+          "type": "bytes32",
+          "indexed": true
+        },
+        {
+          "name": "sourceNetworkId",
+          "type": "bytes32",
+          "indexed": true
+        },
+        {
+          "name": "destinationNetworkId",
+          "type": "bytes32",
+          "indexed": true
+        },
+        {
+          "name": "sourceAssetId",
+          "type": "bytes32",
+          "indexed": false
+        },
+        {
+          "name": "destinationAssetId",
+          "type": "bytes32",
+          "indexed": false
+        }
+      ]
+    },
+    "RouteStatusChangedV6": {
+      "contract": "NexaMainnetRegistryV6",
+      "signature": "RouteStatusChangedV6(bytes32,uint8,uint8,address,uint64)",
+      "topic0": "0x771e9b8d4c1d52f53e432497b0cc8f7a4ede4172b67909caecc5f3c1f7cc4188",
+      "abi": "event RouteStatusChangedV6(bytes32 indexed routeId,uint8 previousStatus,uint8 status,address indexed actor,uint64 generation)",
+      "indexed": [
+        "routeId",
+        "actor"
+      ],
+      "fields": [
+        {
+          "name": "routeId",
+          "type": "bytes32",
+          "indexed": true
+        },
+        {
+          "name": "previousStatus",
+          "type": "uint8",
+          "indexed": false
+        },
+        {
+          "name": "status",
+          "type": "uint8",
+          "indexed": false
+        },
+        {
+          "name": "actor",
+          "type": "address",
+          "indexed": true
+        },
+        {
+          "name": "generation",
+          "type": "uint64",
+          "indexed": false
+        }
+      ]
+    },
+    "SourceIntakeConfigured": {
+      "contract": "NexaMainnetRouterV6",
+      "signature": "SourceIntakeConfigured(bool,address)",
+      "topic0": "0x9359764deaafda5ba9ff799a2c3eac775403a15fd633618438d7b011f3e775af",
+      "abi": "event SourceIntakeConfigured(bool enabled,address indexed actor)",
+      "indexed": [
+        "actor"
+      ],
+      "fields": [
+        {
+          "name": "enabled",
+          "type": "bool",
+          "indexed": false
+        },
+        {
+          "name": "actor",
+          "type": "address",
+          "indexed": true
+        }
+      ]
+    },
+    "SourceFillV6": {
+      "contract": "NexaMainnetRouterV6",
+      "signature": "SourceFillV6(bytes32,bytes32,bytes32,address,address,address,address,uint256,uint128,uint128,uint32,uint64,bytes32,bytes32)",
+      "topic0": "0x77d880254b141dedc64867f6d2d253eedfc609837b892c4ddfe154a43ea80561",
+      "abi": "event SourceFillV6(bytes32 indexed fillId,bytes32 indexed routeId,bytes32 indexed quoteId,address payer,address recipient,address sourceAsset,address destinationAsset,uint256 destinationChainId,uint128 amountInRaw,uint128 amountOutRaw,uint32 sourceFinalityBlocks,uint64 settlementDeadline,bytes32 permitNonce,bytes32 executionGeneration)",
+      "indexed": [
+        "fillId",
+        "routeId",
+        "quoteId"
+      ],
+      "fields": [
+        {
+          "name": "fillId",
+          "type": "bytes32",
+          "indexed": true
+        },
+        {
+          "name": "routeId",
+          "type": "bytes32",
+          "indexed": true
+        },
+        {
+          "name": "quoteId",
+          "type": "bytes32",
+          "indexed": true
+        },
+        {
+          "name": "payer",
+          "type": "address",
+          "indexed": false
+        },
+        {
+          "name": "recipient",
+          "type": "address",
+          "indexed": false
+        },
+        {
+          "name": "sourceAsset",
+          "type": "address",
+          "indexed": false
+        },
+        {
+          "name": "destinationAsset",
+          "type": "address",
+          "indexed": false
+        },
+        {
+          "name": "destinationChainId",
+          "type": "uint256",
+          "indexed": false
+        },
+        {
+          "name": "amountInRaw",
+          "type": "uint128",
+          "indexed": false
+        },
+        {
+          "name": "amountOutRaw",
+          "type": "uint128",
+          "indexed": false
+        },
+        {
+          "name": "sourceFinalityBlocks",
+          "type": "uint32",
+          "indexed": false
+        },
+        {
+          "name": "settlementDeadline",
+          "type": "uint64",
+          "indexed": false
+        },
+        {
+          "name": "permitNonce",
+          "type": "bytes32",
+          "indexed": false
+        },
+        {
+          "name": "executionGeneration",
+          "type": "bytes32",
+          "indexed": false
+        }
+      ]
+    },
+    "StandardModuleConfiguredV6": {
+      "contract": "NexaStandardModuleRegistryV6",
+      "signature": "StandardModuleConfiguredV6(bytes32,address,address)",
+      "topic0": "0x0be5a3783c0f7a412c4a0d5e60bc8f9ff4cac6397e3f700053ae74965f109fdd",
+      "abi": "event StandardModuleConfiguredV6(bytes32 indexed standardId,address indexed previousModule,address indexed module)",
+      "indexed": [
+        "standardId",
+        "previousModule",
+        "module"
+      ],
+      "fields": [
+        {
+          "name": "standardId",
+          "type": "bytes32",
+          "indexed": true
+        },
+        {
+          "name": "previousModule",
+          "type": "address",
+          "indexed": true
+        },
+        {
+          "name": "module",
+          "type": "address",
+          "indexed": true
+        }
+      ]
+    }
+  },
+  "standards": {
+    "erc7683": {
+      "standardId": "0x27ecffeeec898dbaf864fc095016ad6212d7a27e32a3069234a4a1da23f50993",
+      "moduleAddress": "0x534A0f500A7270b9b19d2AFa18DE24DCE93eb522",
+      "executable": true,
+      "compatibilityLevel": "EXECUTABLE_RESOLVER"
+    },
+    "oif": {
+      "standardId": "0x3de00a2eccd5b86df839b3747bda483b2de2a855d640eb3d4938d6d43cb162c0",
+      "moduleAddress": "0x4f81426fE8999E982aE6b771536a4093879F6A20",
+      "executable": false,
+      "compatibilityLevel": "DISCOVERY_DESCRIPTION_ONLY"
+    }
+  },
+  "executionInvariant": {
+    "botSourceTransactions": 1,
+    "nexaDestinationTransactions": 1,
+    "totalTransactions": 2
+  }
+}

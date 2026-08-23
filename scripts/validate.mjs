@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { getAddress, id, Interface, recoverAddress } from "ethers";
 import { buildAbiBundle } from "./generate-abi.mjs";
 import { buildChecksums } from "./generate-checksums.mjs";
+import { validateIndexingPackage } from "./validate-indexing.mjs";
 import { buildNexaSolverManifest, serializeNexaSolverManifest } from "./generate-nexa-solver-manifest.mjs";
 import { buildOnboardingPackage, serializeOnboardingPackage } from "./generate-onboarding-package.mjs";
 import { buildOpenApi } from "./generate-openapi.mjs";
@@ -313,9 +314,15 @@ if (await read("public/.well-known/nexa-solver.json") !== generatedDiscovery) {
 }
 same(JSON.parse(generatedDiscovery).endpoints, PUBLIC_ENDPOINTS, "Discovery endpoint drift");
 if (packageJson.exports["./standards"] !== "./standards/nexa-standards.json"
-    || packageJson.exports["./standards/test-vectors"] !== "./standards/test-vectors.json") {
-  throw new Error("Standards package exports missing");
+    || packageJson.exports["./standards/test-vectors"] !== "./standards/test-vectors.json"
+    || packageJson.exports["./indexing/config"] !== "./indexing/nexa-v6-indexing.json"
+    || packageJson.exports["./indexing/manifest"] !== "./indexing/indexing-manifest.json"
+    || manifest.indexing !== "./indexing/indexing-manifest.json"
+    || manifest.verification.indexingDeploymentEvidence
+      !== "./verification/indexing-deployment-evidence.json") {
+  throw new Error("Public package exports or artifact pointers missing");
 }
+await validateIndexingPackage(root);
 if (await read("verification/checksums.sha256") !== await buildChecksums(root)) {
   throw new Error("Public artifact checksums are stale");
 }

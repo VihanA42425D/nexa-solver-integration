@@ -1,0 +1,62 @@
+specVersion: v0.1.0
+package:
+  name: nexa_v6_indexing_hyper_evm
+  version: v1.0.0
+  url: https://github.com/VihanA42425D/nexa-solver-integration
+  description: Passive non-authoritative Nexa V6 onchain event projection.
+network: hyper-evm
+protobuf:
+  files:
+    - nexa/v6/indexing.proto
+  importPaths:
+    - ./proto
+binaries:
+  default:
+    type: wasm/rust-v1
+    file: ./target/wasm32-unknown-unknown/release/nexa_v6_substreams.wasm
+modules:
+  - name: map_nexa_v6_events
+    kind: map
+    initialBlock: 43533441
+    inputs:
+      - params: string
+      - source: sf.ethereum.type.v2.Block
+    output:
+      type: proto:nexa.v6.NexaV6Events
+  - name: store_networks
+    kind: store
+    initialBlock: 43533441
+    updatePolicy: set
+    valueType: proto:nexa.v6.NetworkState
+    inputs:
+      - map: map_nexa_v6_events
+  - name: store_assets
+    kind: store
+    initialBlock: 43533441
+    updatePolicy: set
+    valueType: proto:nexa.v6.AssetState
+    inputs:
+      - map: map_nexa_v6_events
+  - name: store_routes
+    kind: store
+    initialBlock: 43533441
+    updatePolicy: set
+    valueType: proto:nexa.v6.RouteState
+    inputs:
+      - map: map_nexa_v6_events
+  - name: store_router_state
+    kind: store
+    initialBlock: 43533441
+    updatePolicy: set
+    valueType: proto:nexa.v6.RouterState
+    inputs:
+      - map: map_nexa_v6_events
+  - name: store_standard_modules
+    kind: store
+    initialBlock: 43533441
+    updatePolicy: set
+    valueType: proto:nexa.v6.StandardModuleState
+    inputs:
+      - map: map_nexa_v6_events
+params:
+  map_nexa_v6_events: "chain_id=999&registry=0x3db7752f052acfecb3da99bee7c6a34d22367141&router=0x9ea675a496b6a2d13b3091f6e6eb3f87183c3938&standard_module_registry=0xa149c756e611d0315bcb2d469aa642d6be32f765&erc7683_standard_id=0x27ecffeeec898dbaf864fc095016ad6212d7a27e32a3069234a4a1da23f50993&oif_standard_id=0x3de00a2eccd5b86df839b3747bda483b2de2a855d640eb3d4938d6d43cb162c0"

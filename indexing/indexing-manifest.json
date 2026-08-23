@@ -1,0 +1,76 @@
+{
+  "schema": "NEXA_V6_INDEXING_PACKAGE_MANIFEST_V1",
+  "version": "1.0.0",
+  "protocol": "Nexa V6",
+  "status": "PACKAGE_READY",
+  "authoritative": false,
+  "authority": [
+    "ONCHAIN_REGISTRY_ROUTER",
+    "SIGNED_FEED",
+    "EXECUTION_PERMIT"
+  ],
+  "source": "ONCHAIN_EVENTS",
+  "externalDeploymentStatus": "UNPUBLISHED",
+  "canonicalConfig": "./nexa-v6-indexing.json",
+  "canonicalFixtures": "./fixtures/nexa-v6-events.json",
+  "networks": [
+    {
+      "graphNetwork": "base",
+      "chainId": 8453
+    },
+    {
+      "graphNetwork": "bsc",
+      "chainId": 56
+    },
+    {
+      "graphNetwork": "hyper-evm",
+      "chainId": 999
+    }
+  ],
+  "graph": {
+    "schema": "./graph/schema.graphql",
+    "sharedMapping": "./graph/src/mapping.ts",
+    "manifests": {
+      "base": "./graph/subgraph.base.yaml",
+      "bsc": "./graph/subgraph.bsc.yaml",
+      "hyper-evm": "./graph/subgraph.hyper-evm.yaml"
+    },
+    "deploymentIds": null,
+    "graphqlUrls": null
+  },
+  "substreams": {
+    "sharedRust": "./substreams/src",
+    "sharedProtobuf": "./substreams/proto/nexa/v6/indexing.proto",
+    "manifests": {
+      "base": "./substreams/substreams.base.yaml",
+      "bsc": "./substreams/substreams.bsc.yaml",
+      "hyper-evm": "./substreams/substreams.hyper-evm.yaml"
+    },
+    "registryPackageIds": null
+  },
+  "indexedContracts": [
+    "NexaMainnetRegistryV6",
+    "NexaMainnetRouterV6",
+    "NexaStandardModuleRegistryV6"
+  ],
+  "indexedEvents": [
+    "NetworkRegisteredV6",
+    "NetworkStatusChangedV6",
+    "AssetRegisteredV6",
+    "AssetStatusChangedV6",
+    "RouteRegisteredV6",
+    "RouteStatusChangedV6",
+    "SourceIntakeConfigured",
+    "SourceFillV6",
+    "StandardModuleConfiguredV6"
+  ],
+  "canonicalSignedFeed": "https://solver.vsnexa.com/api/v6/solver-feed",
+  "canonicalDiscovery": "https://solver.vsnexa.com/.well-known/nexa-solver.json",
+  "canonicalOnchainDiscovery": "https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json",
+  "executionInvariant": {
+    "model": "1_BOT_SOURCE_TX_PLUS_1_NEXA_DESTINATION_TX",
+    "botSourceTransactions": 1,
+    "nexaDestinationTransactions": 1,
+    "totalTransactions": 2
+  }
+}

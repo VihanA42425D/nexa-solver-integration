@@ -180,10 +180,10 @@
           "standardJsonIdentity": "EXACT_AFTER_ETHERSCAN_OUTPUT_SELECTION_NORMALIZATION",
           "metadata": {
             "ownershipClaim": {
-              "status": "SIGNED_EVIDENCE_READY_FOR_FACTORY_SUPPORT_CASE",
+              "status": "SUBMITTED_PENDING_EXPLORER_REVIEW",
               "reason": "CREATE2_FACTORY_IS_ONCHAIN_CREATOR",
               "signatureEvidence": {
-                "status": "SIGNED_EVIDENCE_READY_FOR_FACTORY_SUPPORT_CASE",
+                "status": "SUBMITTED_PENDING_EXPLORER_REVIEW",
                 "explorerAccount": "VihanA",
                 "signer": "0x605F37BeCE2D88bDCA30E529bB26d3478AE81Ef4",
                 "signedAt": "2026-08-22T21:54:54.133Z",
@@ -191,16 +191,16 @@
                 "recoveredAddress": "0x605F37BeCE2D88bDCA30E529bB26d3478AE81Ef4",
                 "verifiedLocally": true,
                 "bundleSchema": "NEXA_MAINNET_V6_FACADE_EXPLORER_OWNERSHIP_SIGNATURES_V1",
-                "bundleSha256": "3b2ef544acdbfa49af8a0d87e1029e35def4c432d17ee5adf067fec5b8b7d10b",
+                "bundleSha256": "0212c7df684e157df40b75996b32987dc48edd8d314ea757c95df9211934b1d2",
                 "evidencePath": "./verification/explorer-ownership-signatures.json"
               }
             },
             "contractLabel": {
-              "status": "PENDING_SUPPORT_SUBMISSION"
+              "status": "SUBMITTED_PENDING_EXPLORER_REVIEW"
             },
             "projectUrl": {
-              "status": "PENDING_SUPPORT_SUBMISSION",
-              "value": "https://vsnexa.com"
+              "status": "SUBMITTED_PENDING_EXPLORER_REVIEW",
+              "value": "https://solver.vsnexa.com"
             }
           }
         },
@@ -245,10 +245,10 @@
           "standardJsonIdentity": "EXACT_AFTER_ETHERSCAN_OUTPUT_SELECTION_NORMALIZATION",
           "metadata": {
             "ownershipClaim": {
-              "status": "SIGNED_EVIDENCE_READY_FOR_FACTORY_SUPPORT_CASE",
+              "status": "SUBMITTED_PENDING_EXPLORER_REVIEW",
               "reason": "CREATE2_FACTORY_IS_ONCHAIN_CREATOR",
               "signatureEvidence": {
-                "status": "SIGNED_EVIDENCE_READY_FOR_FACTORY_SUPPORT_CASE",
+                "status": "SUBMITTED_PENDING_EXPLORER_REVIEW",
                 "explorerAccount": "VihanA",
                 "signer": "0x605F37BeCE2D88bDCA30E529bB26d3478AE81Ef4",
                 "signedAt": "2026-08-22T21:54:54.133Z",
@@ -256,16 +256,16 @@
                 "recoveredAddress": "0x605F37BeCE2D88bDCA30E529bB26d3478AE81Ef4",
                 "verifiedLocally": true,
                 "bundleSchema": "NEXA_MAINNET_V6_FACADE_EXPLORER_OWNERSHIP_SIGNATURES_V1",
-                "bundleSha256": "3b2ef544acdbfa49af8a0d87e1029e35def4c432d17ee5adf067fec5b8b7d10b",
+                "bundleSha256": "0212c7df684e157df40b75996b32987dc48edd8d314ea757c95df9211934b1d2",
                 "evidencePath": "./verification/explorer-ownership-signatures.json"
               }
             },
             "contractLabel": {
-              "status": "PENDING_SUPPORT_SUBMISSION"
+              "status": "SUBMITTED_PENDING_EXPLORER_REVIEW"
             },
             "projectUrl": {
-              "status": "PENDING_SUPPORT_SUBMISSION",
-              "value": "https://vsnexa.com"
+              "status": "SUBMITTED_PENDING_EXPLORER_REVIEW",
+              "value": "https://solver.vsnexa.com"
             }
           }
         },
@@ -310,10 +310,10 @@
           "standardJsonIdentity": "EXACT_AFTER_ETHERSCAN_OUTPUT_SELECTION_NORMALIZATION",
           "metadata": {
             "ownershipClaim": {
-              "status": "SIGNED_EVIDENCE_READY_FOR_FACTORY_SUPPORT_CASE",
+              "status": "SUBMITTED_PENDING_EXPLORER_REVIEW",
               "reason": "CREATE2_FACTORY_IS_ONCHAIN_CREATOR",
               "signatureEvidence": {
-                "status": "SIGNED_EVIDENCE_READY_FOR_FACTORY_SUPPORT_CASE",
+                "status": "SUBMITTED_PENDING_EXPLORER_REVIEW",
                 "explorerAccount": "VihanA",
                 "signer": "0x605F37BeCE2D88bDCA30E529bB26d3478AE81Ef4",
                 "signedAt": "2026-08-22T21:54:54.133Z",
@@ -321,16 +321,16 @@
                 "recoveredAddress": "0x605F37BeCE2D88bDCA30E529bB26d3478AE81Ef4",
                 "verifiedLocally": true,
                 "bundleSchema": "NEXA_MAINNET_V6_FACADE_EXPLORER_OWNERSHIP_SIGNATURES_V1",
-                "bundleSha256": "3b2ef544acdbfa49af8a0d87e1029e35def4c432d17ee5adf067fec5b8b7d10b",
+                "bundleSha256": "0212c7df684e157df40b75996b32987dc48edd8d314ea757c95df9211934b1d2",
                 "evidencePath": "./verification/explorer-ownership-signatures.json"
               }
             },
             "contractLabel": {
-              "status": "PENDING_SUPPORT_SUBMISSION"
+              "status": "SUBMITTED_PENDING_EXPLORER_REVIEW"
             },
             "projectUrl": {
-              "status": "PENDING_SUPPORT_SUBMISSION",
-              "value": "https://vsnexa.com"
+              "status": "SUBMITTED_PENDING_EXPLORER_REVIEW",
+              "value": "https://solver.vsnexa.com"
             }
           }
         },

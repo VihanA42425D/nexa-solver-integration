@@ -7,9 +7,20 @@
   "deterministicFactory": "0x4e59b44847b379578588920cA78FbF26c0B4956C",
   "signer": "0x605F37BeCE2D88bDCA30E529bB26d3478AE81Ef4",
   "explorerAccount": "VihanA",
+  "submission": {
+    "status": "SUBMITTED_PENDING_EXPLORER_REVIEW",
+    "submittedAt": "2026-08-23",
+    "submittedByExplorerAccount": "VihanA",
+    "networks": [
+      "base",
+      "bsc",
+      "hyperevm"
+    ],
+    "publicVisibility": "PENDING_EXPLORER_REVIEW"
+  },
   "requestedMetadata": {
     "contractLabel": "Nexa Solver Discovery V6",
-    "projectUrl": "https://vsnexa.com"
+    "projectUrl": "https://solver.vsnexa.com"
   },
   "statements": [
     {

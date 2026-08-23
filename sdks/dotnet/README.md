@@ -2,6 +2,10 @@
 
 Canonical .NET implementation of the frozen Nexa V6 SDK contract.
 
+```shell
+dotnet add package Nexa.Solver.V6.Sdk --version 1.0.0
+```
+
 ```csharp
 var client = new NexaV6Client();
 var routes = await client.GetRoutes();

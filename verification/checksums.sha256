@@ -1,4 +1,4 @@
-7674c6b7bed44ddc270338f61089d508506e3455c0a71b50173226a4e991a00e  README.md
+fa5e1dae3b74855e154f651bf475addfb0b04e3a632710d6efc4e271888c082c  README.md
 9339ba0bf3d98031185847431a457beca5d00c518916e1d8223cafa8fd55b5db  manifest.json
 2d0dad28ddce69ce54d06afbbbc53edf591dffe0cfd8105e4daddad5f5e33624  nexa-mainnet-v6.json
 1991d0f7182739bc555a6f3408e158b9e7d78ee85d3b527fe853e5dc271c7a28  public/.well-known/nexa-solver.json
@@ -31,7 +31,7 @@ a0d72e1797c21c7227e9a897a176f2ef7c51ec20abb744156fa54bbd5417080d  sdks/jvm/pom.x
 c455df02abd59a80ecf2999a4feaa910c70b03883aa6ead9d0eb64d01b718ba7  sdks/jvm/src/main/java/io/github/vihana42425d/nexa/v6/NexaV6Abi.java
 1aacd75554a24ec28c685c43374439f6fe9d9381706c1c3134a28e83bab9cadd  sdks/jvm/src/main/java/io/github/vihana42425d/nexa/v6/NexaV6Client.java
 81bbd2bd22db9870cd472b2fbbd42e4b3cc61ac12729ae36d690729310a23868  sdks/jvm/src/main/java/io/github/vihana42425d/nexa/v6/NexaV6Core.java
-71e2056850e89f8107734c8f89627145f14edda1e394274b12fc8161eec8d6c7  sdks/dotnet/src/Nexa.V6.Sdk/Nexa.V6.Sdk.csproj
+22b1855c4a002e1c1b36d2ac70a7daf232f3858c8e3357246a9d64439dad76ec  sdks/dotnet/src/Nexa.V6.Sdk/Nexa.V6.Sdk.csproj
 d32290505e51492c8a53035fd00c311065bd08200e09ef3313669298286f068f  sdks/dotnet/src/Nexa.V6.Sdk/NexaSdkException.cs
 7db618583405706f722692d1e35bc6f8aa99315f802c9faaaade553e19f0ae1d  sdks/dotnet/src/Nexa.V6.Sdk/NexaV6Abi.cs
 4591bee217b89b99c1ee7b3b43153cc3738a6f7523e4244b6f5bdd014d5cdf94  sdks/dotnet/src/Nexa.V6.Sdk/NexaV6Client.cs

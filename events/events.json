@@ -1,11 +1,14 @@
 {
-  "schema": "nexa-solver-events/v3",
+  "schema": "NEXA_MAINNET_V6_EVENTS_FINAL",
   "deploymentVersion": 6,
   "events": {
     "SourceFillV6": {
       "contract": "NexaMainnetRouterV6",
       "signature": "SourceFillV6(bytes32,bytes32,bytes32,address,address,address,address,uint256,uint128,uint128,uint32,uint64,bytes32,bytes32)",
-      "topic0": "0x77d880254b141dedc64867f6d2d253eedfc609837b892c4ddfe154a43ea80561"
+      "topic0": "0x77d880254b141dedc64867f6d2d253eedfc609837b892c4ddfe154a43ea80561",
+      "abi": "event SourceFillV6(bytes32 indexed fillId,bytes32 indexed routeId,bytes32 indexed quoteId,address payer,address recipient,address sourceAsset,address destinationAsset,uint256 destinationChainId,uint128 amountInRaw,uint128 amountOutRaw,uint32 sourceFinalityBlocks,uint64 settlementDeadline,bytes32 permitNonce,bytes32 executionGeneration)",
+      "indexed": ["fillId", "routeId", "quoteId"],
+      "consistencyKeys": ["fillId", "routeId", "quoteId"]
     }
   }
 }

@@ -1,0 +1,29 @@
+{
+  "schema": "NEXA_MAINNET_V6_NETWORK_IDS_FINAL",
+  "deploymentVersion": 6,
+  "vmType": "0x9c73caa427dcc7a3ba321dd9ec93943758502b982786658421fd1e094bf2b5f3",
+  "derivation": "canonical Nexa network identity",
+  "networks": {
+    "base": {
+      "name": "Base",
+      "chainId": 8453,
+      "chainIdHex": "0x2105",
+      "networkId": "0x3d5484ad492110227dc184ab6abbeeccd54b127aa00bfc256fd8d8037a4e48c2",
+      "networkReference": "0x0000000000000000000000000000000000000000000000000000000000002105"
+    },
+    "bsc": {
+      "name": "BNB Smart Chain",
+      "chainId": 56,
+      "chainIdHex": "0x38",
+      "networkId": "0x5863eb850b94ec5a94a1653871dc308d32f4aec504d789f356419886170a0928",
+      "networkReference": "0x0000000000000000000000000000000000000000000000000000000000000038"
+    },
+    "hyperevm": {
+      "name": "HyperEVM",
+      "chainId": 999,
+      "chainIdHex": "0x3e7",
+      "networkId": "0x5587698f40d78ef64484dda8f2c78692af870cfe3926dbc61a73881680bd01c8",
+      "networkReference": "0x00000000000000000000000000000000000000000000000000000000000003e7"
+    }
+  }
+}

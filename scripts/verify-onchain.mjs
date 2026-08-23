@@ -7,7 +7,7 @@ const rpcByNetwork = {
   hyperevm: process.env.NEXA_HYPEREVM_RPC_URL ?? "https://rpc.hyperliquid.xyz/evm",
 };
 
-const retry = async (operation, attempts = 3) => {
+const retry = async (operation, attempts = 5) => {
   let lastError;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {
@@ -15,7 +15,7 @@ const retry = async (operation, attempts = 3) => {
     } catch (error) {
       lastError = error;
       if (attempt === attempts) throw error;
-      await new Promise((resolve) => setTimeout(resolve, 500 * attempt));
+      await new Promise((resolve) => setTimeout(resolve, 1_000 * attempt));
     }
   }
   throw lastError;
@@ -24,7 +24,10 @@ const retry = async (operation, attempts = 3) => {
 const surface = await loadPublicSurface(null, { requireActive: true });
 const registryDefinition = surface.integration.contracts.NexaMainnetRegistryV6;
 const routerDefinition = surface.integration.contracts.NexaMainnetRouterV6;
-if (!registryDefinition || !routerDefinition) throw new Error("V6 public Registry/Router surface missing");
+const facadeDefinition = surface.integration.contracts.NexaSolverDiscoveryV6;
+if (!registryDefinition || !routerDefinition || !facadeDefinition) {
+  throw new Error("V6 public Facade/Registry/Router surface missing");
+}
 
 const expectedHashes = new Map();
 const expectedModuleHashes = new Map();
@@ -37,6 +40,9 @@ const report = {
 for (const [networkName, rpcUrl] of Object.entries(rpcByNetwork)) {
   const network = surface.integration.networks[networkName];
   if (!network) throw new Error(`V6 bundle missing network ${networkName}`);
+  if (network.networkId !== surface.networkIds.networks[networkName].networkId) {
+    throw new Error(`${networkName}: network ID mismatch`);
+  }
   const provider = new JsonRpcProvider(rpcUrl, network.chainId, { staticNetwork: true });
   try {
     const observed = await retry(() => provider.getNetwork());
@@ -83,6 +89,23 @@ for (const [networkName, rpcUrl] of Object.entries(rpcByNetwork)) {
       throw new Error(`${networkName}: Router is not bound to the published Registry`);
     }
 
+    const facade = new Contract(facadeDefinition.address, facadeDefinition.abi, provider);
+    const facadeLive = await retry(() => facade.isLive());
+    const facadeRegistry = await retry(() => facade.registry());
+    const facadeRouter = await retry(() => facade.router());
+    const discoveryURI = await retry(() => facade.discoveryURI());
+    const systemState = await retry(() => facade.systemState());
+    if (facadeLive !== true
+        || String(facadeRegistry).toLowerCase() !== String(registryDefinition.address).toLowerCase()
+        || String(facadeRouter).toLowerCase() !== String(routerDefinition.address).toLowerCase()
+        || discoveryURI !== surface.integration.discovery.endpoints.manifest
+        || BigInt(systemState.currentChainId) !== BigInt(network.chainId)
+        || String(systemState.release).toLowerCase() !== String(surface.integration.releaseId).toLowerCase()
+        || BigInt(systemState.discoverableRouteCount) !== routeCount
+        || systemState.live !== true) {
+      throw new Error(`${networkName}: Facade identity or immutable binding mismatch`);
+    }
+
     const modules = {};
     for (const [standardName, standard] of Object.entries(surface.standards.standards)) {
       const code = await retry(() => provider.getCode(standard.moduleAddress));
@@ -97,12 +120,23 @@ for (const [networkName, rpcUrl] of Object.entries(rpcByNetwork)) {
         throw new Error(`${networkName}: cross-network module runtime hash mismatch at ${standardName}`);
       }
       expectedModuleHashes.set(standardName, runtimeCodeHash);
-      const module = new Contract(standard.moduleAddress, ["function standardId() view returns (bytes32)"], provider);
+      const module = new Contract(standard.moduleAddress, [
+        "function standardId() view returns (bytes32)",
+        "function router() view returns (address)",
+      ], provider);
       const standardId = await retry(() => module.standardId());
+      const moduleRouter = await retry(() => module.router());
       if (String(standardId).toLowerCase() !== String(standard.id).toLowerCase()) {
         throw new Error(`${networkName}: standard ID mismatch at ${standardName} module`);
       }
-      modules[standardName] = { address: standard.moduleAddress, runtimeCodeHash };
+      if (String(moduleRouter).toLowerCase() !== String(routerDefinition.address).toLowerCase()) {
+        throw new Error(`${networkName}: Router binding mismatch at ${standardName} module`);
+      }
+      modules[standardName] = {
+        address: standard.moduleAddress,
+        runtimeCodeHash,
+        router: moduleRouter,
+      };
     }
 
     report.networks[networkName] = {
@@ -110,6 +144,10 @@ for (const [networkName, rpcUrl] of Object.entries(rpcByNetwork)) {
       routeCount: routeCount.toString(),
       routerActive: true,
       routerRegistry: boundRegistry,
+      facadeLive,
+      facadeRegistry,
+      facadeRouter,
+      discoveryURI,
       contracts,
       modules,
     };

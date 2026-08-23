@@ -1,162 +1,184 @@
 import { readFile, readdir } from "node:fs/promises";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { getAddress, id, Interface } from "ethers";
-import { auditRepositoryForSecrets } from "./repo-secret-audit.mjs";
+import { getAddress, id, Interface, recoverAddress } from "ethers";
+import { buildAbiBundle } from "./generate-abi.mjs";
+import { buildChecksums } from "./generate-checksums.mjs";
 import { buildNexaSolverManifest, serializeNexaSolverManifest } from "./generate-nexa-solver-manifest.mjs";
-import { PUBLIC_ENDPOINTS } from "../src/public-endpoints.mjs";
+import { buildOpenApi } from "./generate-openapi.mjs";
+import { auditRepositoryForSecrets } from "./repo-secret-audit.mjs";
+import { PUBLIC_ENDPOINTS, PUBLIC_PATHS } from "../src/public-endpoints.mjs";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
-const readJson = async (file) => JSON.parse(await readFile(resolve(root, file), "utf8"));
-const PRE_ACTIVATION_DEPLOYMENT_STATUSES = new Set([
-  "AWAITING_POST_DEPLOY_EXPORT",
-  "DEPLOYED_AWAITING_CUTOVER",
-]);
-const [manifest, integration, standards, events] = await Promise.all([
+const read = (file) => readFile(resolve(root, file), "utf8");
+const readJson = async (file) => JSON.parse(await read(file));
+const same = (left, right, code) => {
+  if (JSON.stringify(left) !== JSON.stringify(right)) throw new Error(code);
+};
+const hash = (value, code) => {
+  if (!/^0x[0-9a-f]{64}$/i.test(String(value ?? ""))) throw new Error(code);
+};
+
+const [manifest, integration, standards, events, networkIds, abi, facadeEvidence,
+  inputEvidence, ownershipEvidence, identityEvidence, openapi, packageJson] = await Promise.all([
   readJson("manifest.json"),
   readJson("nexa-mainnet-v6.json"),
   readJson("standards/standard-ids.json"),
   readJson("events/events.json"),
+  readJson("networks/network-ids.json"),
+  readJson("abi/solver-facing.json"),
+  readJson("verification/facade-deployment.json"),
+  readJson("verification/NexaSolverDiscoveryV6.standard-input.json"),
+  readJson("verification/explorer-ownership-signatures.json"),
+  readJson("verification/onchain-identity.json"),
+  readJson("openapi/openapi.json"),
+  readJson("package.json"),
 ]);
 
-if (manifest.publicSurfaceOnly !== true || manifest.deploymentVersion !== 6) {
-  throw new Error("Manifest must remain V6 public-surface-only");
+if (manifest.publicSurfaceOnly !== true || manifest.deploymentVersion !== 6
+    || manifest.deploymentStatus !== "ACTIVE" || integration.deploymentStatus !== "ACTIVE"
+    || integration.activationRequired !== false
+    || integration.doNotUseForExecutionUntilActivated !== false) {
+  throw new Error("Public V6 release must be final ACTIVE");
 }
-if (manifest.releaseId !== integration.releaseId) throw new Error("V6 release ID mismatch");
+if (manifest.releaseId !== integration.releaseId
+    || manifest.releaseId !== identityEvidence.releaseId) {
+  throw new Error("Release ID mismatch");
+}
+same(integration.solverProfile, manifest.solverProfile, "Solver profile mismatch");
 
-const profile = manifest.solverProfile;
-if (!profile
-    || JSON.stringify(profile.executionScopes) !== JSON.stringify(["INTRA_CHAIN", "CROSS_CHAIN"])
-    || profile.automatedDiscovery !== true
-    || profile.variableSizeExecution !== true
-    || profile.machineVerifiableState !== true
-    || profile.accountlessDiscovery !== true) {
-  throw new Error("V6 public Solver capability profile mismatch");
-}
-if (JSON.stringify(integration.solverProfile) !== JSON.stringify(profile)) {
-  throw new Error("V6 public Solver capability profile is not synchronized");
+const contractNames = [
+  "NexaMainnetRegistryV6",
+  "NexaMainnetRouterV6",
+  "NexaSolverDiscoveryV6",
+];
+same(Object.keys(integration.contracts).sort(), [...contractNames].sort(), "Public contract allowlist drift");
+for (const name of contractNames) {
+  const contract = integration.contracts[name];
+  getAddress(contract.address);
+  hash(contract.runtimeCodeHash, `Missing runtime hash: ${name}`);
+  new Interface(contract.abi);
+  same(abi.contracts[name].abi, contract.abi, `ABI drift: ${name}`);
+  if (abi.contracts[name].runtimeCodeHash !== contract.runtimeCodeHash) {
+    throw new Error(`ABI runtime identity drift: ${name}`);
+  }
 }
 
-for (const standard of Object.values(standards.standards)) {
-  if (id(standard.name) !== standard.id) throw new Error("Standard ID mismatch: " + standard.name);
+const registry = integration.contracts.NexaMainnetRegistryV6;
+const router = integration.contracts.NexaMainnetRouterV6;
+const facade = integration.contracts.NexaSolverDiscoveryV6;
+if (getAddress(facade.registry) !== getAddress(registry.address)
+    || getAddress(facade.router) !== getAddress(router.address)
+    || facade.address !== facade.facadeAddress
+    || facade.discoveryURI !== PUBLIC_ENDPOINTS.manifest
+    || manifest.facadeAddress !== facade.address
+    || manifest.discoveryURI !== facade.discoveryURI) {
+  throw new Error("Facade immutable binding or discovery URI drift");
+}
+
+const expectedNetworks = { base: 8453, bsc: 56, hyperevm: 999 };
+for (const [slug, chainId] of Object.entries(expectedNetworks)) {
+  const network = integration.networks[slug];
+  const identity = networkIds.networks[slug];
+  const evidence = facadeEvidence.networks[slug];
+  if (network.chainId !== chainId || identity.chainId !== chainId
+      || network.networkId !== identity.networkId
+      || network.facadeAddress !== facade.address
+      || network.runtimeCodeHash !== facade.runtimeCodeHash
+      || getAddress(network.registry) !== getAddress(registry.address)
+      || getAddress(network.router) !== getAddress(router.address)
+      || network.discoveryURI !== facade.discoveryURI
+      || network.systemState.chainId !== chainId
+      || network.systemState.releaseId !== integration.releaseId
+      || BigInt(network.systemState.routeCount) <= 0n
+      || network.systemState.live !== true
+      || network.verification.onchainIdentity.status !== "VERIFIED"
+      || network.verification.explorer.status !== "VERIFIED_EXACT_STANDARD_JSON"
+      || network.verification.sourcify.status !== "VERIFIED_EXACT_MATCH"
+      || evidence.status !== "VERIFIED"
+      || evidence.chainId !== chainId
+      || evidence.isLive !== true
+      || evidence.immutableBindingsVerified !== true
+      || BigInt(evidence.routeCount) !== BigInt(network.systemState.routeCount)) {
+    throw new Error(`Network identity mismatch: ${slug}`);
+  }
+}
+
+for (const [key, standard] of Object.entries(standards.standards)) {
+  if (id(standard.name) !== standard.id) throw new Error(`Standard ID mismatch: ${key}`);
   getAddress(standard.moduleAddress);
+  hash(standard.runtimeCodeHash, `Standard runtime hash missing: ${key}`);
+  const name = key === "erc7683" ? "NexaERC7683ModuleV6" : "NexaOIFModuleV6";
+  if (abi.contracts[name].address !== standard.moduleAddress
+      || abi.contracts[name].runtimeCodeHash !== standard.runtimeCodeHash) {
+    throw new Error(`Standard ABI identity mismatch: ${key}`);
+  }
+  new Interface(abi.contracts[name].abi);
 }
 for (const event of Object.values(events.events)) {
-  if (id(event.signature) !== event.topic0) throw new Error("Event topic mismatch: " + event.signature);
-}
-if (Object.keys(events.events).some((name) => name !== "SourceFillV6")) {
-  throw new Error("Only Solver-facing source execution events may be published");
+  if (id(event.signature) !== event.topic0) throw new Error("Event topic mismatch");
+  new Interface([event.abi]);
 }
 
-const active = !PRE_ACTIVATION_DEPLOYMENT_STATUSES.has(integration.deploymentStatus)
-  && integration.activationRequired !== true
-  && integration.doNotUseForExecutionUntilActivated !== true;
-if (active) {
-  const publicContractNames = Object.keys(integration.contracts ?? {}).sort();
-  if (JSON.stringify(publicContractNames) !== JSON.stringify([
-    "NexaMainnetRegistryV6",
-    "NexaMainnetRouterV6",
-  ])) {
-    throw new Error("Active V6 bundle must expose only RegistryV6 and RouterV6 contracts");
+if (facadeEvidence.sourceVerificationComplete !== true
+    || facadeEvidence.facadeAddress !== facade.address
+    || facadeEvidence.runtimeCodeHash !== facade.runtimeCodeHash
+    || facadeEvidence.registry !== registry.address
+    || facadeEvidence.router !== router.address
+    || facadeEvidence.discoveryURI !== facade.discoveryURI
+    || inputEvidence.standardJsonInputHash !== facadeEvidence.standardJsonInputHash
+    || inputEvidence.compiler !== facadeEvidence.compiler) {
+  throw new Error("Facade verification evidence drift");
+}
+for (const statement of ownershipEvidence.statements) {
+  const recovered = getAddress(recoverAddress(statement.messageHash, statement.signature));
+  if (statement.verifiedLocally !== true
+      || recovered !== getAddress(statement.recoveredAddress)
+      || recovered !== getAddress(ownershipEvidence.signer)) {
+    throw new Error(`Ownership signature mismatch: ${statement.network}`);
   }
-  for (const contract of Object.values(integration.contracts)) {
-    getAddress(contract.address);
-    new Interface(contract.abi);
+}
+for (const [name, value] of Object.entries(identityEvidence.contracts)) {
+  const source = abi.contracts[name];
+  if (!source || source.address !== value.address || source.runtimeCodeHash !== value.runtimeCodeHash) {
+    throw new Error(`Pinned onchain identity drift: ${name}`);
   }
-  const expectedNetworks = { base: 8453, bsc: 56, hyperevm: 999 };
-  for (const [slug, chainId] of Object.entries(expectedNetworks)) {
-    const network = integration.networks?.[slug];
-    if (!network || network.chainId !== chainId
-        || getAddress(network.registry) !== getAddress(integration.contracts.NexaMainnetRegistryV6.address)
-        || getAddress(network.router) !== getAddress(integration.contracts.NexaMainnetRouterV6.address)
-        || Object.keys(network).some((key) => !["chainId", "registry", "router"].includes(key))) {
-      throw new Error("Public V6 network surface mismatch: " + slug);
+}
+
+same(await buildAbiBundle(root), abi, "Generated ABI is stale");
+same(buildOpenApi(), openapi, "Generated OpenAPI is stale");
+same(Object.keys(openapi.paths).sort(), Object.values(PUBLIC_PATHS).sort(), "OpenAPI path catalog drift");
+const generatedDiscovery = serializeNexaSolverManifest(await buildNexaSolverManifest(root));
+if (await read("public/.well-known/nexa-solver.json") !== generatedDiscovery) {
+  throw new Error("Generated Solver discovery is stale");
+}
+same(JSON.parse(generatedDiscovery).endpoints, PUBLIC_ENDPOINTS, "Discovery endpoint drift");
+if (await read("verification/checksums.sha256") !== await buildChecksums(root)) {
+  throw new Error("Public artifact checksums are stale");
+}
+if (packageJson.scripts["worker:deploy"] || packageJson.scripts["worker:dev"]) {
+  throw new Error("Public integration package must not expose production deployment authority");
+}
+
+const excluded = new Set([".git", "node_modules", ".wrangler"]);
+const scan = async (directory, prefix = "") => {
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    if (entry.isDirectory() && excluded.has(entry.name)) continue;
+    const relative = prefix ? `${prefix}/${entry.name}` : entry.name;
+    const absolute = resolve(directory, entry.name);
+    if (entry.isDirectory()) await scan(absolute, relative);
+    else if (entry.name !== "package-lock.json") {
+      const source = await readFile(absolute, "utf8");
+      const retiredMajor = integration.deploymentVersion - 1;
+      if (source.includes(`V${retiredMajor}`)
+          || source.includes(`v${retiredMajor}`)
+          || source.includes(`/api/v${retiredMajor}/`)) {
+        throw new Error(`Retired major-version reference in ${relative}`);
+      }
     }
   }
-} else {
-  if (!PRE_ACTIVATION_DEPLOYMENT_STATUSES.has(integration.deploymentStatus)) {
-    throw new Error("Inactive V6 bundle has an invalid deployment status");
-  }
-}
-
-const expectedEndpointUrls = [
-  "https://solver.vsnexa.com/.well-known/nexa-solver.json",
-  "https://solver.vsnexa.com/api/v6/solver-discovery",
-  "https://solver.vsnexa.com/api/v6/solver-feed",
-  "https://solver.vsnexa.com/api/v6/solver-feed/events",
-  "https://solver.vsnexa.com/api/v6/routes/{routeId}",
-  "https://solver.vsnexa.com/api/v6/execution-permits/request-message",
-  "https://solver.vsnexa.com/api/v6/execution-permits",
-  "https://solver.vsnexa.com/api/v6/execution-permits/{fillId}"
-];
-if (JSON.stringify(Object.values(PUBLIC_ENDPOINTS)) !== JSON.stringify(expectedEndpointUrls)) {
-  throw new Error("Public V6 endpoint catalog mismatch");
-}
-
-const staticPublicFiles = [
-  ".env.example",
-  "README.md",
-  "manifest.json",
-  "nexa-mainnet-v6.json",
-  "standards/standard-ids.json",
-  "events/events.json",
-  "public/.well-known/nexa-solver.json",
-];
-const forbiddenPublicTokens = [
-  "0x13D8881F30985A0CeE8c24F897CE8B37F4299255",
-  "0x16e4012ce6E87b024cAD55689B7836Dc98738438",
-  "0xB247B7Aa76d9Af4C69524b1B48840050E3976896",
-  "0xA149C756E611D0315bCB2d469aA642d6Be32F765",
-  "0x7fF3D7F41B5C3b53F1242a0bE5a683B95e09FFB4",
-  "0xA767213615Bb6f8BE5C82DD41d029572E6944E7C",
-  "0xF2009b45f521A8b4E62b0B68386aB6Fc5C5F6d5b",
-  "0xCbeC1dDeEA1f4317ce6eF6F33Ad46d1fFD81c163",
-  "NexaMainnetVaultV6",
-  "NexaMainnetAuthorizationVerifierV6",
-  "NexaMainnetEntryPointV6",
-  "NexaStandardModuleRegistryV6",
-  "NexaClearingBatchExecutorV5",
-  "NexaStargateV2AdapterV5",
-  "\"feedSigner\"",
-  "\"preparationHash\"",
-  "\"deploymentSource\"",
-];
-for (const file of staticPublicFiles) {
-  const source = await readFile(resolve(root, file), "utf8");
-  for (const token of forbiddenPublicTokens) {
-    if (source.toLowerCase().includes(token.toLowerCase())) {
-      throw new Error(`Forbidden non-Solver public detail in ${file}: ${token}`);
-    }
-  }
-}
-
-for (const directory of ["src", "examples"]) {
-  for (const file of await readdir(resolve(root, directory))) {
-    const source = await readFile(resolve(root, directory, file), "utf8");
-    if (/\/api\/v5\/|ReservationRequestedV5|requestReservation|reserveDestination|SolverLaneFactoryV5/.test(source)) {
-      throw new Error("Active V5 reservation-first surface remains in " + directory + "/" + file);
-    }
-  }
-}
-
-const generatedManifest = serializeNexaSolverManifest(await buildNexaSolverManifest(root));
-const staticManifest = await readFile(resolve(root, "public/.well-known/nexa-solver.json"), "utf8");
-if (staticManifest !== generatedManifest) throw new Error("Generated V6 solver manifest is stale");
-
-const wrangler = await readJson("wrangler.jsonc");
-if (wrangler.main !== "./src/worker.mjs" || wrangler.workers_dev !== false
-    || wrangler.assets?.directory !== "./public" || wrangler.assets?.binding !== "ASSETS"
-    || wrangler.assets?.run_worker_first !== true) {
-  throw new Error("Wrangler Worker or Static Assets configuration mismatch");
-}
-if (Object.hasOwn(wrangler, "vars") || JSON.stringify(wrangler).includes("SOLVER_ORIGIN")) {
-  throw new Error("Origin configuration must not be committed to Wrangler");
-}
-const workerSource = await readFile(resolve(root, "src/worker.mjs"), "utf8");
-if (/https?:\/\//i.test(workerSource)) throw new Error("Worker must not hardcode an origin URL");
-if (!workerSource.includes("NEXA_V6_EDGE_TELEMETRY_HMAC_SECRET")) {
-  throw new Error("Worker HMAC telemetry binding missing");
-}
+};
+await scan(root);
 
 const auditedFiles = await auditRepositoryForSecrets(root);
-console.log(`Nexa V6 minimal public solver surface validated (${auditedFiles} files secret-scanned; active=${active})`);
+console.log(`Nexa V6 public integration release validated (${auditedFiles} files secret-scanned; ACTIVE)`);

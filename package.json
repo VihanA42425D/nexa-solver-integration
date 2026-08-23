@@ -1,6 +1,6 @@
 {
   "name": "@nexa/solver-integration",
-  "version": "1.0.0",
+  "version": "6.0.0",
   "description": "Public Nexa V6 Solver discovery and execution integration surface for intra-chain and cross-chain opportunities.",
   "type": "module",
   "private": false,
@@ -9,12 +9,17 @@
     "node": ">=20"
   },
   "files": [
+    "abi",
     "config",
+    "contracts",
     "events",
     "examples",
+    "networks",
+    "openapi",
     "src",
     "public",
     "standards",
+    "verification",
     "manifest.json",
     "nexa-mainnet-v6.json",
     "wrangler.jsonc",
@@ -23,14 +28,20 @@
   ],
   "scripts": {
     "discover": "node examples/discover-open-routes.mjs",
+    "facade:read": "node examples/read-discovery-facade.mjs",
     "permit:request": "node examples/request-execution-permit.mjs",
+    "package:verify": "node scripts/verify-package.mjs",
+    "resolve:erc7683": "node examples/resolve-erc7683.mjs",
+    "describe:oif": "node examples/describe-oif-mandate.mjs",
+    "generate:abi": "node scripts/generate-abi.mjs",
     "generate:solver-manifest": "node scripts/generate-nexa-solver-manifest.mjs",
+    "generate:checksums": "node scripts/generate-checksums.mjs",
+    "generate:openapi": "node scripts/generate-openapi.mjs",
     "worker:check": "wrangler deploy --dry-run --outdir .wrangler/dry-run",
-    "worker:deploy": "npm run validate && wrangler deploy",
-    "worker:dev": "npm run validate && wrangler dev",
     "verify:onchain": "node scripts/verify-onchain.mjs",
     "validate": "node scripts/validate.mjs",
-    "test": "node --test test/*.test.mjs"
+    "test": "node --test test/*.test.mjs",
+    "release:check": "npm run validate && npm test && npm run package:verify && npm run worker:check && npm run verify:onchain"
   },
   "dependencies": {
     "ethers": "^6.15.0"
@@ -60,6 +71,12 @@
     "./endpoints": "./src/public-endpoints.mjs",
     "./manifest.json": "./manifest.json",
     "./nexa-mainnet-v6.json": "./nexa-mainnet-v6.json",
-    "./standards/standard-ids.json": "./standards/standard-ids.json"
+    "./abi": "./abi/solver-facing.json",
+    "./contracts/NexaSolverDiscoveryV6.sol": "./contracts/NexaSolverDiscoveryV6.sol",
+    "./events": "./events/events.json",
+    "./networks": "./networks/network-ids.json",
+    "./openapi": "./openapi/openapi.json",
+    "./standards/standard-ids.json": "./standards/standard-ids.json",
+    "./verification": "./verification/facade-deployment.json"
   }
 }

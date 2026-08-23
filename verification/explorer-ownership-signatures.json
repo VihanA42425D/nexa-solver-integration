@@ -1,0 +1,46 @@
+{
+  "schema": "NEXA_MAINNET_V6_FACADE_EXPLORER_OWNERSHIP_SIGNATURES_V1",
+  "recordedAt": "2026-08-22T21:54:54.133Z",
+  "claimType": "FACTORY_CREATED_CONTRACT_MANUAL_SUPPORT",
+  "contract": "NexaSolverDiscoveryV6",
+  "facadeAddress": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+  "deterministicFactory": "0x4e59b44847b379578588920cA78FbF26c0B4956C",
+  "signer": "0x605F37BeCE2D88bDCA30E529bB26d3478AE81Ef4",
+  "explorerAccount": "VihanA",
+  "requestedMetadata": {
+    "contractLabel": "Nexa Solver Discovery V6",
+    "projectUrl": "https://vsnexa.com"
+  },
+  "statements": [
+    {
+      "network": "base",
+      "explorer": "BaseScan",
+      "chainId": 8453,
+      "deploymentTransactionHash": "0x334767284d7041afb92f807a8a762f16ce6dd3e9af1b95f2231c5f79e1de9cc4",
+      "messageHash": "0x16c801c38e8a5b5ba62da9c0449995acf2bbe0d17b6c8ebba00a3dcf6aa52a0a",
+      "signature": "0x54b954cf2332440d5162eab95563712a2dac2d5dc36b8575381243db7e1f13136e0833e3007288d6c4d8acd2567512bbd3e7492196398c2f5d68df2a45ede3a31b",
+      "recoveredAddress": "0x605F37BeCE2D88bDCA30E529bB26d3478AE81Ef4",
+      "verifiedLocally": true
+    },
+    {
+      "network": "bsc",
+      "explorer": "BscScan",
+      "chainId": 56,
+      "deploymentTransactionHash": "0x416cf6de4552414be42fd5a1a9e75fdf2c9c0466c64fda6e1e66bb1aa8fbf1c8",
+      "messageHash": "0xfcb1994c2e0a5977648765dc819d30bcc3025157a3214e394fda4b470d9fe7ca",
+      "signature": "0xaf232cc44c8cc3872dfe9a36786dcc3f20b0e3bc7d3a30eb5a32ea2bbd3b6a9344bbbc6162f30f591c0759a2527e47da5cb4a5300e33b15b5fe7e0912aa558481b",
+      "recoveredAddress": "0x605F37BeCE2D88bDCA30E529bB26d3478AE81Ef4",
+      "verifiedLocally": true
+    },
+    {
+      "network": "hyperevm",
+      "explorer": "HyperEVMScan",
+      "chainId": 999,
+      "deploymentTransactionHash": "0x504b9d54c686248d98a7b610c41de76f7c8077e8f592546dbd063c1b52ae3617",
+      "messageHash": "0x136593f07e30acc31b4265b2fb972d2ecbad2a357415ab3c1fed1d21666afe31",
+      "signature": "0x9b64e1f639da2ec8d2e89c97863cc18e7fef692f2dde457521bda4f5c537f63a4a8ada523b57deb43e4934282e97b265b0862cde826c05d3344448c47cd738091b",
+      "recoveredAddress": "0x605F37BeCE2D88bDCA30E529bB26d3478AE81Ef4",
+      "verifiedLocally": true
+    }
+  ]
+}

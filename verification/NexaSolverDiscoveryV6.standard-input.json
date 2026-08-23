@@ -1,0 +1,29 @@
+{
+  "schema": "NEXA_MAINNET_V6_STANDARD_JSON_IDENTITY_FINAL",
+  "contract": "NexaSolverDiscoveryV6",
+  "fullyQualifiedName": "contracts/evm/mainnet/v6/NexaSolverDiscoveryV6.sol:NexaSolverDiscoveryV6",
+  "compiler": "0.8.26+commit.8a97fa7a.Emscripten.clang",
+  "compilerVersionForExplorer": "v0.8.26+commit.8a97fa7a",
+  "standardJsonInputHash": "0xdf265c811f70686d74a717f60d51d20747ac4529e30f0f7d33b08a0b01f357e7",
+  "sourceFile": "../contracts/NexaSolverDiscoveryV6.sol",
+  "sourceVerification": "VERIFIED_EXACT_STANDARD_JSON",
+  "standardJsonSettings": {
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "viaIR": true,
+    "metadata": {
+      "bytecodeHash": "ipfs"
+    }
+  },
+  "constructorArguments": "0x0000000000000000000000003db7752f052acfecb3da99bee7c6a34d223671410000000000000000000000009ea675a496b6a2d13b3091f6e6eb3f87183c3938",
+  "initCodeHash": "0xbdf7fc63e9d23151249eaf7a7efa2433a0466e498e0cc6d884b50bed26f9e534",
+  "runtimeCodeHash": "0x57cb853a995215d352eb64ab9ec33aed60f4ef5f8a38575bc2dd018b38babfc1",
+  "exactInputsPublishedBy": [
+    "https://basescan.org/address/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6#code",
+    "https://bscscan.com/address/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6#code",
+    "https://hyperevmscan.io/address/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6#code",
+    "https://repo.sourcify.dev/8453/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6"
+  ]
+}

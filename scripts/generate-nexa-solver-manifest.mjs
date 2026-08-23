@@ -22,17 +22,12 @@ export const buildNexaSolverManifest = async (root = repositoryRoot) => {
     && Object.keys(integration.contracts ?? {}).length > 0
     && Object.keys(integration.networks ?? {}).length > 0;
   return {
-    schema: "NEXA_MAINNET_V6_SOLVER_DISCOVERY_V2",
-    deploymentVersion: 6,
+    ...structuredClone(integration.discovery),
     deploymentStatus: active
       ? "ACTIVE"
       : (PRE_ACTIVATION_DEPLOYMENT_STATUSES.has(integration.deploymentStatus)
         ? integration.deploymentStatus
         : "AWAITING_POST_DEPLOY_EXPORT"),
-    releaseId: manifest.releaseId,
-    solverProfile: manifest.solverProfile,
-    discoveryModel: "SIGNED_MACHINE_READABLE_FEED",
-    authentication: "WALLET_OR_NATIVE_ACCOUNT_PROOF",
     endpoints: PUBLIC_ENDPOINTS,
     standards: [
       {

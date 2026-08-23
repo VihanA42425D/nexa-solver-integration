@@ -1,15 +1,9 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "nexa-solver-integration",
+  "name": "nexa-solver-integration-verification",
   "main": "./src/worker.mjs",
   "compatibility_date": "2026-08-16",
   "workers_dev": false,
-  "routes": [
-    {
-      "pattern": "solver.vsnexa.com",
-      "custom_domain": true
-    }
-  ],
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",

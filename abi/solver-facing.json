@@ -1,0 +1,82 @@
+{
+  "schema": "NEXA_MAINNET_V6_SOLVER_FACING_ABI_FINAL",
+  "deploymentVersion": 6,
+  "contracts": {
+    "NexaMainnetRegistryV6": {
+      "address": "0x3db7752f052ACFECB3DA99BeE7c6a34D22367141",
+      "runtimeCodeHash": "0x5e766be0eb7a9b75f0b38c8509a15ac261209f06b0c993e8904a9f38633c790a",
+      "format": "ethers-human-readable",
+      "abi": [
+        "function releaseId() pure returns (bytes32)",
+        "function getRoute(bytes32 routeId) view returns (tuple(bytes32 routeId,bytes32 sourceNetworkId,bytes32 sourceAssetId,bytes32 destinationNetworkId,bytes32 destinationAssetId))",
+        "function executionGeneration(bytes32 routeId) view returns (bytes32)",
+        "function localAssetAddress(bytes32 networkId,bytes32 assetId) view returns (address localAddress,bool configured)",
+        "function isRouteExecutable(bytes32 routeId) view returns (bool)",
+        "function routeStatus(bytes32 routeId) view returns (uint8)",
+        "function routeCount() view returns (uint256)",
+        "function routeAt(uint256 index) view returns (bytes32)"
+      ]
+    },
+    "NexaMainnetRouterV6": {
+      "address": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+      "runtimeCodeHash": "0xcdda1b571b317479c6d297aa4354c406d4709f83562e2b6b29bd0e1268e4af70",
+      "format": "ethers-human-readable",
+      "abi": [
+        "function releaseId() pure returns (bytes32)",
+        "function registry() view returns (address)",
+        "function sourceIntakeEnabled() view returns (bool)",
+        "function previewFillDirect(tuple(bytes32 releaseId,bytes32 fillId,bytes32 routeId,bytes32 quoteId,bytes32 policyHash,bytes32 permitNonce,bytes32 sourceNetworkId,bytes32 sourceAssetId,bytes32 destinationNetworkId,bytes32 destinationAssetId,bytes32 sourceVaultAccountId,bytes32 destinationVaultAccountId,bytes32 payerAccountId,bytes32 recipientAccountId,uint64 dataVersion,bytes32 executionGeneration,uint64 validAfter,uint64 validUntil,uint32 sourceFinalityBlocks,uint32 settlementWindowSeconds,uint256 sourceChainId,uint256 destinationChainId,address sourceAsset,address destinationAsset,address sourceVault,address destinationVault,address sourceRouter,address payer,address recipient,uint128 amountInRaw,uint128 amountOutRaw) permit,bytes signature) view returns (bool valid,bytes32 reason)",
+        "function fillDirect(tuple(bytes32 releaseId,bytes32 fillId,bytes32 routeId,bytes32 quoteId,bytes32 policyHash,bytes32 permitNonce,bytes32 sourceNetworkId,bytes32 sourceAssetId,bytes32 destinationNetworkId,bytes32 destinationAssetId,bytes32 sourceVaultAccountId,bytes32 destinationVaultAccountId,bytes32 payerAccountId,bytes32 recipientAccountId,uint64 dataVersion,bytes32 executionGeneration,uint64 validAfter,uint64 validUntil,uint32 sourceFinalityBlocks,uint32 settlementWindowSeconds,uint256 sourceChainId,uint256 destinationChainId,address sourceAsset,address destinationAsset,address sourceVault,address destinationVault,address sourceRouter,address payer,address recipient,uint128 amountInRaw,uint128 amountOutRaw) permit,bytes signature) payable returns (bytes32 fillId)"
+      ]
+    },
+    "NexaSolverDiscoveryV6": {
+      "address": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+      "runtimeCodeHash": "0x57cb853a995215d352eb64ab9ec33aed60f4ef5f8a38575bc2dd018b38babfc1",
+      "format": "ethers-human-readable",
+      "abi": [
+        "function RELEASE_ID() view returns (bytes32)",
+        "function DEPLOYMENT_VERSION() view returns (uint256)",
+        "function registry() view returns (address)",
+        "function router() view returns (address)",
+        "function chainId() view returns (uint256)",
+        "function discoveryURI() pure returns (string)",
+        "function isLive() view returns (bool)",
+        "function systemState() view returns (uint256 currentChainId,bytes32 release,address publicRegistry,address publicRouter,uint256 discoverableRouteCount,bool live)",
+        "function routeCount() view returns (uint256)",
+        "function routeAt(uint256 index) view returns (bytes32)",
+        "function route(bytes32 routeId) view returns (bytes32 sourceNetworkId,bytes32 sourceAssetId,bytes32 destinationNetworkId,bytes32 destinationAssetId,bytes32 executionGeneration,uint8 status,bool executable)"
+      ]
+    },
+    "NexaERC7683ModuleV6": {
+      "address": "0x534A0f500A7270b9b19d2AFa18DE24DCE93eb522",
+      "runtimeCodeHash": "0xea99f0e1e33a9a9e1ae926e8f15fd09bf1b7b9cecf81a2ef294cd4820e26d392",
+      "standardId": "0x27ecffeeec898dbaf864fc095016ad6212d7a27e32a3069234a4a1da23f50993",
+      "format": "ethers-human-readable",
+      "abi": [
+        "function STANDARD_ID() view returns (bytes32)",
+        "function router() view returns (address)",
+        "function standardId() pure returns (bytes32)",
+        "function supportsInterface(bytes4 interfaceId) pure returns (bool)",
+        "function resolveExecution(bytes payload) view returns (tuple(bytes32 routeId,bytes32 quoteId,address target,uint256 value,bytes callData) result)",
+        "function resolve(bytes payload) view returns (tuple(bytes[] steps,bytes[] variables,bytes[] payments,tuple(string name,bytes data)[] assumptions) order)",
+        "function resolveOrder(bytes payload) view returns (uint256 sourceChainId,uint256 destinationChainId,address target,bytes callData)"
+      ]
+    },
+    "NexaOIFModuleV6": {
+      "address": "0x4f81426fE8999E982aE6b771536a4093879F6A20",
+      "runtimeCodeHash": "0x103c954e71ec79abefc0f8e1ef745787649edb91742a4d4a7b0d2a4646925cba",
+      "standardId": "0x3de00a2eccd5b86df839b3747bda483b2de2a855d640eb3d4938d6d43cb162c0",
+      "format": "ethers-human-readable",
+      "abi": [
+        "function STANDARD_ID() view returns (bytes32)",
+        "function COMPATIBILITY_LEVEL() view returns (bytes32)",
+        "function router() view returns (address)",
+        "function standardId() pure returns (bytes32)",
+        "function compatibilityLevel() pure returns (bytes32)",
+        "function supportsInterface(bytes4 interfaceId) pure returns (bool)",
+        "function resolveExecution(bytes payload) pure returns (tuple(bytes32 routeId,bytes32 quoteId,address target,uint256 value,bytes callData) result)",
+        "function describeMandate(bytes payload) pure returns (tuple(bytes32 oracle,bytes32 settler,uint256 chainId,bytes32 token,uint256 amount,bytes32 recipient,bytes callbackData,bytes context) mandate)"
+      ]
+    }
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "schema": "NEXA_MAINNET_V6_PUBLIC_SOLVER_INTEGRATION_V3",
+  "schema": "NEXA_MAINNET_V6_PUBLIC_SOLVER_INTEGRATION_FINAL",
   "deploymentStatus": "ACTIVE",
   "activationRequired": false,
   "doNotUseForExecutionUntilActivated": false,
@@ -17,25 +17,80 @@
   },
   "discovery": {
     "schema": "NEXA_MAINNET_V6_SOLVER_DISCOVERY_V2",
-    "executionScopes": [
-      "INTRA_CHAIN",
-      "CROSS_CHAIN"
-    ],
+    "deploymentVersion": 6,
+    "deploymentStatus": "ACTIVE",
+    "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
+    "feedSigner": "0xCbeC1dDeEA1f4317ce6eF6F33Ad46d1fFD81c163",
+    "solverProfile": {
+      "executionScopes": [
+        "INTRA_CHAIN",
+        "CROSS_CHAIN"
+      ],
+      "automatedDiscovery": true,
+      "variableSizeExecution": true,
+      "machineVerifiableState": true,
+      "accountlessDiscovery": true
+    },
     "discoveryModel": "SIGNED_MACHINE_READABLE_FEED",
+    "executionModel": "EXACTLY_ONE_BOT_SOURCE_TX_PLUS_ONE_NEXA_DESTINATION_TX",
+    "publication": "SIGNED_OFFCHAIN_FEED_ZERO_PERIODIC_GAS",
+    "feedTransport": {
+      "primary": "SSE_CONFIRMED_ACTIVE_SET",
+      "recovery": "HTTP_SIGNED_FEED",
+      "reconnectWithLastEventId": true
+    },
     "authentication": "WALLET_OR_NATIVE_ACCOUNT_PROOF",
+    "permitRequestSigning": {
+      "mode": "LOCAL_DETERMINISTIC_MESSAGE",
+      "domain": "NEXA_MAINNET_V6_EXECUTION_PERMIT_REQUEST_V1",
+      "canonicalizer": "canonicalPermitRequest",
+      "messageBuilder": "permitRequestMessage",
+      "signatureScheme": "EIP191_PERSONAL_SIGN_UTF8",
+      "canonicalJson": "RECURSIVE_SORTED_OBJECT_KEYS_COMPACT_JSON",
+      "messageLines": [
+        "NEXA_MAINNET_V6_EXECUTION_PERMIT_REQUEST_V1",
+        "quoteId={lowercase-bytes32}",
+        "requestedAmountInRaw={base10-uint128}",
+        "standard={uppercase-standard}",
+        "payer={lowercase-evm-address}|payerAccountId={lowercase-bytes32}\\npayerLocator={canonical-json}",
+        "recipient={lowercase-evm-address}|recipientAccountId={lowercase-bytes32}\\nrecipientLocator={canonical-json}",
+        "idempotencyKey={exact-trimmed-key}"
+      ],
+      "requestMessageEndpointRequired": false
+    },
     "endpoints": {
-      "feed": "/api/v6/solver-feed",
-      "feedEvents": "/api/v6/solver-feed/events",
-      "routeDetail": "/api/v6/routes/{routeId}",
-      "permitRequestMessage": "/api/v6/execution-permits/request-message",
-      "executionPermits": "/api/v6/execution-permits",
-      "permitStatus": "/api/v6/execution-permits/{fillId}",
-      "wellKnown": "/.well-known/nexa-solver.json"
-    }
+      "manifest": "https://solver.vsnexa.com/.well-known/nexa-solver.json",
+      "solverDiscovery": "https://solver.vsnexa.com/api/v6/solver-discovery",
+      "solverFeed": "https://solver.vsnexa.com/api/v6/solver-feed",
+      "solverFeedEvents": "https://solver.vsnexa.com/api/v6/solver-feed/events",
+      "routeDetailTemplate": "https://solver.vsnexa.com/api/v6/routes/{routeId}",
+      "permitRequestMessage": "https://solver.vsnexa.com/api/v6/execution-permits/request-message",
+      "executionPermits": "https://solver.vsnexa.com/api/v6/execution-permits",
+      "permitStatusTemplate": "https://solver.vsnexa.com/api/v6/execution-permits/{fillId}"
+    },
+    "standards": [
+      {
+        "standardId": "0x27ecffeeec898dbaf864fc095016ad6212d7a27e32a3069234a4a1da23f50993",
+        "name": "ERC-7683",
+        "compatibilityLevel": "EXECUTABLE_RESOLVER",
+        "moduleAddress": "0x534A0f500A7270b9b19d2AFa18DE24DCE93eb522",
+        "executable": true
+      },
+      {
+        "standardId": "0x3de00a2eccd5b86df839b3747bda483b2de2a855d640eb3d4938d6d43cb162c0",
+        "name": "OIF",
+        "compatibilityLevel": "DISCOVERY_DESCRIPTION_ONLY",
+        "moduleAddress": "0x4f81426fE8999E982aE6b771536a4093879F6A20",
+        "executable": false
+      }
+    ],
+    "activationRequired": false
   },
   "contracts": {
     "NexaMainnetRegistryV6": {
       "address": "0x3db7752f052ACFECB3DA99BeE7c6a34D22367141",
+      "runtimeCodeHash": "0x5e766be0eb7a9b75f0b38c8509a15ac261209f06b0c993e8904a9f38633c790a",
+      "abiPath": "./abi/solver-facing.json#/contracts/NexaMainnetRegistryV6",
       "abi": [
         "function releaseId() pure returns (bytes32)",
         "function getRoute(bytes32 routeId) view returns (tuple(bytes32 routeId,bytes32 sourceNetworkId,bytes32 sourceAssetId,bytes32 destinationNetworkId,bytes32 destinationAssetId))",
@@ -49,6 +104,8 @@
     },
     "NexaMainnetRouterV6": {
       "address": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+      "runtimeCodeHash": "0xcdda1b571b317479c6d297aa4354c406d4709f83562e2b6b29bd0e1268e4af70",
+      "abiPath": "./abi/solver-facing.json#/contracts/NexaMainnetRouterV6",
       "abi": [
         "function releaseId() pure returns (bytes32)",
         "function registry() view returns (address)",
@@ -56,23 +113,225 @@
         "function previewFillDirect(tuple(bytes32 releaseId,bytes32 fillId,bytes32 routeId,bytes32 quoteId,bytes32 policyHash,bytes32 permitNonce,bytes32 sourceNetworkId,bytes32 sourceAssetId,bytes32 destinationNetworkId,bytes32 destinationAssetId,bytes32 sourceVaultAccountId,bytes32 destinationVaultAccountId,bytes32 payerAccountId,bytes32 recipientAccountId,uint64 dataVersion,bytes32 executionGeneration,uint64 validAfter,uint64 validUntil,uint32 sourceFinalityBlocks,uint32 settlementWindowSeconds,uint256 sourceChainId,uint256 destinationChainId,address sourceAsset,address destinationAsset,address sourceVault,address destinationVault,address sourceRouter,address payer,address recipient,uint128 amountInRaw,uint128 amountOutRaw) permit,bytes signature) view returns (bool valid,bytes32 reason)",
         "function fillDirect(tuple(bytes32 releaseId,bytes32 fillId,bytes32 routeId,bytes32 quoteId,bytes32 policyHash,bytes32 permitNonce,bytes32 sourceNetworkId,bytes32 sourceAssetId,bytes32 destinationNetworkId,bytes32 destinationAssetId,bytes32 sourceVaultAccountId,bytes32 destinationVaultAccountId,bytes32 payerAccountId,bytes32 recipientAccountId,uint64 dataVersion,bytes32 executionGeneration,uint64 validAfter,uint64 validUntil,uint32 sourceFinalityBlocks,uint32 settlementWindowSeconds,uint256 sourceChainId,uint256 destinationChainId,address sourceAsset,address destinationAsset,address sourceVault,address destinationVault,address sourceRouter,address payer,address recipient,uint128 amountInRaw,uint128 amountOutRaw) permit,bytes signature) payable returns (bytes32 fillId)"
       ]
+    },
+    "NexaSolverDiscoveryV6": {
+      "address": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+      "facadeAddress": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+      "runtimeCodeHash": "0x57cb853a995215d352eb64ab9ec33aed60f4ef5f8a38575bc2dd018b38babfc1",
+      "registry": "0x3db7752f052ACFECB3DA99BeE7c6a34D22367141",
+      "router": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+      "discoveryURI": "https://solver.vsnexa.com/.well-known/nexa-solver.json",
+      "abiPath": "./abi/solver-facing.json#/contracts/NexaSolverDiscoveryV6",
+      "abi": [
+        "function RELEASE_ID() view returns (bytes32)",
+        "function DEPLOYMENT_VERSION() view returns (uint256)",
+        "function registry() view returns (address)",
+        "function router() view returns (address)",
+        "function chainId() view returns (uint256)",
+        "function discoveryURI() pure returns (string)",
+        "function isLive() view returns (bool)",
+        "function systemState() view returns (uint256 currentChainId,bytes32 release,address publicRegistry,address publicRouter,uint256 discoverableRouteCount,bool live)",
+        "function routeCount() view returns (uint256)",
+        "function routeAt(uint256 index) view returns (bytes32)",
+        "function route(bytes32 routeId) view returns (bytes32 sourceNetworkId,bytes32 sourceAssetId,bytes32 destinationNetworkId,bytes32 destinationAssetId,bytes32 executionGeneration,uint8 status,bool executable)"
+      ]
     }
   },
   "networks": {
     "base": {
       "chainId": 8453,
+      "networkId": "0x3d5484ad492110227dc184ab6abbeeccd54b127aa00bfc256fd8d8037a4e48c2",
+      "facadeAddress": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+      "runtimeCodeHash": "0x57cb853a995215d352eb64ab9ec33aed60f4ef5f8a38575bc2dd018b38babfc1",
       "registry": "0x3db7752f052ACFECB3DA99BeE7c6a34D22367141",
-      "router": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938"
+      "router": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+      "discoveryURI": "https://solver.vsnexa.com/.well-known/nexa-solver.json",
+      "systemState": {
+        "chainId": 8453,
+        "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
+        "routeCount": "108",
+        "live": true
+      },
+      "verification": {
+        "onchainIdentity": {
+          "status": "VERIFIED",
+          "transactionHash": "0x334767284d7041afb92f807a8a762f16ce6dd3e9af1b95f2231c5f79e1de9cc4",
+          "blockNumber": 50320644
+        },
+        "explorer": {
+          "supported": true,
+          "status": "VERIFIED_EXACT_STANDARD_JSON",
+          "verifier": "ETHERSCAN_V2",
+          "reference": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+          "url": "https://basescan.org/address/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6#code",
+          "compilerVersion": "v0.8.26+commit.8a97fa7a",
+          "contractName": "NexaSolverDiscoveryV6",
+          "standardJsonIdentity": "EXACT_AFTER_ETHERSCAN_OUTPUT_SELECTION_NORMALIZATION",
+          "metadata": {
+            "ownershipClaim": {
+              "status": "SIGNED_EVIDENCE_READY_FOR_FACTORY_SUPPORT_CASE",
+              "reason": "CREATE2_FACTORY_IS_ONCHAIN_CREATOR",
+              "signatureEvidence": {
+                "status": "SIGNED_EVIDENCE_READY_FOR_FACTORY_SUPPORT_CASE",
+                "explorerAccount": "VihanA",
+                "signer": "0x605F37BeCE2D88bDCA30E529bB26d3478AE81Ef4",
+                "signedAt": "2026-08-22T21:54:54.133Z",
+                "messageHash": "0x16c801c38e8a5b5ba62da9c0449995acf2bbe0d17b6c8ebba00a3dcf6aa52a0a",
+                "recoveredAddress": "0x605F37BeCE2D88bDCA30E529bB26d3478AE81Ef4",
+                "verifiedLocally": true,
+                "bundleSchema": "NEXA_MAINNET_V6_FACADE_EXPLORER_OWNERSHIP_SIGNATURES_V1",
+                "bundleSha256": "3b2ef544acdbfa49af8a0d87e1029e35def4c432d17ee5adf067fec5b8b7d10b",
+                "evidencePath": "./verification/explorer-ownership-signatures.json"
+              }
+            },
+            "contractLabel": {
+              "status": "PENDING_SUPPORT_SUBMISSION"
+            },
+            "projectUrl": {
+              "status": "PENDING_SUPPORT_SUBMISSION",
+              "value": "https://vsnexa.com"
+            }
+          }
+        },
+        "sourcify": {
+          "supported": true,
+          "status": "VERIFIED_EXACT_MATCH",
+          "verifier": "SOURCIFY_V2",
+          "reference": "45519799",
+          "url": "https://repo.sourcify.dev/8453/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+          "verifiedAt": "2026-08-22T20:34:21Z"
+        }
+      }
     },
     "bsc": {
       "chainId": 56,
+      "networkId": "0x5863eb850b94ec5a94a1653871dc308d32f4aec504d789f356419886170a0928",
+      "facadeAddress": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+      "runtimeCodeHash": "0x57cb853a995215d352eb64ab9ec33aed60f4ef5f8a38575bc2dd018b38babfc1",
       "registry": "0x3db7752f052ACFECB3DA99BeE7c6a34D22367141",
-      "router": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938"
+      "router": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+      "discoveryURI": "https://solver.vsnexa.com/.well-known/nexa-solver.json",
+      "systemState": {
+        "chainId": 56,
+        "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
+        "routeCount": "126",
+        "live": true
+      },
+      "verification": {
+        "onchainIdentity": {
+          "status": "VERIFIED",
+          "transactionHash": "0x416cf6de4552414be42fd5a1a9e75fdf2c9c0466c64fda6e1e66bb1aa8fbf1c8",
+          "blockNumber": 117488361
+        },
+        "explorer": {
+          "supported": true,
+          "status": "VERIFIED_EXACT_STANDARD_JSON",
+          "verifier": "ETHERSCAN_V2",
+          "reference": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+          "url": "https://bscscan.com/address/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6#code",
+          "compilerVersion": "v0.8.26+commit.8a97fa7a",
+          "contractName": "NexaSolverDiscoveryV6",
+          "standardJsonIdentity": "EXACT_AFTER_ETHERSCAN_OUTPUT_SELECTION_NORMALIZATION",
+          "metadata": {
+            "ownershipClaim": {
+              "status": "SIGNED_EVIDENCE_READY_FOR_FACTORY_SUPPORT_CASE",
+              "reason": "CREATE2_FACTORY_IS_ONCHAIN_CREATOR",
+              "signatureEvidence": {
+                "status": "SIGNED_EVIDENCE_READY_FOR_FACTORY_SUPPORT_CASE",
+                "explorerAccount": "VihanA",
+                "signer": "0x605F37BeCE2D88bDCA30E529bB26d3478AE81Ef4",
+                "signedAt": "2026-08-22T21:54:54.133Z",
+                "messageHash": "0xfcb1994c2e0a5977648765dc819d30bcc3025157a3214e394fda4b470d9fe7ca",
+                "recoveredAddress": "0x605F37BeCE2D88bDCA30E529bB26d3478AE81Ef4",
+                "verifiedLocally": true,
+                "bundleSchema": "NEXA_MAINNET_V6_FACADE_EXPLORER_OWNERSHIP_SIGNATURES_V1",
+                "bundleSha256": "3b2ef544acdbfa49af8a0d87e1029e35def4c432d17ee5adf067fec5b8b7d10b",
+                "evidencePath": "./verification/explorer-ownership-signatures.json"
+              }
+            },
+            "contractLabel": {
+              "status": "PENDING_SUPPORT_SUBMISSION"
+            },
+            "projectUrl": {
+              "status": "PENDING_SUPPORT_SUBMISSION",
+              "value": "https://vsnexa.com"
+            }
+          }
+        },
+        "sourcify": {
+          "supported": true,
+          "status": "VERIFIED_EXACT_MATCH",
+          "verifier": "SOURCIFY_V2",
+          "reference": "45520012",
+          "url": "https://repo.sourcify.dev/56/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+          "verifiedAt": "2026-08-22T20:34:35Z"
+        }
+      }
     },
     "hyperevm": {
       "chainId": 999,
+      "networkId": "0x5587698f40d78ef64484dda8f2c78692af870cfe3926dbc61a73881680bd01c8",
+      "facadeAddress": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+      "runtimeCodeHash": "0x57cb853a995215d352eb64ab9ec33aed60f4ef5f8a38575bc2dd018b38babfc1",
       "registry": "0x3db7752f052ACFECB3DA99BeE7c6a34D22367141",
-      "router": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938"
+      "router": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+      "discoveryURI": "https://solver.vsnexa.com/.well-known/nexa-solver.json",
+      "systemState": {
+        "chainId": 999,
+        "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
+        "routeCount": "108",
+        "live": true
+      },
+      "verification": {
+        "onchainIdentity": {
+          "status": "VERIFIED",
+          "transactionHash": "0x504b9d54c686248d98a7b610c41de76f7c8077e8f592546dbd063c1b52ae3617",
+          "blockNumber": 43894134
+        },
+        "explorer": {
+          "supported": true,
+          "status": "VERIFIED_EXACT_STANDARD_JSON",
+          "verifier": "ETHERSCAN_V2",
+          "reference": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+          "url": "https://hyperevmscan.io/address/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6#code",
+          "compilerVersion": "v0.8.26+commit.8a97fa7a",
+          "contractName": "NexaSolverDiscoveryV6",
+          "standardJsonIdentity": "EXACT_AFTER_ETHERSCAN_OUTPUT_SELECTION_NORMALIZATION",
+          "metadata": {
+            "ownershipClaim": {
+              "status": "SIGNED_EVIDENCE_READY_FOR_FACTORY_SUPPORT_CASE",
+              "reason": "CREATE2_FACTORY_IS_ONCHAIN_CREATOR",
+              "signatureEvidence": {
+                "status": "SIGNED_EVIDENCE_READY_FOR_FACTORY_SUPPORT_CASE",
+                "explorerAccount": "VihanA",
+                "signer": "0x605F37BeCE2D88bDCA30E529bB26d3478AE81Ef4",
+                "signedAt": "2026-08-22T21:54:54.133Z",
+                "messageHash": "0x136593f07e30acc31b4265b2fb972d2ecbad2a357415ab3c1fed1d21666afe31",
+                "recoveredAddress": "0x605F37BeCE2D88bDCA30E529bB26d3478AE81Ef4",
+                "verifiedLocally": true,
+                "bundleSchema": "NEXA_MAINNET_V6_FACADE_EXPLORER_OWNERSHIP_SIGNATURES_V1",
+                "bundleSha256": "3b2ef544acdbfa49af8a0d87e1029e35def4c432d17ee5adf067fec5b8b7d10b",
+                "evidencePath": "./verification/explorer-ownership-signatures.json"
+              }
+            },
+            "contractLabel": {
+              "status": "PENDING_SUPPORT_SUBMISSION"
+            },
+            "projectUrl": {
+              "status": "PENDING_SUPPORT_SUBMISSION",
+              "value": "https://vsnexa.com"
+            }
+          }
+        },
+        "sourcify": {
+          "supported": true,
+          "status": "VERIFIED_EXACT_MATCH",
+          "verifier": "SOURCIFY_V2",
+          "reference": "45520062",
+          "url": "https://repo.sourcify.dev/999/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+          "verifiedAt": "2026-08-22T20:34:37Z"
+        }
+      }
     }
   },
   "standards": {
@@ -80,14 +339,18 @@
       "standardId": "0x27ecffeeec898dbaf864fc095016ad6212d7a27e32a3069234a4a1da23f50993",
       "name": "ERC-7683",
       "compatibilityLevel": "EXECUTABLE_RESOLVER",
-      "moduleAddress": "0x534A0f500A7270b9b19d2AFa18DE24DCE93eb522"
+      "moduleAddress": "0x534A0f500A7270b9b19d2AFa18DE24DCE93eb522",
+      "runtimeCodeHash": "0xea99f0e1e33a9a9e1ae926e8f15fd09bf1b7b9cecf81a2ef294cd4820e26d392",
+      "abiPath": "./abi/solver-facing.json#/contracts/NexaERC7683ModuleV6"
     },
     "oif": {
       "standardId": "0x3de00a2eccd5b86df839b3747bda483b2de2a855d640eb3d4938d6d43cb162c0",
       "name": "OIF",
       "compatibilityLevel": "DISCOVERY_DESCRIPTION_ONLY",
       "executable": false,
-      "moduleAddress": "0x4f81426fE8999E982aE6b771536a4093879F6A20"
+      "moduleAddress": "0x4f81426fE8999E982aE6b771536a4093879F6A20",
+      "runtimeCodeHash": "0x103c954e71ec79abefc0f8e1ef745787649edb91742a4d4a7b0d2a4646925cba",
+      "abiPath": "./abi/solver-facing.json#/contracts/NexaOIFModuleV6"
     }
   }
 }

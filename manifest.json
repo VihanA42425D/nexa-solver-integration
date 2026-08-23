@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "schema": "nexa-solver-integration-manifest/v3",
+  "schema": "NEXA_MAINNET_V6_PUBLIC_INTEGRATION_MANIFEST_FINAL",
   "name": "Nexa Solver Integration",
   "environment": "mainnet",
   "deploymentVersion": 6,
@@ -9,6 +9,8 @@
   "deploymentStatus": "ACTIVE",
   "publicSurfaceOnly": true,
   "canonicalBundle": "./nexa-mainnet-v6.json",
+  "discoveryURI": "https://solver.vsnexa.com/.well-known/nexa-solver.json",
+  "facadeAddress": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
   "solverProfile": {
     "executionScopes": [
       "INTRA_CHAIN",
@@ -26,9 +28,22 @@
   "authentication": "WALLET_OR_NATIVE_ACCOUNT_PROOF",
   "standards": "./standards/standard-ids.json",
   "events": "./events/events.json",
+  "networkIds": "./networks/network-ids.json",
+  "abi": "./abi/solver-facing.json",
+  "openapi": "./openapi/openapi.json",
+  "verification": {
+    "facadeDeployment": "./verification/facade-deployment.json",
+    "standardJsonInput": "./verification/NexaSolverDiscoveryV6.standard-input.json",
+    "ownershipStatements": "./verification/explorer-ownership-signatures.json",
+    "onchainIdentity": "./verification/onchain-identity.json",
+    "checksums": "./verification/checksums.sha256"
+  },
   "examples": {
     "discoverRoutes": "./examples/discover-open-routes.mjs",
     "requestPermit": "./examples/request-execution-permit.mjs",
+    "readFacade": "./examples/read-discovery-facade.mjs",
+    "resolveERC7683": "./examples/resolve-erc7683.mjs",
+    "describeOIF": "./examples/describe-oif-mandate.mjs",
     "config": "./config/example.config.json"
   },
   "privateDetailsExcluded": [

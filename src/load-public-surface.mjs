@@ -25,11 +25,15 @@ export function isActiveV6Bundle(bundle) {
 }
 
 export async function loadPublicSurface(networkName = null, options = {}) {
-  const [manifest, integration, standards, events] = await Promise.all([
+  const [manifest, integration, standards, events, networkIds, abi, verification, openapi] = await Promise.all([
     readJson("manifest.json"),
     readJson("nexa-mainnet-v6.json"),
     readJson("standards/standard-ids.json"),
     readJson("events/events.json"),
+    readJson("networks/network-ids.json"),
+    readJson("abi/solver-facing.json"),
+    readJson("verification/facade-deployment.json"),
+    readJson("openapi/openapi.json"),
   ]);
   const active = isActiveV6Bundle(integration);
   if (options.requireActive !== false && !active) {
@@ -39,5 +43,16 @@ export async function loadPublicSurface(networkName = null, options = {}) {
   if (networkName != null && active && !network) {
     throw new Error(`Unsupported Nexa network: ${networkName}`);
   }
-  return Object.freeze({ manifest, integration, standards, events, active, network });
+  return Object.freeze({
+    manifest,
+    integration,
+    standards,
+    events,
+    networkIds,
+    abi,
+    verification,
+    openapi,
+    active,
+    network,
+  });
 }

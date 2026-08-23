@@ -1,0 +1,81 @@
+{
+  "schema": "NEXA_MAINNET_V6_PUBLIC_FACADE_VERIFICATION_FINAL",
+  "generatedAt": "2026-08-22T21:17:09.018Z",
+  "contract": "NexaSolverDiscoveryV6",
+  "fullyQualifiedName": "contracts/evm/mainnet/v6/NexaSolverDiscoveryV6.sol:NexaSolverDiscoveryV6",
+  "compiler": "0.8.26+commit.8a97fa7a.Emscripten.clang",
+  "standardJsonInputHash": "0xdf265c811f70686d74a717f60d51d20747ac4529e30f0f7d33b08a0b01f357e7",
+  "constructorArguments": "0x0000000000000000000000003db7752f052acfecb3da99bee7c6a34d223671410000000000000000000000009ea675a496b6a2d13b3091f6e6eb3f87183c3938",
+  "initCodeHash": "0xbdf7fc63e9d23151249eaf7a7efa2433a0466e498e0cc6d884b50bed26f9e534",
+  "facadeAddress": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+  "runtimeCodeHash": "0x57cb853a995215d352eb64ab9ec33aed60f4ef5f8a38575bc2dd018b38babfc1",
+  "registry": "0x3db7752f052ACFECB3DA99BeE7c6a34D22367141",
+  "router": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+  "discoveryURI": "https://solver.vsnexa.com/.well-known/nexa-solver.json",
+  "sourceVerificationComplete": true,
+  "networks": {
+    "base": {
+      "status": "VERIFIED",
+      "chainId": 8453,
+      "deploymentTransactionHash": "0x334767284d7041afb92f807a8a762f16ce6dd3e9af1b95f2231c5f79e1de9cc4",
+      "deploymentBlockNumber": 50320644,
+      "runtimeArtifactMatch": true,
+      "immutableBindingsVerified": true,
+      "isLive": true,
+      "routeCount": "108",
+      "firstExecutableRouteId": "0x016b4438e55ea12ecc6cfb937b7cc9b690c7f834bb45dba3d3c79c6a5a971419",
+      "explorer": {
+        "status": "VERIFIED_EXACT_STANDARD_JSON",
+        "url": "https://basescan.org/address/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6#code",
+        "compilerVersion": "v0.8.26+commit.8a97fa7a"
+      },
+      "sourcify": {
+        "status": "VERIFIED_EXACT_MATCH",
+        "reference": "45519799",
+        "url": "https://repo.sourcify.dev/8453/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6"
+      }
+    },
+    "bsc": {
+      "status": "VERIFIED",
+      "chainId": 56,
+      "deploymentTransactionHash": "0x416cf6de4552414be42fd5a1a9e75fdf2c9c0466c64fda6e1e66bb1aa8fbf1c8",
+      "deploymentBlockNumber": 117488361,
+      "runtimeArtifactMatch": true,
+      "immutableBindingsVerified": true,
+      "isLive": true,
+      "routeCount": "126",
+      "firstExecutableRouteId": "0x00771fd1aaaffe5b4ec4627631f2dd6bfbc537920b5be144c3f1da605b4e9e4d",
+      "explorer": {
+        "status": "VERIFIED_EXACT_STANDARD_JSON",
+        "url": "https://bscscan.com/address/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6#code",
+        "compilerVersion": "v0.8.26+commit.8a97fa7a"
+      },
+      "sourcify": {
+        "status": "VERIFIED_EXACT_MATCH",
+        "reference": "45520012",
+        "url": "https://repo.sourcify.dev/56/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6"
+      }
+    },
+    "hyperevm": {
+      "status": "VERIFIED",
+      "chainId": 999,
+      "deploymentTransactionHash": "0x504b9d54c686248d98a7b610c41de76f7c8077e8f592546dbd063c1b52ae3617",
+      "deploymentBlockNumber": 43894134,
+      "runtimeArtifactMatch": true,
+      "immutableBindingsVerified": true,
+      "isLive": true,
+      "routeCount": "108",
+      "firstExecutableRouteId": "0x01471f457d4bf428b987e87bd3ef1064e2ae86fed705577a2e4e88917fd55db8",
+      "explorer": {
+        "status": "VERIFIED_EXACT_STANDARD_JSON",
+        "url": "https://hyperevmscan.io/address/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6#code",
+        "compilerVersion": "v0.8.26+commit.8a97fa7a"
+      },
+      "sourcify": {
+        "status": "VERIFIED_EXACT_MATCH",
+        "reference": "45520062",
+        "url": "https://repo.sourcify.dev/999/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6"
+      }
+    }
+  }
+}

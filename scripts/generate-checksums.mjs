@@ -1,0 +1,46 @@
+import { createHash } from "node:crypto";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
+export const CHECKSUM_FILES = Object.freeze([
+  "README.md",
+  "manifest.json",
+  "nexa-mainnet-v6.json",
+  "public/.well-known/nexa-solver.json",
+  "abi/solver-facing.json",
+  "contracts/NexaSolverDiscoveryV6.sol",
+  "events/events.json",
+  "networks/network-ids.json",
+  "openapi/openapi.json",
+  "standards/standard-ids.json",
+  "verification/NexaSolverDiscoveryV6.standard-input.json",
+  "verification/explorer-ownership-signatures.json",
+  "verification/facade-deployment.json",
+  "verification/onchain-identity.json",
+]);
+
+export async function buildChecksums(repositoryRoot = root) {
+  const lines = [];
+  for (const file of CHECKSUM_FILES) {
+    const normalized = (await readFile(resolve(repositoryRoot, file), "utf8"))
+      .replaceAll("\r\n", "\n");
+    const digest = createHash("sha256")
+      .update(normalized, "utf8")
+      .digest("hex");
+    lines.push(`${digest}  ${file}`);
+  }
+  return lines.join("\n") + "\n";
+}
+
+export async function generateChecksums(repositoryRoot = root) {
+  const output = resolve(repositoryRoot, "verification/checksums.sha256");
+  await mkdir(dirname(output), { recursive: true });
+  await writeFile(output, await buildChecksums(repositoryRoot), "utf8");
+  return output;
+}
+
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  console.log("Generated " + await generateChecksums());
+}

@@ -19,6 +19,7 @@ test("active V6 bundle exposes only the Solver-facing contract surface", async (
   assert.deepEqual(Object.keys(surface.integration.contracts).sort(), [
     "NexaMainnetRegistryV6",
     "NexaMainnetRouterV6",
+    "NexaSolverDiscoveryV6",
   ]);
   assert.equal(
     surface.integration.contracts.NexaMainnetRegistryV6.address,
@@ -28,16 +29,32 @@ test("active V6 bundle exposes only the Solver-facing contract surface", async (
     surface.integration.contracts.NexaMainnetRouterV6.address,
     "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
   );
+  assert.equal(
+    surface.integration.contracts.NexaSolverDiscoveryV6.address,
+    "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+  );
+  assert.equal(
+    surface.integration.contracts.NexaSolverDiscoveryV6.discoveryURI,
+    "https://solver.vsnexa.com/.well-known/nexa-solver.json",
+  );
   for (const [slug, chainId] of Object.entries({ base: 8453, bsc: 56, hyperevm: 999 })) {
-    assert.deepEqual(surface.integration.networks[slug], {
-      chainId,
-      registry: "0x3db7752f052ACFECB3DA99BeE7c6a34D22367141",
-      router: "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
-    });
+    const network = surface.integration.networks[slug];
+    assert.equal(network.chainId, chainId);
+    assert.equal(network.facadeAddress, "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6");
+    assert.equal(network.registry, "0x3db7752f052ACFECB3DA99BeE7c6a34D22367141");
+    assert.equal(network.router, "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938");
+    assert.equal(network.systemState.live, true);
+    assert.ok(BigInt(network.systemState.routeCount) > 0n);
+    assert.equal(network.verification.explorer.status, "VERIFIED_EXACT_STANDARD_JSON");
   }
   assert.equal(Object.hasOwn(surface.integration, "preparationHash"), false);
   assert.equal(Object.hasOwn(surface.integration, "deploymentSource"), false);
-  assert.equal(Object.hasOwn(surface.integration.discovery, "feedSigner"), false);
+  assert.equal(
+    surface.integration.discovery.feedSigner,
+    "0xCbeC1dDeEA1f4317ce6eF6F33Ad46d1fFD81c163",
+  );
+  assert.equal(surface.verification.sourceVerificationComplete, true);
+  assert.equal(surface.openapi.openapi, "3.1.0");
 });
 
 test("deployed-awaiting-cutover status cannot be promoted by partial activation fields", () => {
@@ -95,6 +112,10 @@ test("static public files contain no forbidden internal deployment details", asy
     "../nexa-mainnet-v6.json",
     "../standards/standard-ids.json",
     "../events/events.json",
+    "../networks/network-ids.json",
+    "../abi/solver-facing.json",
+    "../openapi/openapi.json",
+    "../verification/facade-deployment.json",
     "../public/.well-known/nexa-solver.json",
   ];
   const forbidden = [
@@ -105,7 +126,6 @@ test("static public files contain no forbidden internal deployment details", asy
     "0x7fF3D7F41B5C3b53F1242a0bE5a683B95e09FFB4",
     "0xA767213615Bb6f8BE5C82DD41d029572E6944E7C",
     "0xF2009b45f521A8b4E62b0B68386aB6Fc5C5F6d5b",
-    "0xCbeC1dDeEA1f4317ce6eF6F33Ad46d1fFD81c163",
   ];
   for (const file of files) {
     const text = await readFile(new URL(file, import.meta.url), "utf8");

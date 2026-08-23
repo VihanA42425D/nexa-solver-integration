@@ -1,0 +1,53 @@
+{
+  "schema": "NEXA_MAINNET_V6_ONCHAIN_IDENTITY_FINAL",
+  "verifiedAt": "2026-08-22T23:50:29Z",
+  "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
+  "crossNetworkAddressInvariant": true,
+  "crossNetworkRuntimeInvariant": true,
+  "contracts": {
+    "NexaMainnetRegistryV6": {
+      "address": "0x3db7752f052ACFECB3DA99BeE7c6a34D22367141",
+      "runtimeCodeHash": "0x5e766be0eb7a9b75f0b38c8509a15ac261209f06b0c993e8904a9f38633c790a"
+    },
+    "NexaMainnetRouterV6": {
+      "address": "0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938",
+      "runtimeCodeHash": "0xcdda1b571b317479c6d297aa4354c406d4709f83562e2b6b29bd0e1268e4af70"
+    },
+    "NexaSolverDiscoveryV6": {
+      "address": "0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6",
+      "runtimeCodeHash": "0x57cb853a995215d352eb64ab9ec33aed60f4ef5f8a38575bc2dd018b38babfc1"
+    },
+    "NexaERC7683ModuleV6": {
+      "address": "0x534A0f500A7270b9b19d2AFa18DE24DCE93eb522",
+      "runtimeCodeHash": "0xea99f0e1e33a9a9e1ae926e8f15fd09bf1b7b9cecf81a2ef294cd4820e26d392"
+    },
+    "NexaOIFModuleV6": {
+      "address": "0x4f81426fE8999E982aE6b771536a4093879F6A20",
+      "runtimeCodeHash": "0x103c954e71ec79abefc0f8e1ef745787649edb91742a4d4a7b0d2a4646925cba"
+    }
+  },
+  "networks": {
+    "base": {
+      "chainId": 8453,
+      "routeCount": "108",
+      "sourceIntakeEnabled": true,
+      "registryBindingVerified": true,
+      "facadeLive": true
+    },
+    "bsc": {
+      "chainId": 56,
+      "routeCount": "126",
+      "sourceIntakeEnabled": true,
+      "registryBindingVerified": true,
+      "facadeLive": true
+    },
+    "hyperevm": {
+      "chainId": 999,
+      "routeCount": "108",
+      "sourceIntakeEnabled": true,
+      "registryBindingVerified": true,
+      "facadeLive": true
+    }
+  },
+  "reproduce": "npm run verify:onchain"
+}

@@ -3,6 +3,7 @@
   "deploymentVersion": 6,
   "deploymentStatus": "ACTIVE",
   "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
+  "feedSigner": "0xCbeC1dDeEA1f4317ce6eF6F33Ad46d1fFD81c163",
   "solverProfile": {
     "executionScopes": [
       "INTRA_CHAIN",
@@ -14,7 +15,32 @@
     "accountlessDiscovery": true
   },
   "discoveryModel": "SIGNED_MACHINE_READABLE_FEED",
+  "executionModel": "EXACTLY_ONE_BOT_SOURCE_TX_PLUS_ONE_NEXA_DESTINATION_TX",
+  "publication": "SIGNED_OFFCHAIN_FEED_ZERO_PERIODIC_GAS",
+  "feedTransport": {
+    "primary": "SSE_CONFIRMED_ACTIVE_SET",
+    "recovery": "HTTP_SIGNED_FEED",
+    "reconnectWithLastEventId": true
+  },
   "authentication": "WALLET_OR_NATIVE_ACCOUNT_PROOF",
+  "permitRequestSigning": {
+    "mode": "LOCAL_DETERMINISTIC_MESSAGE",
+    "domain": "NEXA_MAINNET_V6_EXECUTION_PERMIT_REQUEST_V1",
+    "canonicalizer": "canonicalPermitRequest",
+    "messageBuilder": "permitRequestMessage",
+    "signatureScheme": "EIP191_PERSONAL_SIGN_UTF8",
+    "canonicalJson": "RECURSIVE_SORTED_OBJECT_KEYS_COMPACT_JSON",
+    "messageLines": [
+      "NEXA_MAINNET_V6_EXECUTION_PERMIT_REQUEST_V1",
+      "quoteId={lowercase-bytes32}",
+      "requestedAmountInRaw={base10-uint128}",
+      "standard={uppercase-standard}",
+      "payer={lowercase-evm-address}|payerAccountId={lowercase-bytes32}\\npayerLocator={canonical-json}",
+      "recipient={lowercase-evm-address}|recipientAccountId={lowercase-bytes32}\\nrecipientLocator={canonical-json}",
+      "idempotencyKey={exact-trimmed-key}"
+    ],
+    "requestMessageEndpointRequired": false
+  },
   "endpoints": {
     "manifest": "https://solver.vsnexa.com/.well-known/nexa-solver.json",
     "solverDiscovery": "https://solver.vsnexa.com/api/v6/solver-discovery",

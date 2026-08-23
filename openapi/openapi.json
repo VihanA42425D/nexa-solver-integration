@@ -1,0 +1,454 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Nexa Mainnet V6 Solver API",
+    "version": "6.0.0",
+    "description": "Public discovery, signed Feed, SSE, Route and execution Permit API."
+  },
+  "servers": [
+    {
+      "url": "https://solver.vsnexa.com"
+    }
+  ],
+  "paths": {
+    "/.well-known/nexa-solver.json": {
+      "get": {
+        "operationId": "getWellKnownDiscovery",
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Discovery"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/api/v6/solver-discovery": {
+      "get": {
+        "operationId": "getSolverDiscovery",
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Discovery"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/api/v6/solver-feed": {
+      "get": {
+        "operationId": "getSignedSolverFeed",
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "parameters": [
+          {
+            "name": "sourceChainId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "sourceNetworkId",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Bytes32"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v6/solver-feed/events": {
+      "get": {
+        "operationId": "streamSignedSolverFeed",
+        "responses": {
+          "200": {
+            "description": "SSE events: feed, publication-closed and error.",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/api/v6/routes/{routeId}": {
+      "get": {
+        "operationId": "getRouteDetail",
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JsonObject"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "parameters": [
+          {
+            "name": "routeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Bytes32"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v6/execution-permits/request-message": {
+      "post": {
+        "operationId": "buildPermitRequestMessage",
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JsonObject"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PermitRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v6/execution-permits": {
+      "post": {
+        "operationId": "createExecutionPermit",
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JsonObject"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignedPermitRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ]
+      }
+    },
+    "/api/v6/execution-permits/{fillId}": {
+      "get": {
+        "operationId": "getExecutionPermit",
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JsonObject"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "parameters": [
+          {
+            "name": "fillId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Bytes32"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Bytes32": {
+        "type": "string",
+        "pattern": "^0x[0-9a-fA-F]{64}$"
+      },
+      "Address": {
+        "type": "string",
+        "pattern": "^0x[0-9a-fA-F]{40}$"
+      },
+      "JsonObject": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "Discovery": {
+        "type": "object",
+        "required": [
+          "schema",
+          "deploymentVersion",
+          "deploymentStatus",
+          "releaseId",
+          "feedSigner",
+          "endpoints"
+        ],
+        "properties": {
+          "schema": {
+            "const": "NEXA_MAINNET_V6_SOLVER_DISCOVERY_V2"
+          },
+          "deploymentVersion": {
+            "const": 6
+          },
+          "deploymentStatus": {
+            "const": "ACTIVE"
+          },
+          "releaseId": {
+            "$ref": "#/components/schemas/Bytes32"
+          },
+          "feedSigner": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "endpoints": {
+            "$ref": "#/components/schemas/JsonObject"
+          },
+          "standards": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JsonObject"
+            }
+          }
+        }
+      },
+      "Route": {
+        "type": "object",
+        "required": [
+          "routeId",
+          "quoteId",
+          "sourceNetworkId",
+          "destinationNetworkId"
+        ],
+        "properties": {
+          "routeId": {
+            "$ref": "#/components/schemas/Bytes32"
+          },
+          "quoteId": {
+            "$ref": "#/components/schemas/Bytes32"
+          },
+          "sourceNetworkId": {
+            "$ref": "#/components/schemas/Bytes32"
+          },
+          "destinationNetworkId": {
+            "$ref": "#/components/schemas/Bytes32"
+          }
+        },
+        "additionalProperties": true
+      },
+      "SignedFeed": {
+        "type": "object",
+        "required": [
+          "schema",
+          "feedHash",
+          "feedSigner",
+          "feedSignature",
+          "validUntil",
+          "routes"
+        ],
+        "properties": {
+          "schema": {
+            "const": "NEXA_MAINNET_V6_SIGNED_FEED_V1"
+          },
+          "feedHash": {
+            "$ref": "#/components/schemas/Bytes32"
+          },
+          "feedSigner": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "feedSignature": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]+$"
+          },
+          "validUntil": {
+            "type": "integer"
+          },
+          "routes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Route"
+            }
+          }
+        }
+      },
+      "FeedResponse": {
+        "type": "object",
+        "required": [
+          "ok",
+          "feed"
+        ],
+        "properties": {
+          "ok": {
+            "const": true
+          },
+          "feed": {
+            "$ref": "#/components/schemas/SignedFeed"
+          }
+        }
+      },
+      "PermitRequest": {
+        "type": "object",
+        "required": [
+          "quoteId",
+          "requestedAmountInRaw",
+          "standard",
+          "payer",
+          "recipient",
+          "idempotencyKey"
+        ],
+        "properties": {
+          "quoteId": {
+            "$ref": "#/components/schemas/Bytes32"
+          },
+          "requestedAmountInRaw": {
+            "type": "string",
+            "pattern": "^[0-9]+$"
+          },
+          "standard": {
+            "type": "string",
+            "enum": [
+              "DIRECT",
+              "ERC-7683",
+              "OIF"
+            ]
+          },
+          "payer": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "recipient": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "SignedPermitRequest": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PermitRequest"
+          },
+          {
+            "type": "object",
+            "required": [
+              "requestSignature"
+            ],
+            "properties": {
+              "requestSignature": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]+$"
+              }
+            }
+          }
+        ]
+      },
+      "Error": {
+        "type": "object",
+        "required": [
+          "ok",
+          "error"
+        ],
+        "properties": {
+          "ok": {
+            "const": false
+          },
+          "error": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "responses": {
+      "Error": {
+        "description": "Request rejected or publication gate closed.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      }
+    }
+  }
+}

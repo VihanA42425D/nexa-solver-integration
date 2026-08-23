@@ -86,8 +86,8 @@ The same ten behavioral operations are implemented for:
 
 | Runtime | Package |
 | --- | --- |
-| Node / TypeScript | nexa-v6-sdk on npm |
-| Python | nexa-v6-sdk on PyPI |
+| Node / TypeScript | [nexa-v6-sdk@1.0.0 on npm](https://www.npmjs.com/package/nexa-v6-sdk/v/1.0.0) |
+| Python | [nexa-v6-sdk 1.0.0 on PyPI](https://pypi.org/project/nexa-v6-sdk/1.0.0/) |
 | Rust | nexa-v6-sdk on crates.io |
 | Go | github.com/VihanA42425D/nexa-solver-integration/sdks/go |
 | Java / Kotlin | com.vsnexa:nexa-v6-sdk on Maven Central |

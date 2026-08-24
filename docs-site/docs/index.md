@@ -83,11 +83,3 @@ well-known discovery
 
 Resolver and preview calls use `eth_call`. They do not add transactions. A
 successful fill retains the exact total of two transactions.
-
-## Public scope
-
-This documentation covers only the public solver integration repository:
-discovery documents, HTTP/SSE endpoints, solver-facing ABIs, supported SDKs,
-standards compatibility, passive indexing packages, and public verification
-evidence. It does not document or expose private runtime, database, operations,
-fraud controls, credentials, infrastructure topology, or internal policies.

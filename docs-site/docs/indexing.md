@@ -11,13 +11,6 @@ execution decisions.
 
 --8<-- "generated/indexing.md"
 
-## Infrastructure boundary
-
-Managed external indexers consume their own RPC infrastructure. The packages do
-not use Nexa runtime RPC, Nexa database queries or sessions, runtime workers,
-pollers, or transaction submission. Nothing in the documentation site hosts an
-indexer.
-
 ## The Graph
 
 The Base and BNB Smart Chain subgraphs share one schema and mapping source.

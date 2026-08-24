@@ -8,7 +8,7 @@ All endpoints are served from: `https://solver.vsnexa.com`
 
 ## Static Discovery Documents
 
-These endpoints perform **no RPC, database, or runtime work**. Suitable for crawlers, indexers, and LLM context.
+These stable documents are suitable for crawlers, indexers, and LLM context.
 
 ### 1. Solver Metadata
 ```
@@ -72,7 +72,7 @@ Returns the current **signed** solver Feed containing active routes.
 - `feedSigner` - Signer public key
 - `feedSignature` - Cryptographic signature
 
-⚠️ **Critical**: `signedPayload` is the authoritative object. Top-level `routes` and `openRoutes` are convenience filters; never replace the signature preimage.
+**Important:** `signedPayload` is the authoritative object. Top-level `routes` and `openRoutes` are convenience filters; never replace the signature preimage.
 
 #### Stream Feed Events (Server-Sent Events)
 ```

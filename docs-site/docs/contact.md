@@ -5,16 +5,9 @@ description: Submit a private ticket for public Nexa documentation defects, inte
 
 # Contact documentation support
 
-Use this form to send a private ticket about the public Nexa documentation or
-solver-integration artifacts. The receiving mailbox is deliberately not
-published on this page, which reduces address harvesting and unsolicited mail.
-
-!!! info "Private delivery, no ticket database"
-    The static documentation site sends this form to a narrowly scoped
-    Cloudflare Worker. Cloudflare Turnstile is verified on the server before
-    the Worker delivers one email to the fixed support mailbox. The form does
-    not create an account, write to a database, call a Nexa runtime service, or
-    expose the destination address to the browser.
+Use this form to report a documentation defect, broken public artifact,
+integration question, or security concern. Include enough detail to reproduce
+the problem.
 
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
@@ -81,13 +74,9 @@ published on this page, which reduces address harvesting and unsolicited mail.
 
 ## What happens next
 
-After server-side validation, the form receives a reference such as
+After the ticket is accepted, the page shows a reference such as
 `NXDOC-20260824-1A2B3C4D`. Keep that reference in follow-up replies. A valid
-reply-to address is included in the delivered ticket so support can respond.
-
-Cloudflare processes the request and email-delivery metadata. The documentation
-site and Worker do not persist the ticket in application storage. The receiving
-mailbox applies its normal email retention policy.
+reply-to address lets support respond.
 
 For reproducible public defects that contain no sensitive information, you can
 also use the [GitHub issue tracker](https://github.com/VihanA42425D/nexa-solver-integration/issues).

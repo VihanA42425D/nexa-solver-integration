@@ -1,8 +1,6 @@
 # Nexa V6 passive indexing package
 
-This directory is the Nexa-owned, repository-side package for passive projections
-of public V6 on-chain events. It does not deploy, publish, poll, price, authorize,
-execute, or settle anything.
+This package projects public V6 on-chain events for discovery and analytics.
 
 Authority remains the on-chain Registry/Router plus the Signed Feed and Execution
 Permit. The Graph and Substreams outputs are non-authoritative discovery aids.
@@ -18,10 +16,6 @@ Substreams package, but its Graph Studio state is `UNSUPPORTED` and its indexing
 mode is `STANDALONE_SUBSTREAMS`. Its downstream stores consume the mapped event
 stream, so raw logs are decoded exactly once.
 
-Normal generation performs no RPC, HTTP, database, or environment lookup and
-fails if a required exact deployment block is absent. The Facade block is
-retained as evidence but is not substituted for Registry, Router, or Standard
-Module Registry start blocks.
 
 ## Deterministic commands
 
@@ -67,5 +61,4 @@ Non-secret external deployment evidence is canonical in
 external-deployments.json. Base and BSC are deployed to Graph Studio, and the Base, BSC, and HyperEVM
 Substreams packages are published and live-validated. Exact non-secret IDs, URLs,
 package hashes, validation ranges, and statuses are recorded in
-`external-deployments.json`. External managed indexers consume their own RPC; no
-Graph Node, Firehose, Substreams endpoint, or chain RPC is self-hosted by Nexa.
+`external-deployments.json`.

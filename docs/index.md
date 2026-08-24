@@ -37,7 +37,7 @@ The SDK verifies the signed Feed before returning routes. Wallet signing remains
 
 ## Public indexing
 
-Nexa publishes non-authoritative passive indexing packages for The Graph and Substreams. These indexers use managed external infrastructure and do not consume Nexa production RPC or database resources.
+Nexa publishes non-authoritative passive indexing packages for The Graph and Substreams.
 
 See the repository [indexing package](../indexing/README.md) for manifests, package IDs, deployment evidence, and validation results.
 

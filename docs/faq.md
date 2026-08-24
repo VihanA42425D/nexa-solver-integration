@@ -30,9 +30,9 @@ A valid Nexa **Execution Permit**.
 
 No. They are passive, non-authoritative discovery/indexing projections.
 
-## Does Nexa require an indexer to poll its private infrastructure?
+## How should index results be used?
 
-No. Published passive indexers consume public blockchain data using external managed infrastructure.
+Use them for discovery and analytics, then verify candidates against the signed Feed, Execution Permit, and on-chain state before execution.
 
 ## Does ERC-7683 add an extra execution transaction?
 

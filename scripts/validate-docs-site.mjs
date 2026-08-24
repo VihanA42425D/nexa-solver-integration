@@ -72,6 +72,18 @@ const listFiles = async (directory, files = []) => {
   }
   return files;
 };
+const forbiddenInternalCopy = [
+  /receiving mailbox/i,
+  /ticket database/i,
+  /Cloudflare Worker/i,
+  /destination address to the browser/i,
+  /Nexa runtime (?:RPC|database|worker)/i,
+  /LISTEN\/NOTIFY/i,
+  /private infrastructure/i,
+  /does not self-host/i,
+  /background poll(?:er|ing)/i,
+];
+
 
 const titles = new Set();
 const descriptions = new Set();
@@ -141,6 +153,9 @@ for (const htmlPath of htmlFiles) {
   const html = await readFile(htmlPath, "utf8");
   const currentRoute = relative(SITE, htmlPath).replaceAll("\\", "/");
   assert(!/admin@vsnexa\.com/i.test(html), `Receiving mailbox exposed in ${currentRoute}`);
+  for (const pattern of forbiddenInternalCopy) {
+    assert(!pattern.test(html), `Internal implementation copy exposed in ${currentRoute}: ${pattern}`);
+  }
   const canonical = currentRoute === "index.html"
     ? `${ORIGIN}/`
     : `${ORIGIN}/${currentRoute.replace(/index\.html$/, "")}`;
@@ -201,8 +216,6 @@ assert(/\bid=(?:"nexa-contact-form"|nexa-contact-form)(?:\s|>)/.test(contactHtml
 assert(/\bclass=(?:"cf-turnstile"|cf-turnstile)(?:\s|>)/.test(contactHtml), "Contact page lacks Turnstile");
 assert(/\bdata-action=(?:"docs_contact"|docs_contact)(?:\s|>)/.test(contactHtml), "Contact page has the wrong Turnstile action");
 assert(/\bdata-sitekey=(?:"0x4A[A-Za-z0-9_-]+"|0x4A[A-Za-z0-9_-]+)(?:\s|>)/.test(contactHtml), "Contact page lacks a production Turnstile sitekey");
-assert(contactHtml.includes("receiving mailbox is deliberately not published"), "Contact form lacks its address-privacy disclosure");
-assert(contactHtml.includes("do not persist the ticket"), "Contact form lacks its storage disclosure");
 assert(contactScript.includes('fetch("/api/tickets"'), "Contact script does not use the same-origin ticket endpoint");
 assert(contactScript.includes("cf-turnstile-response"), "Contact script does not submit the Turnstile token");
 assert(!contactScript.includes("mailto:"), "Contact script exposes an email draft path");

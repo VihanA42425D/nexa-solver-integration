@@ -75,8 +75,8 @@ execution object, validity interval, and transaction count before proceeding.
 ## 5. Resolve or preview off-chain
 
 The Router preview and ERC-7683 resolver are view calls made through the
-solver's own RPC provider. They create no Nexa HTTP-side RPC work and no
-transaction. Resolution must yield the expected Router target and `fillDirect`
+solver's own RPC provider. They do not create a transaction. Resolution must
+yield the expected Router target and `fillDirect`
 calldata for the issued permit.
 
 OIF support is description-only. `describeMandate` may describe a mandate, but

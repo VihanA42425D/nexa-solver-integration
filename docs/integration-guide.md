@@ -83,7 +83,7 @@ It provides stable selectors, event metadata, deployment evidence, runtime hashe
 
 ## 6. Indexer integration
 
-For passive indexing, use the published Graph/Substreams artifacts rather than adding a Nexa-side poller.
+For passive indexing, use the published Graph/Substreams artifacts.
 
 - [Indexing package](../indexing/README.md)
 - [External deployment evidence](../indexing/external-deployments.json)
@@ -109,4 +109,3 @@ It describes discovery, Feed, route detail, Permit, and Fill-status endpoints.
 - [ ] Request a Permit before execution.
 - [ ] Preserve the documented transaction path.
 - [ ] Treat Graph/Substreams/analytics as discovery only.
-- [ ] Do not introduce a duplicate polling/indexing pipeline.

@@ -6,8 +6,6 @@ The execution invariant is exact: one Bot source transaction plus one Nexa desti
 
 Authority is layered. The on-chain Registry and Router define deployment identity and executable state. The signed Feed defines live published commercial terms. The Execution Permit authorizes one specific fill. Graph and Substreams outputs, search results, documentation, and cached HTTP responses are passive, non-authoritative projections and must be checked against the canonical layers before execution.
 
-No documentation workflow, crawler, Graph package, or Substreams package uses Nexa runtime RPC, database sessions, background polling, or transaction submission. External managed indexers consume their own RPC infrastructure.
-
 ## Documentation map
 
 - https://docs.vsnexa.com/

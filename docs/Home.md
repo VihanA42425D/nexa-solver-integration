@@ -116,11 +116,7 @@ Discovery only (`DISCOVERY_DESCRIPTION_ONLY`); execution remains unsupported via
 5. ✅ Build and submit execution transaction
 6. ✅ Monitor Fill status via API
 
-## Security & Scope
-
-This package exports only **solver-facing contracts** and **public cryptographic identities**. 
-
-**Excluded**: custody, authorization, clearing, operator infrastructure, pricing, risk management, and business logic.
+## Security reports
 
 [Report security issues responsibly](SECURITY.md)
 

@@ -113,13 +113,14 @@
   margin-top: 0.25rem;
 }
 
-.field-note,
-.contact-status {
+.field-note {
   font-weight: 400;
-  color: var(--md-default-fg-color--light);
+  color: var(--md-default-fg-color);
 }
 
 .contact-status {
+  font-weight: 400;
+  color: var(--md-default-fg-color--light);
   min-height: 1.5rem;
 }
 

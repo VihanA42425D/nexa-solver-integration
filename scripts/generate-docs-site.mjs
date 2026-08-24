@@ -179,12 +179,7 @@ const generateIndexing = async () => {
       inlineCode(network.indexingMode),
     ];
   });
-  const infra = manifest.externalInfrastructure ?? {};
-  const body = [
-    table(["Network", "Chain ID", "Graph", "Substreams", "Mode"], rows),
-    "",
-    `Authority: **non-authoritative**. Hosting: ${inlineCode(infra.hosting)}. RPC consumption: ${inlineCode(infra.rpcConsumption)}. Self-hosted: ${inlineCode(infra.selfHosted)}. Nexa runtime RPC used: ${inlineCode(infra.nexaRpcUsed)}.`,
-  ].join("\n");
+  const body = table(["Network", "Chain ID", "Graph", "Substreams", "Mode"], rows);
   await writeGenerated(
     "indexing.md",
     "Canonical external indexing projection",

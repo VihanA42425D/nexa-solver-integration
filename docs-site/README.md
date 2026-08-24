@@ -1,13 +1,8 @@
 # Nexa documentation site
 
-This directory contains the source for the public, static documentation at
-`https://docs.vsnexa.com/`. The documentation describes only the public solver
-integration surface. Generated tables and the downloadable OpenAPI document are
-derived at build time from canonical repository artifacts.
-
-The site content remains static. The contact page posts only to the isolated
-`docs-ticket-worker/`, which validates Turnstile and sends a fixed-destination
-email without exposing the destination or storing ticket data.
+Source and deployment configuration for `https://docs.vsnexa.com/`. Generated
+tables and the downloadable OpenAPI document are derived at build time from
+canonical repository artifacts.
 
 ## Local build
 
@@ -37,6 +32,3 @@ The custom domain is `docs.vsnexa.com`. A validated direct deployment is:
 npm run docs:build
 npx wrangler pages deploy docs-site/site --project-name nexa-docs --branch main
 ```
-
-When native Git integration is available, use the table above for automatic
-production deployments from `main` and preview deployments from other branches.

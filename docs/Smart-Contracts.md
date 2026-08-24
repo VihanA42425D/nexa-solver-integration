@@ -237,15 +237,6 @@ npm run facade:read    # Read all Facade methods
 npm run verify:onchain # Verify on-chain bindings
 ```
 
----
-
-## Public scope
-
-This reference covers only the solver-facing contracts and evidence published
-in this repository. See [Security Boundary](Home.md#security--scope) for the
-public documentation boundary.
-
----
 
 ## Links
 

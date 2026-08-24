@@ -1,6 +1,5 @@
 # Architecture
 
-This document describes only the public Nexa V6 integration boundary.
 
 ## Solver discovery and execution
 
@@ -55,11 +54,7 @@ flowchart LR
     GP --> D[Discovery / analytics consumers]
     SS --> D
 
-    NX[Nexa runtime] -. no RPC feed .-> GP
-    NX -. no DB feed .-> SS
 ```
-
-The Graph and Substreams index the chains using external managed infrastructure. Nexa does not run an additional production poller, database sink, or indexer for these packages.
 
 ## Networks
 

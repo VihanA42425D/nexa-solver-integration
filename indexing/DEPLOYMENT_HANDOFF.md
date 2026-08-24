@@ -27,10 +27,8 @@ and Substreams Registry deployments are recorded below.
    same WASM and protobuf sources.
 3. Authenticate to the selected external Substreams Registry with
    operator-owned credentials and publish the reviewed packages.
-4. Run bounded external verification from each exact initial block. Use the
-   managed Substreams endpoint and its own RPC infrastructure; do not self-host
-   an endpoint or chain RPC and do not add a permanent sink, SQL database, or
-   Nexa runtime consumer.
+4. Run bounded external verification from each exact initial block against the
+   published managed endpoint.
 5. Only after publication and live validation succeed, record public package IDs
    and Registry URLs in external-deployments.json, then regenerate the descriptor.
 
@@ -46,15 +44,3 @@ Graph live queries passed with no indexing errors. Bounded live Substreams
 validation passed from each canonical initial block. HyperEVM remains intentionally
 Substreams-only. Exact IDs, URLs, package SHA-256 values, ranges, observed events,
 and validation status are canonical in `external-deployments.json`.
-
-## Operational boundary
-
-Use only managed external Graph/Substreams infrastructure and its indexer-owned
-RPC. Do not self-host Graph Node, Firehose, Substreams services, or chain RPC.
-Do not connect either indexer to Nexa production DB, API internals, signing,
-Permit, settlement, pricing, treasury, or worker infrastructure. Do not ingest
-the Signed Feed. Do not create Graph/Substreams billing, API keys, SQL sinks, or
-permanent consumers as part of this repository task.
-
-The execution model remains exactly one Bot source transaction plus one Nexa
-destination transaction (two total). Indexing adds no transaction or gas.

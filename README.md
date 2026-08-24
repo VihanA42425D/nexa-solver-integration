@@ -31,7 +31,7 @@ Authoritative OpenAPI and standards discovery:
 https://solver.vsnexa.com/openapi.json
 https://solver.vsnexa.com/.well-known/nexa-standards.json
 ```
-Crawler entry points are served directly by the public Cloudflare Worker:
+Discovery and crawler entry points:
 
 ```text
 https://solver.vsnexa.com/
@@ -45,7 +45,6 @@ https://solver.vsnexa.com/openapi.json
 https://solver.vsnexa.com/api/v6/solver-discovery
 ```
 
-All nine static documents perform no origin, RPC or database work. The sitemap and indexing headers cover stable discovery only; signed Feed, Route, Permit and SSE data remain dynamic and non-indexed.
 
 
 ```bash
@@ -126,8 +125,7 @@ operational metrics remain separate and non-authoritative.
 SSE event IDs are Feed `dataVersion` values. A missing, invalid or older
 `Last-Event-ID` receives the current confirmed Feed immediately; an ID equal to
 the current `dataVersion` suppresses only that duplicate initial event. The
-stream publishes `feed`, `publication-closed` and `error` events through the
-runtime's existing LISTEN/NOTIFY path, without replay storage or polling.
+stream publishes `feed`, `publication-closed` and `error` events.
 
 ## Frozen SDK contract
 
@@ -171,12 +169,10 @@ The [indexing package](indexing/README.md) supplies one generated canonical
 configuration, one shared Graph schema/mapping for Base (8453) and BSC (56), and
 one shared Substreams Rust/protobuf implementation for Base, BSC, and HyperEVM
 (999). HyperEVM Subgraphs are unsupported by Subgraph Studio and remain
-standalone-Substreams-only. All projections consume public on-chain events only.
-They are non-authoritative, have no Nexa runtime dependency, and do not ingest
-the Signed Feed. Base and BSC are deployed to Graph Studio; all three network
-packages are published to the Substreams Registry and bounded live validation
-passed. Managed external indexers consume their own RPC infrastructure; Nexa does
-not self-host an indexer or provide production RPC budget to this package.
+standalone-Substreams-only. Base and BSC are available through Graph Studio; all
+three network packages are published to the Substreams Registry. Treat every
+index result as a passive discovery aid and verify it against the signed Feed,
+Execution Permit, and on-chain Registry/Router state before execution.
 
     npm run indexing:generate
     npm run indexing:validate
@@ -185,9 +181,7 @@ not self-host an indexer or provide production RPC budget to this package.
 Exact per-contract start blocks come from committed offline
 [deployment evidence](verification/indexing-deployment-evidence.json). External Graph Studio and Substreams Registry IDs, URLs, package hashes, and
 validation evidence are recorded in
-[indexing/external-deployments.json](indexing/external-deployments.json); the
-operator boundary remains documented in the
-[deployment handoff](indexing/DEPLOYMENT_HANDOFF.md).
+[indexing/external-deployments.json](indexing/external-deployments.json).
 
 ## Zero-touch Solver onboarding
 
@@ -246,8 +240,6 @@ npm run worker:check
 npm run verify:onchain
 ```
 
-This public package exposes no deploy command or production secret.
+## Security
 
-## Security boundary
-
-Only solver-facing contracts and public cryptographic identities are included. Custody, authorization, clearing, operator, pricing, risk, capital and business infrastructure are excluded. Report security issues according to [SECURITY.md](SECURITY.md).
+Report security issues according to [SECURITY.md](SECURITY.md).

@@ -42,7 +42,7 @@ jobs:
       - run: npm run indexing:graph:codegen
       - run: npm run indexing:graph:build
       - run: npm run indexing:graph:test
-      - run: git diff --exit-code
+      - run: git -c core.fileMode=false diff --exit-code
 
   substreams:
     runs-on: ubuntu-latest

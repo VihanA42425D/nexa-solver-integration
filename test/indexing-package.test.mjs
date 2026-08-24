@@ -14,7 +14,8 @@ test("canonical Graph/Substreams indexing package passes every repository hard g
     events: 9,
     fixtures: 11,
     generatedArtifacts: 14,
-    runtimeSourcesScanned: 12,
+    graphHandlersExecutedByMatchstick: 9,
+    runtimeSourcesScanned: 13,
     generationSourcesScanned: 2,
   });
 });

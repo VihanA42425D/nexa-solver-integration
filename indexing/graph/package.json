@@ -10,12 +10,15 @@
     "build:bsc": "graph build subgraph.bsc.yaml --output-dir build/bsc",
     "build:hyper-evm": "graph build subgraph.hyper-evm.yaml --output-dir build/hyper-evm",
     "build:all": "npm run build:base && npm run build:bsc && npm run build:hyper-evm",
-    "test": "node --test test/*.test.mjs"
+    "test:fixtures": "node --test test/*.test.mjs",
+    "test:mapping": "graph test --version 0.6.0",
+    "test": "npm run test:fixtures && npm run test:mapping"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "0.98.1",
     "@graphprotocol/graph-ts": "0.38.2",
-    "ethers": "6.15.0"
+    "ethers": "6.15.0",
+    "matchstick-as": "0.6.0"
   },
   "dependencies": {
     "@nexa/solver-integration": "file:../.."

@@ -180,9 +180,32 @@ export async function validateIndexingPackage(root = repositoryRoot) {
     && standardKinds.has("OIF_DISCOVERY_DESCRIPTION_ONLY"),
   "INDEXING_STANDARD_CLASSIFICATION_FIXTURES_INVALID");
 
-  const graphMapping = await read(root, "indexing/graph/src/mapping.ts");
+  const [graphMapping, graphMatchstickTest, graphPackage] = await Promise.all([
+    read(root, "indexing/graph/src/mapping.ts"),
+    read(root, "indexing/graph/tests/mapping-fixtures.test.ts"),
+    readJson(root, "indexing/graph/package.json"),
+  ]);
   assert(!/ethereum\.call|try_[A-Za-z]|routeCount|setInterval|setTimeout|poll/i.test(graphMapping),
     "GRAPH_MAPPING_NOT_EVENT_ONLY");
+  assert(graphPackage.devDependencies["matchstick-as"] === "0.6.0"
+    && graphPackage.scripts["test:mapping"] === "graph test --version 0.6.0"
+    && graphPackage.scripts.test.includes("test:fixtures")
+    && graphPackage.scripts.test.includes("test:mapping"),
+  "GRAPH_MATCHSTICK_COMMAND_NOT_PINNED");
+  assert(graphMatchstickTest.includes('readFile("../fixtures/nexa-v6-events.json")')
+    && graphMatchstickTest.includes('from "../src/mapping"')
+    && !/0x[0-9a-f]{40,64}/i.test(graphMatchstickTest),
+  "GRAPH_MATCHSTICK_NOT_CANONICAL_FIXTURE_DRIVEN");
+  const mappedHandlers = [
+    "handleNetworkRegisteredV6", "handleNetworkStatusChangedV6",
+    "handleAssetRegisteredV6", "handleAssetStatusChangedV6",
+    "handleRouteRegisteredV6", "handleRouteStatusChangedV6",
+    "handleSourceIntakeConfigured", "handleSourceFillV6", "handleStandardModuleConfiguredV6",
+  ];
+  for (const handler of mappedHandlers) {
+    assert(graphMatchstickTest.includes(handler + "(event)"),
+      "GRAPH_MATCHSTICK_HANDLER_MISSING:" + handler);
+  }
 
   const substreamsSource = await read(root, "indexing/substreams/src/lib.rs");
   assert((substreamsSource.match(/\bfn decode_log\b/g) ?? []).length === 1,
@@ -250,6 +273,7 @@ export async function validateIndexingPackage(root = repositoryRoot) {
     events: Object.keys(config.events).length,
     fixtures: fixtures.fixtures.length,
     generatedArtifacts: Object.keys(generated).length,
+    graphHandlersExecutedByMatchstick: mappedHandlers.length,
     runtimeSourcesScanned: runtimeSources.length,
     generationSourcesScanned: generationSources.length,
   };

@@ -36,6 +36,7 @@ From the repository root:
     npm run indexing:substreams:build
     npm run indexing:substreams:package
     npm run indexing:substreams:pack
+    npm run indexing:substreams:package:official
     npm run indexing:check
 
 indexing:substreams:codegen runs Cargo's vendored-protoc build step. Build
@@ -43,6 +44,11 @@ outputs (graph/build, graph/generated, and substreams/target) are intentionally
 untracked. No external deployment identifiers or endpoints are claimed.
 The optional indexing:substreams:pack command requires the official Substreams
 CLI and creates three local, ignored SPKG files; it never publishes them.
+indexing:substreams:package:official is the explicit audit alias for that same
+three-manifest parse/package operation. CI pins Substreams CLI v1.18.5 and
+verifies the official Linux archive checksum before running it. The Graph test
+command pins Matchstick 0.6.0 and executes src/mapping.ts against the canonical
+fixture JSON; the JavaScript ABI-decoding checks remain a separate first stage.
 
 ## Networks
 

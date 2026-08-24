@@ -1,0 +1,85 @@
+name: Validate passive indexing packages
+
+on:
+  push:
+    paths:
+      - ".github/workflows/indexing-validation.yml"
+      - "indexing/**"
+      - "scripts/generate-indexing.mjs"
+      - "scripts/indexing-events.mjs"
+      - "scripts/validate-indexing.mjs"
+      - "scripts/validate-substreams-package.mjs"
+      - "package.json"
+  pull_request:
+    paths:
+      - ".github/workflows/indexing-validation.yml"
+      - "indexing/**"
+      - "scripts/generate-indexing.mjs"
+      - "scripts/indexing-events.mjs"
+      - "scripts/validate-indexing.mjs"
+      - "scripts/validate-substreams-package.mjs"
+      - "package.json"
+
+permissions:
+  contents: read
+
+jobs:
+  graph:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            indexing/graph/package-lock.json
+      - run: npm ci
+      - run: npm ci --prefix indexing/graph
+      - run: npm run indexing:generate
+      - run: npm run indexing:validate
+      - run: npm run indexing:graph:codegen
+      - run: npm run indexing:graph:build
+      - run: npm run indexing:graph:test
+      - run: git diff --exit-code
+
+  substreams:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: indexing/substreams
+      - run: npm run indexing:substreams:fmt
+      - run: npm run indexing:substreams:test
+      - run: npm run indexing:substreams:build
+      - run: npm run indexing:substreams:package
+      - name: Install checksum-verified Substreams CLI v1.18.5
+        shell: bash
+        run: |
+          archive="${RUNNER_TEMP}/substreams_linux_x86_64.tar.gz"
+          tool_dir="${RUNNER_TEMP}/substreams-cli"
+          mkdir -p "${tool_dir}"
+          curl --fail --location --retry 3 \
+            --output "${archive}" \
+            https://github.com/streamingfast/substreams/releases/download/v1.18.5/substreams_linux_x86_64.tar.gz
+          echo "ce2e4ee5f4c68ad06536163c076af60b0a5875acd4faad5df992d0e073f5909a  ${archive}" \
+            | sha256sum --check
+          tar --extract --gzip --file "${archive}" --directory "${tool_dir}"
+          echo "${tool_dir}" >> "${GITHUB_PATH}"
+      - run: substreams --version
+      - run: npm run indexing:substreams:package:official
+      - name: Verify all official packages were created locally
+        shell: bash
+        run: |
+          test -f indexing/substreams/target/nexa-v6-base.spkg
+          test -f indexing/substreams/target/nexa-v6-bsc.spkg
+          test -f indexing/substreams/target/nexa-v6-hyper-evm.spkg
+          test -z "$(git status --short --untracked-files=all)"

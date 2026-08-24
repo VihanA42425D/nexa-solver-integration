@@ -104,7 +104,18 @@ function validateExternalDeployments(external) {
         && substreams.liveValidation.status === "PASS"
         && Number.isSafeInteger(substreams.liveValidation.stopBlock)
         && substreams.liveValidation.stopBlock > expected.initialBlock
-        && Array.isArray(substreams.liveValidation.eventsObserved),
+        && Array.isArray(substreams.liveValidation.eventsObserved)
+        && Number.isSafeInteger(substreams.liveValidation.eventBlocks)
+        && substreams.liveValidation.eventBlocks > 0
+        && Number.isSafeInteger(substreams.liveValidation.eventCount)
+        && substreams.liveValidation.eventCount > 0
+        && substreams.liveValidation.eventsObserved.every((eventName) =>
+          Number.isSafeInteger(substreams.liveValidation.eventTypeCounts?.[eventName])
+          && substreams.liveValidation.eventTypeCounts[eventName] > 0)
+        && Object.keys(substreams.liveValidation.eventTypeCounts).length
+          === substreams.liveValidation.eventsObserved.length
+        && Object.values(substreams.liveValidation.eventTypeCounts)
+          .reduce((total, count) => total + count, 0) === substreams.liveValidation.eventCount,
       "INDEXING_EXTERNAL_SUBSTREAMS_PUBLISHED_EVIDENCE_INVALID:" + expected.graphNetwork);
     } else {
       assert(substreams.packageId === null && substreams.registryUrl === null

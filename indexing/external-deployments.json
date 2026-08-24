@@ -70,7 +70,13 @@
         "eventsObserved": [
           "NetworkRegisteredV6",
           "NetworkStatusChangedV6"
-        ]
+        ],
+        "eventBlocks": 1,
+        "eventCount": 2,
+        "eventTypeCounts": {
+          "NetworkRegisteredV6": 1,
+          "NetworkStatusChangedV6": 1
+        }
       },
       "registryNamespace": "VihanA42425D",
       "registryIdentity": "6eed135e7d5007aef850692150efed903a8e1014",
@@ -99,7 +105,18 @@
           "RouteRegisteredV6",
           "RouteStatusChangedV6",
           "StandardModuleConfiguredV6"
-        ]
+        ],
+        "eventBlocks": 298,
+        "eventCount": 446,
+        "eventTypeCounts": {
+          "NetworkRegisteredV6": 3,
+          "NetworkStatusChangedV6": 6,
+          "AssetRegisteredV6": 19,
+          "AssetStatusChangedV6": 38,
+          "RouteRegisteredV6": 126,
+          "RouteStatusChangedV6": 252,
+          "StandardModuleConfiguredV6": 2
+        }
       },
       "registryNamespace": "VihanA42425D",
       "registryIdentity": "7b6780074a4684f94a2365c7bf7c63852ed7bc00",
@@ -128,7 +145,18 @@
           "RouteRegisteredV6",
           "RouteStatusChangedV6",
           "StandardModuleConfiguredV6"
-        ]
+        ],
+        "eventBlocks": 262,
+        "eventCount": 392,
+        "eventTypeCounts": {
+          "NetworkRegisteredV6": 3,
+          "NetworkStatusChangedV6": 6,
+          "AssetRegisteredV6": 19,
+          "AssetStatusChangedV6": 38,
+          "RouteRegisteredV6": 108,
+          "RouteStatusChangedV6": 216,
+          "StandardModuleConfiguredV6": 2
+        }
       },
       "registryNamespace": "VihanA42425D",
       "registryIdentity": "dec54c43c83030a95814c6c77768b9da95cac97c",

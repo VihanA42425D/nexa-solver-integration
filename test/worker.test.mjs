@@ -2,7 +2,14 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { PUBLIC_ENDPOINTS, PUBLIC_PATHS } from "../src/public-endpoints.mjs";
-import { handleRequest } from "../src/worker.mjs";
+import {
+  EDGE_STABLE_DISCOVERY,
+  LLMS_TEXT,
+  ROBOTS_TEXT,
+  ROOT_HTML,
+  SITEMAP_XML,
+  handleRequest,
+} from "../src/worker.mjs";
 
 const readJson = async (path) => JSON.parse(await readFile(new URL(path, import.meta.url), "utf8"));
 const secretBinding = ["CF_ACCESS_CLIENT", "SECRET"].join("_");
@@ -28,7 +35,7 @@ test("static discovery is the final active signed Feed surface", async () => {
   assert.deepEqual(generated.endpoints, PUBLIC_ENDPOINTS);
 });
 
-test("Worker proxies only the public route allowlist with public CORS", async () => {
+test("Worker serves stable documents at the Edge and proxies only the dynamic allowlist", async () => {
   const upstream = [];
   const fetchImpl = async (request) => {
     upstream.push(request);
@@ -52,10 +59,10 @@ test("Worker proxies only the public route allowlist with public CORS", async ()
     assert.equal(response.headers.get("access-control-allow-origin"), "*");
     assert.equal(response.headers.has("set-cookie"), false);
   }
-  assert.equal(upstream.length, 8);
-  assert.equal(new URL(upstream[0].url).pathname, PUBLIC_PATHS.manifest);
+  assert.equal(upstream.length, 3);
+  assert.equal(new URL(upstream[0].url).pathname, PUBLIC_PATHS.solverFeed);
 
-  for (const path of ["/", "/api/unsupported/solver-feed", "/api/v6/not-allowed", "/manifest.json"]) {
+  for (const path of ["/api/unsupported/solver-feed", "/api/v6/not-allowed", "/manifest.json"]) {
     const response = await handleRequest(
       new Request(new URL(path, "https://solver.vsnexa.com")),
       enabledEnv(),
@@ -148,4 +155,112 @@ test("event proxy preserves SSE streaming semantics", async () => {
   assert.equal(new TextDecoder().decode(firstChunk.value), "event: ready\ndata: {}\n\n");
   streamController.close();
   await reader.cancel();
+});
+
+test("Worker serves all nine canonical crawler documents at the Edge without origin or bindings", async () => {
+  const solverManifest = await readJson("../public/.well-known/nexa-solver.json");
+  const onchainDiscovery = await readJson("../public/.well-known/nexa-onchain-discovery.json");
+  const standardsManifest = await readJson("../public/.well-known/nexa-standards.json");
+  const openApiDocument = await readJson("../openapi/openapi.json");
+  let originCalls = 0;
+  let bindingReads = 0;
+  const env = new Proxy({}, {
+    get() {
+      bindingReads += 1;
+      throw new Error("static crawler discovery must not read bindings");
+    },
+  });
+  const expected = new Map([
+    ["/", ["text/html; charset=utf-8", ROOT_HTML]],
+    ["/robots.txt", ["text/plain; charset=utf-8", ROBOTS_TEXT]],
+    ["/sitemap.xml", ["application/xml; charset=utf-8", SITEMAP_XML]],
+    ["/llms.txt", ["text/plain; charset=utf-8", LLMS_TEXT]],
+    ["/.well-known/nexa-solver.json", ["application/json; charset=utf-8", JSON.stringify(solverManifest)]],
+    ["/.well-known/nexa-onchain-discovery.json", ["application/json; charset=utf-8", JSON.stringify(onchainDiscovery)]],
+    ["/.well-known/nexa-standards.json", ["application/json; charset=utf-8", JSON.stringify(standardsManifest)]],
+    ["/openapi.json", ["application/json; charset=utf-8", JSON.stringify(openApiDocument)]],
+    ["/api/v6/solver-discovery", ["application/json; charset=utf-8", JSON.stringify(solverManifest)]],
+  ]);
+
+  for (const [pathname, [contentType, body]] of expected) {
+    const response = await handleRequest(
+      new Request(`https://solver.vsnexa.com${pathname}`),
+      env,
+      { fetchImpl: async () => { originCalls += 1; throw new Error("unexpected origin call"); } },
+    );
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("content-type"), contentType);
+    assert.equal(response.headers.get("x-robots-tag"), "index, follow");
+    assert.match(response.headers.get("link"), /rel="service-desc"/);
+    assert.equal(await response.text(), body);
+
+    const head = await handleRequest(
+      new Request(`https://solver.vsnexa.com${pathname}`, { method: "HEAD" }),
+      env,
+      { fetchImpl: async () => { originCalls += 1; throw new Error("unexpected origin call"); } },
+    );
+    assert.equal(head.status, 200);
+    assert.equal(await head.text(), "");
+  }
+
+  assert.equal(ROBOTS_TEXT, "User-agent: *\nAllow: /\nSitemap: https://solver.vsnexa.com/sitemap.xml\n");
+  assert.deepEqual(
+    [...SITEMAP_XML.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]),
+    [
+      "https://solver.vsnexa.com/",
+      "https://solver.vsnexa.com/.well-known/nexa-solver.json",
+      "https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json",
+      "https://solver.vsnexa.com/.well-known/nexa-standards.json",
+      "https://solver.vsnexa.com/openapi.json",
+      "https://solver.vsnexa.com/api/v6/solver-discovery",
+    ],
+  );
+  assert.strictEqual(
+    EDGE_STABLE_DISCOVERY["/.well-known/nexa-solver.json"].body,
+    EDGE_STABLE_DISCOVERY["/api/v6/solver-discovery"].body,
+  );
+  assert(Object.isFrozen(EDGE_STABLE_DISCOVERY));
+  assert.match(ROOT_HTML, /rel="canonical" href="https:\/\/solver\.vsnexa\.com\/"/);
+  assert.match(LLMS_TEXT, /Graph and Substreams are non-authoritative passive indexes/);
+  assert.equal(originCalls, 0);
+  assert.equal(bindingReads, 0);
+});
+
+test("Worker adds crawler headers and CDN cache policy to stable discovery only", async () => {
+  const fetchImpl = async () => new Response("{}", {
+    status: 200,
+    headers: { "content-type": "application/json" },
+  });
+  for (const url of [
+    PUBLIC_ENDPOINTS.manifest,
+    PUBLIC_ENDPOINTS.onchainDiscovery,
+    PUBLIC_ENDPOINTS.standards,
+    PUBLIC_ENDPOINTS.openapi,
+    PUBLIC_ENDPOINTS.solverDiscovery,
+  ]) {
+    const response = await handleRequest(new Request(url), enabledEnv(), { fetchImpl });
+    assert.equal(response.headers.get("x-robots-tag"), "index, follow");
+    assert.match(response.headers.get("link"), /nexa-solver\.json/);
+    assert.match(response.headers.get("cloudflare-cdn-cache-control"), /public, max-age=/);
+  }
+
+  for (const url of [
+    PUBLIC_ENDPOINTS.solverFeed,
+    PUBLIC_ENDPOINTS.solverFeedEvents,
+    PUBLIC_ENDPOINTS.routeDetailTemplate.replace("{routeId}", "0x" + "11".repeat(32)),
+    PUBLIC_ENDPOINTS.permitStatusTemplate.replace("{fillId}", "0x" + "22".repeat(32)),
+  ]) {
+    const response = await handleRequest(new Request(url), enabledEnv(), { fetchImpl });
+    assert.equal(response.headers.get("x-robots-tag"), null);
+    assert.equal(response.headers.get("link"), null);
+    assert.equal(response.headers.get("cloudflare-cdn-cache-control"), null);
+  }
+
+  const post = await handleRequest(
+    new Request(PUBLIC_ENDPOINTS.executionPermits, { method: "POST", body: "{}" }),
+    enabledEnv(),
+    { fetchImpl },
+  );
+  assert.equal(post.headers.get("x-robots-tag"), null);
+  assert.equal(post.headers.get("link"), null);
 });

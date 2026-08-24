@@ -29,6 +29,22 @@ Authoritative OpenAPI and standards discovery:
 https://solver.vsnexa.com/openapi.json
 https://solver.vsnexa.com/.well-known/nexa-standards.json
 ```
+Crawler entry points are served directly by the public Cloudflare Worker:
+
+```text
+https://solver.vsnexa.com/
+https://solver.vsnexa.com/robots.txt
+https://solver.vsnexa.com/sitemap.xml
+https://solver.vsnexa.com/llms.txt
+https://solver.vsnexa.com/.well-known/nexa-solver.json
+https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json
+https://solver.vsnexa.com/.well-known/nexa-standards.json
+https://solver.vsnexa.com/openapi.json
+https://solver.vsnexa.com/api/v6/solver-discovery
+```
+
+All nine static documents perform no origin, RPC or database work. The sitemap and indexing headers cover stable discovery only; signed Feed, Route, Permit and SSE data remain dynamic and non-indexed.
+
 
 ```bash
 npm install

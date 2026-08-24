@@ -1,5 +1,78 @@
+import solverManifest from "../public/.well-known/nexa-solver.json" with { type: "json" };
+import onchainDiscovery from "../public/.well-known/nexa-onchain-discovery.json" with { type: "json" };
+import standardsManifest from "../public/.well-known/nexa-standards.json" with { type: "json" };
+import openApiDocument from "../openapi/openapi.json" with { type: "json" };
+
 const SOLVER_HOST = "solver.vsnexa.com";
 const APP_HOST = "vsnexa.com";
+const SOLVER_BASE_URL = `https://${SOLVER_HOST}`;
+
+const SOLVER_MANIFEST_URL = `${SOLVER_BASE_URL}/.well-known/nexa-solver.json`;
+const OPENAPI_URL = `${SOLVER_BASE_URL}/openapi.json`;
+const CRAWLER_LINK_HEADER = [
+  `<${SOLVER_MANIFEST_URL}>; rel="alternate"; type="application/json"; title="Nexa V6 Solver Manifest"`,
+  `<${OPENAPI_URL}>; rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1"`,
+].join(", ");
+
+const EDGE_STATIC_DISCOVERY_PATHS = Object.freeze([
+  "/",
+  "/robots.txt",
+  "/sitemap.xml",
+  "/llms.txt",
+]);
+
+const ORIGIN_STABLE_DISCOVERY_PATHS = Object.freeze([
+  "/.well-known/nexa-solver.json",
+  "/.well-known/nexa-onchain-discovery.json",
+  "/.well-known/nexa-standards.json",
+  "/openapi.json",
+  "/api/v6/solver-discovery",
+]);
+
+const LONG_LIVED_ORIGIN_DISCOVERY_PATHS = Object.freeze([
+  "/.well-known/nexa-onchain-discovery.json",
+  "/.well-known/nexa-standards.json",
+  "/openapi.json",
+]);
+
+const ROOT_HTML = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Nexa V6 Solver Discovery</title><link rel="canonical" href="${SOLVER_BASE_URL}/"><link rel="alternate" type="application/json" href="${SOLVER_MANIFEST_URL}"><link rel="service-desc" type="application/vnd.oai.openapi+json;version=3.1" href="${OPENAPI_URL}"></head><body><main><h1>Nexa V6 Solver Discovery</h1><p>Machine-readable solver integration and discovery surface for Nexa V6.</p><nav aria-label="Nexa V6 machine discovery"><ul><li><a href="${SOLVER_MANIFEST_URL}">Solver discovery manifest</a></li><li><a href="${SOLVER_BASE_URL}/.well-known/nexa-onchain-discovery.json">On-chain discovery</a></li><li><a href="${SOLVER_BASE_URL}/.well-known/nexa-standards.json">Standards</a></li><li><a href="${OPENAPI_URL}">OpenAPI</a></li><li><a href="${SOLVER_BASE_URL}/api/v6/solver-discovery">Solver discovery API</a></li><li><a href="${SOLVER_BASE_URL}/api/v6/solver-feed">Signed Feed</a></li><li><a href="https://github.com/VihanA42425D/nexa-solver-integration">Public integration repository</a></li></ul></nav></main></body></html>\n`;
+
+const ROBOTS_TEXT = `User-agent: *\nAllow: /\nSitemap: ${SOLVER_BASE_URL}/sitemap.xml\n`;
+
+const SITEMAP_XML = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>${SOLVER_BASE_URL}/</loc></url>\n  <url><loc>${SOLVER_BASE_URL}/.well-known/nexa-solver.json</loc></url>\n  <url><loc>${SOLVER_BASE_URL}/.well-known/nexa-onchain-discovery.json</loc></url>\n  <url><loc>${SOLVER_BASE_URL}/.well-known/nexa-standards.json</loc></url>\n  <url><loc>${SOLVER_BASE_URL}/openapi.json</loc></url>\n  <url><loc>${SOLVER_BASE_URL}/api/v6/solver-discovery</loc></url>\n</urlset>\n`;
+
+const LLMS_TEXT = `# Nexa V6\n\nNexa V6 exposes a machine-readable solver integration surface.\n\n- Solver discovery manifest: ${SOLVER_MANIFEST_URL}\n- On-chain discovery: ${SOLVER_BASE_URL}/.well-known/nexa-onchain-discovery.json\n- Standards: ${SOLVER_BASE_URL}/.well-known/nexa-standards.json\n- OpenAPI: ${OPENAPI_URL}\n- Signed Feed: ${SOLVER_BASE_URL}/api/v6/solver-feed\n- Public integration repository: https://github.com/VihanA42425D/nexa-solver-integration\n- Graph Base index: https://api.studio.thegraph.com/query/1748073/nexa-v-6-base/1.0.0\n- Graph BSC index: https://api.studio.thegraph.com/query/1748073/nexa-v-6-bsc/1.0.0\n- Substreams Base: https://substreams.dev/packages/nexa-v6-indexing-base/v1.0.0\n- Substreams BSC: https://substreams.dev/packages/nexa-v6-indexing-bsc/v1.0.0\n- Substreams HyperEVM: https://substreams.dev/packages/nexa-v6-indexing-hyper-evm/v1.0.0\n\nThe Signed Feed is authoritative for live route terms. The Execution Permit is the final execution authority. Graph and Substreams are non-authoritative passive indexes.\n`;
+
+const EDGE_STATIC_DISCOVERY = Object.freeze({
+  "/": Object.freeze({ body: ROOT_HTML, contentType: "text/html; charset=utf-8" }),
+  "/robots.txt": Object.freeze({ body: ROBOTS_TEXT, contentType: "text/plain; charset=utf-8" }),
+  "/sitemap.xml": Object.freeze({ body: SITEMAP_XML, contentType: "application/xml; charset=utf-8" }),
+  "/llms.txt": Object.freeze({ body: LLMS_TEXT, contentType: "text/plain; charset=utf-8" }),
+});
+
+const CANONICAL_V6_SOLVER_DISCOVERY_BODY = JSON.stringify(solverManifest);
+const EDGE_STABLE_DISCOVERY = Object.freeze({
+  "/.well-known/nexa-solver.json": Object.freeze({
+    body: CANONICAL_V6_SOLVER_DISCOVERY_BODY,
+    longLived: false,
+  }),
+  "/.well-known/nexa-onchain-discovery.json": Object.freeze({
+    body: JSON.stringify(onchainDiscovery),
+    longLived: true,
+  }),
+  "/.well-known/nexa-standards.json": Object.freeze({
+    body: JSON.stringify(standardsManifest),
+    longLived: true,
+  }),
+  "/openapi.json": Object.freeze({
+    body: JSON.stringify(openApiDocument),
+    longLived: true,
+  }),
+  "/api/v6/solver-discovery": Object.freeze({
+    body: CANONICAL_V6_SOLVER_DISCOVERY_BODY,
+    longLived: false,
+  }),
+});
 
 const PUBLIC_ROUTES = Object.freeze([
   Object.freeze({ method: "GET", pattern: /^\/\.well-known\/nexa-solver\.json$/ }),
@@ -48,6 +121,66 @@ function json(status, body, options = {}) {
   });
   if (options.solverCors) withSolverCors(headers);
   return new Response(JSON.stringify(body), { status, headers });
+}
+
+function isEdgeStaticDiscoveryRoute(method, pathname) {
+  return ["GET", "HEAD"].includes(method) && EDGE_STATIC_DISCOVERY_PATHS.includes(pathname);
+}
+
+function withCrawlerDiscoveryHeaders(headers) {
+  headers.set("x-robots-tag", "index, follow");
+  headers.set("link", CRAWLER_LINK_HEADER);
+  return headers;
+}
+
+function edgeStaticDiscoveryResponse(request, pathname) {
+  if (!isEdgeStaticDiscoveryRoute(request.method, pathname)) return null;
+  const artifact = EDGE_STATIC_DISCOVERY[pathname];
+  const headers = withCrawlerDiscoveryHeaders(withSolverCors(new Headers({
+    "content-type": artifact.contentType,
+    "cache-control": "public, max-age=3600, stale-while-revalidate=300, stale-if-error=86400",
+    "cloudflare-cdn-cache-control": "public, max-age=86400, stale-while-revalidate=3600, stale-if-error=86400",
+    "x-content-type-options": "nosniff",
+    "referrer-policy": "no-referrer",
+  })));
+  return new Response(request.method === "HEAD" ? null : artifact.body, { status: 200, headers });
+}
+
+function edgeStableDiscoveryResponse(request, pathname) {
+  if (!["GET", "HEAD"].includes(request.method)) return null;
+  const artifact = EDGE_STABLE_DISCOVERY[pathname];
+  if (!artifact) return null;
+  const headers = withCrawlerDiscoveryHeaders(withSolverCors(new Headers({
+    "content-type": "application/json; charset=utf-8",
+    "cache-control": artifact.longLived
+      ? "public, max-age=300, stale-while-revalidate=3600"
+      : "public, max-age=60",
+    "cloudflare-cdn-cache-control": artifact.longLived
+      ? "public, max-age=86400, stale-while-revalidate=3600, stale-if-error=86400"
+      : "public, max-age=60, stale-while-revalidate=60, stale-if-error=300",
+    "x-content-type-options": "nosniff",
+    "referrer-policy": "no-referrer",
+  })));
+  return new Response(request.method === "HEAD" ? null : artifact.body, {
+    status: 200,
+    headers,
+  });
+}
+
+function decorateOriginDiscoveryResponse(response, pathname) {
+  if (response.status !== 200 || !ORIGIN_STABLE_DISCOVERY_PATHS.includes(pathname)) return response;
+  const headers = withCrawlerDiscoveryHeaders(new Headers(response.headers));
+  headers.set(
+    "cloudflare-cdn-cache-control",
+    LONG_LIVED_ORIGIN_DISCOVERY_PATHS.includes(pathname)
+      ? "public, max-age=86400, stale-while-revalidate=3600, stale-if-error=86400"
+      : "public, max-age=60, stale-while-revalidate=60, stale-if-error=300",
+  );
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
 }
 
 function isPublicRoute(method, pathname) {
@@ -362,27 +495,46 @@ async function handleRequest(request, env, options = {}) {
     return json(404, { ok: false, error: "edge_host_not_found" });
   }
 
+  const staticDiscovery = edgeStaticDiscoveryResponse(request, incoming.pathname);
+  if (staticDiscovery) return staticDiscovery;
+  const stableDiscovery = edgeStableDiscoveryResponse(request, incoming.pathname);
+  if (stableDiscovery) return stableDiscovery;
+
   if (request.method === "OPTIONS" && isPublicRoute(request.method, incoming.pathname)) {
     return new Response(null, { status: 204, headers: withSolverCors() });
   }
   if (!isPublicRoute(request.method, incoming.pathname)) {
     return json(404, { ok: false, error: "public_solver_route_not_found" }, { solverCors: true });
   }
-  return proxyOriginRequest(request, env, {
+  const response = await proxyOriginRequest(request, env, {
     ...options,
     solverCors: true,
     solverIdentity: true,
   });
+  return request.method === "GET"
+    ? decorateOriginDiscoveryResponse(response, incoming.pathname)
+    : response;
 }
 
 export {
   APP_HOST,
   APP_ACCESS_HEADERS,
+  EDGE_STATIC_DISCOVERY_PATHS,
+  EDGE_STABLE_DISCOVERY,
+  LLMS_TEXT,
+  ORIGIN_STABLE_DISCOVERY_PATHS,
+  ROBOTS_TEXT,
+  ROOT_HTML,
   SOLVER_HOST,
+  SITEMAP_XML,
   attachTrustedAppAccessIdentity,
   attachTrustedEdgeIdentity,
+  decorateOriginDiscoveryResponse,
+  edgeStaticDiscoveryResponse,
+  edgeStableDiscoveryResponse,
   handleRequest,
   hmacHex,
+  isEdgeStaticDiscoveryRoute,
   isPublicRoute,
   originUrl,
   verifiedAccessEmailFromAssertion,

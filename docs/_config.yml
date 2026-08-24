@@ -1,0 +1,11 @@
+theme: jekyll-theme-minimal
+title: Nexa V6 Solver Integration
+description: Public cross-chain solver discovery, SDK, ERC-7683, OpenAPI, Graph and Substreams documentation for Nexa V6.
+url: "https://VihanA42425D.github.io"
+baseurl: "/nexa-solver-integration"
+repository: "VihanA42425D/nexa-solver-integration"
+show_downloads: false
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge

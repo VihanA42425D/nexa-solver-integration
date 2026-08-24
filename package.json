@@ -106,6 +106,12 @@
     "worker:check": "wrangler deploy --dry-run --outdir .wrangler/dry-run",
     "verify:onchain": "node scripts/verify-onchain.mjs",
     "validate": "node scripts/validate.mjs",
+    "docs:install": "python -m pip install -r docs-site/requirements.txt",
+    "docs:generate": "node scripts/generate-docs-site.mjs",
+    "docs:build": "npm run docs:generate && python -m mkdocs build --strict --config-file docs-site/mkdocs.yml",
+    "docs:serve": "npm run docs:generate && python -m mkdocs serve --config-file docs-site/mkdocs.yml",
+    "docs:validate": "npm run docs:build && node scripts/validate-docs-site.mjs",
+    "docs:validate:external": "npm run docs:build && node scripts/validate-docs-external-links.mjs",
     "test": "node --test test/*.test.mjs",
     "release:check": "npm run validate && npm test && npm run indexing:check && npm run sdk:conformance && npm run package:verify && npm run worker:check && npm run onboard:verify && npm run verify:onchain"
   },

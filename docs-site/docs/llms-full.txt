@@ -1,0 +1,32 @@
+# Nexa Mainnet V6 - solver integration context
+
+Nexa Mainnet V6 publishes a public, accountless discovery surface for solvers on Base (8453), BNB Smart Chain (56), and HyperEVM (999). Begin at `https://solver.vsnexa.com/.well-known/nexa-solver.json`, validate the deployment and release identity, consume and cryptographically verify the signed Feed, select a route, locally create and sign the canonical permit-request message, obtain an Execution Permit, preview execution, and submit the single source-chain Router transaction.
+
+The execution invariant is exact: one Bot source transaction plus one Nexa destination transaction, for a total of two. ERC-7683 is exposed as an executable resolver. Resolver calls are off-chain `eth_call` operations and add no transaction. OIF is discovery-and-description only and is not executable. Do not infer OIF execution support from discoverability.
+
+Authority is layered. The on-chain Registry and Router define deployment identity and executable state. The signed Feed defines live published commercial terms. The Execution Permit authorizes one specific fill. Graph and Substreams outputs, search results, documentation, and cached HTTP responses are passive, non-authoritative projections and must be checked against the canonical layers before execution.
+
+No documentation workflow, crawler, Graph package, or Substreams package uses Nexa runtime RPC, database sessions, background polling, or transaction submission. External managed indexers consume their own RPC infrastructure.
+
+## Documentation map
+
+- https://docs.vsnexa.com/
+- https://docs.vsnexa.com/quick-start/
+- https://docs.vsnexa.com/solver-integration/
+- https://docs.vsnexa.com/api/
+- https://docs.vsnexa.com/networks-contracts/
+- https://docs.vsnexa.com/sdks/
+- https://docs.vsnexa.com/standards/
+- https://docs.vsnexa.com/indexing/
+- https://docs.vsnexa.com/verification-security/
+- https://docs.vsnexa.com/resources/
+
+## Canonical artifacts
+
+- https://solver.vsnexa.com/.well-known/nexa-solver.json
+- https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json
+- https://solver.vsnexa.com/.well-known/nexa-standards.json
+- https://solver.vsnexa.com/openapi.json
+- https://github.com/VihanA42425D/nexa-solver-integration
+
+For field-level API and deployment details, use the linked canonical artifacts or the generated reference tables in this documentation. Mutable addresses, hashes, chain mappings, paths, and operations are generated from repository JSON at build time rather than independently maintained here.

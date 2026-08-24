@@ -1,0 +1,88 @@
+site_name: Nexa Mainnet V6 Documentation
+site_description: Public solver integration, discovery, execution, indexing, and verification documentation for Nexa Mainnet V6.
+site_url: https://docs.vsnexa.com/
+repo_name: VihanA42425D/nexa-solver-integration
+repo_url: https://github.com/VihanA42425D/nexa-solver-integration
+edit_uri: edit/main/docs-site/docs/
+copyright: Copyright &copy; Nexa contributors
+
+exclude_docs: |
+  generated/
+
+theme:
+  name: material
+  custom_dir: overrides
+  language: en
+  font: false
+  icon:
+    logo: material/transit-connection-variant
+    repo: fontawesome/brands/github
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.path
+    - navigation.top
+    - toc.follow
+    - content.code.copy
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: black
+      accent: blue
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: light-blue
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+nav:
+  - Overview: index.md
+  - Quick start: quick-start.md
+  - Solver integration: solver-integration.md
+  - API: api.md
+  - Networks & contracts: networks-contracts.md
+  - SDKs: sdks.md
+  - Standards: standards.md
+  - Indexing: indexing.md
+  - Verification & security: verification-security.md
+  - Resources: resources.md
+
+plugins:
+  - search:
+      lang: en
+  - minify:
+      minify_html: true
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.snippets:
+      base_path:
+        - docs-site/docs
+  - pymdownx.superfences
+
+extra_css:
+  - assets/stylesheets/extra.css
+
+extra:
+  generator: false
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/VihanA42425D/nexa-solver-integration
+      name: Nexa solver integration on GitHub

@@ -7,6 +7,8 @@
 
 > **ACTIVE - Mainnet V6.** Public Nexa Solver discovery and execution integration for Base, BNB Smart Chain and HyperEVM.
 
+**Documentation:** [docs.vsnexa.com](https://docs.vsnexa.com/)
+
 This is the machine-readable integration surface for Nexa solvers, indexers and intent frameworks. It publishes the verified onchain Discovery Facade, Registry and Router bindings, signed Feed protocol, ERC-7683 resolver, OIF discovery module, ABI, OpenAPI, events, network IDs and reproducible verification evidence.
 
 ## Start here

@@ -1,0 +1,28 @@
+# Nexa Mainnet V6 documentation
+
+> Public, solver-facing documentation for Nexa Mainnet V6 discovery, signed Feed consumption, execution permits, the exact 1+1 execution model, standards compatibility, passive indexing, and verification.
+
+## Start here
+
+- [Documentation overview](https://docs.vsnexa.com/): Scope, authority, and integration map
+- [Quick start](https://docs.vsnexa.com/quick-start/): Minimal safe solver workflow
+- [Solver integration](https://docs.vsnexa.com/solver-integration/): Discovery-to-settlement lifecycle
+- [API](https://docs.vsnexa.com/api/): HTTP and SSE surface
+
+## Reference
+
+- [Networks and contracts](https://docs.vsnexa.com/networks-contracts/): Canonically generated deployment identifiers
+- [SDKs](https://docs.vsnexa.com/sdks/): Language bindings and frozen operation contract
+- [Standards](https://docs.vsnexa.com/standards/): ERC-7683 and OIF compatibility
+- [Indexing](https://docs.vsnexa.com/indexing/): Passive Graph and Substreams packages
+- [Verification and security](https://docs.vsnexa.com/verification-security/): Trust boundaries and checks
+- [Resources](https://docs.vsnexa.com/resources/): Machine-readable artifacts and source links
+
+## Canonical machine endpoints
+
+- [Solver discovery](https://solver.vsnexa.com/.well-known/nexa-solver.json)
+- [Passive on-chain fingerprint](https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json)
+- [Standards manifest](https://solver.vsnexa.com/.well-known/nexa-standards.json)
+- [OpenAPI](https://solver.vsnexa.com/openapi.json)
+
+The Registry and Router are authoritative for on-chain identity and state. The signed Feed is authoritative for currently published terms. An issued Execution Permit is authoritative for a specific fill. External indexes and this documentation are non-authoritative projections.

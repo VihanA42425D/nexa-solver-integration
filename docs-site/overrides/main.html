@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block extrahead %}
+  {{ super() }}
+  {% set seo_title = page.meta.title if page and page.meta and page.meta.title else config.site_name %}
+  {% set seo_description = page.meta.description if page and page.meta and page.meta.description else config.site_description %}
+  {% set seo_url = page.canonical_url if page and page.canonical_url else config.site_url %}
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="{{ config.site_name }}">
+  <meta property="og:title" content="{{ seo_title }}">
+  <meta property="og:description" content="{{ seo_description }}">
+  <meta property="og:url" content="{{ seo_url }}">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="{{ seo_title }}">
+  <meta name="twitter:description" content="{{ seo_description }}">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://docs.vsnexa.com/#website",
+        "url": "https://docs.vsnexa.com/",
+        "name": {{ config.site_name | tojson }},
+        "description": {{ config.site_description | tojson }}
+      },
+      {
+        "@type": "SoftwareSourceCode",
+        "@id": "https://docs.vsnexa.com/#source",
+        "name": "Nexa Mainnet V6 solver integration",
+        "codeRepository": "https://github.com/VihanA42425D/nexa-solver-integration",
+        "programmingLanguage": ["JavaScript", "TypeScript", "Python", "Rust", "Go", "Java", "C#"],
+        "license": "https://spdx.org/licenses/ISC.html"
+      }{% if page and page.url %},
+      {
+        "@type": "TechArticle",
+        "@id": {{ (page.canonical_url ~ "#article") | tojson }},
+        "url": {{ page.canonical_url | tojson }},
+        "headline": {{ seo_title | tojson }},
+        "description": {{ seo_description | tojson }},
+        "isPartOf": { "@id": "https://docs.vsnexa.com/#website" },
+        "about": { "@id": "https://docs.vsnexa.com/#source" }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Documentation",
+            "item": "https://docs.vsnexa.com/"
+          }{% if page.url %},
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": {{ seo_title | tojson }},
+            "item": {{ page.canonical_url | tojson }}
+          }{% endif %}
+        ]
+      }{% endif %}
+    ]
+  }
+  </script>
+{% endblock %}

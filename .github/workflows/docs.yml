@@ -1,0 +1,53 @@
+name: Documentation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs-site/**"
+      - "scripts/generate-docs-site.mjs"
+      - "scripts/validate-docs-site.mjs"
+      - "scripts/repo-secret-audit.mjs"
+      - "openapi/openapi.json"
+      - "nexa-mainnet-v6.json"
+      - "networks/network-ids.json"
+      - "standards/nexa-standards.json"
+      - "sdk-spec/nexa-v6-sdk-contract.json"
+      - "indexing/indexing-manifest.json"
+      - "package.json"
+      - ".github/workflows/docs.yml"
+  pull_request:
+    paths:
+      - "docs-site/**"
+      - "scripts/generate-docs-site.mjs"
+      - "scripts/validate-docs-site.mjs"
+      - "scripts/repo-secret-audit.mjs"
+      - "openapi/openapi.json"
+      - "nexa-mainnet-v6.json"
+      - "networks/network-ids.json"
+      - "standards/nexa-standards.json"
+      - "sdk-spec/nexa-v6-sdk-contract.json"
+      - "indexing/indexing-manifest.json"
+      - "package.json"
+      - ".github/workflows/docs.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: docs-site/requirements.txt
+      - run: npm ci
+      - run: python -m pip install -r docs-site/requirements.txt
+      - run: npm run docs:validate

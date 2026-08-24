@@ -27,3 +27,8 @@ indexing/graph/build/
 indexing/graph/generated/
 indexing/substreams/target/
 indexing/substreams/*.spkg
+
+# Generated documentation outputs
+docs-site/site/
+docs-site/docs/generated/
+docs-site/docs/assets/openapi.json

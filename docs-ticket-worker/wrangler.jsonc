@@ -1,0 +1,38 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "nexa-docs-ticket-mailer",
+  "main": "./src/worker.mjs",
+  "compatibility_date": "2026-08-24",
+  "workers_dev": false,
+  "routes": [
+    {
+      "pattern": "docs.vsnexa.com/api/tickets",
+      "zone_name": "vsnexa.com"
+    }
+  ],
+  "send_email": [
+    {
+      "name": "TICKET_EMAIL",
+      "allowed_sender_addresses": [
+        "docs-tickets@tickets.vsnexa.com"
+      ]
+    }
+  ],
+  "ratelimits": [
+    {
+      "name": "TICKET_RATE_LIMITER",
+      "namespace_id": "68062401",
+      "simple": {
+        "limit": 5,
+        "period": 60
+      }
+    }
+  ],
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  }
+}

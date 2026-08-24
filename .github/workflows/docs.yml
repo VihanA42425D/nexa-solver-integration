@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "docs-site/**"
+      - "docs-ticket-worker/**"
       - "scripts/generate-docs-site.mjs"
       - "scripts/validate-docs-site.mjs"
       - "scripts/repo-secret-audit.mjs"
@@ -15,10 +16,12 @@ on:
       - "sdk-spec/nexa-v6-sdk-contract.json"
       - "indexing/indexing-manifest.json"
       - "package.json"
+      - "test/docs-ticket-worker.test.mjs"
       - ".github/workflows/docs.yml"
   pull_request:
     paths:
       - "docs-site/**"
+      - "docs-ticket-worker/**"
       - "scripts/generate-docs-site.mjs"
       - "scripts/validate-docs-site.mjs"
       - "scripts/repo-secret-audit.mjs"
@@ -29,6 +32,7 @@ on:
       - "sdk-spec/nexa-v6-sdk-contract.json"
       - "indexing/indexing-manifest.json"
       - "package.json"
+      - "test/docs-ticket-worker.test.mjs"
       - ".github/workflows/docs.yml"
 
 permissions:
@@ -51,3 +55,5 @@ jobs:
       - run: npm ci
       - run: python -m pip install -r docs-site/requirements.txt
       - run: npm run docs:validate
+      - run: npm run docs:ticket:check
+      - run: node --test test/docs-ticket-worker.test.mjs

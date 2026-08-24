@@ -112,6 +112,7 @@
     "docs:serve": "npm run docs:generate && python -m mkdocs serve --config-file docs-site/mkdocs.yml",
     "docs:validate": "npm run docs:build && node scripts/validate-docs-site.mjs",
     "docs:validate:external": "npm run docs:build && node scripts/validate-docs-external-links.mjs",
+    "docs:ticket:check": "wrangler deploy --dry-run --config docs-ticket-worker/wrangler.jsonc --outdir .wrangler/docs-ticket-dry-run",
     "test": "node --test test/*.test.mjs",
     "release:check": "npm run validate && npm test && npm run indexing:check && npm run sdk:conformance && npm run package:verify && npm run worker:check && npm run onboard:verify && npm run verify:onchain"
   },

@@ -17,6 +17,7 @@
 - [Indexing](https://docs.vsnexa.com/indexing/): Passive Graph and Substreams packages
 - [Verification and security](https://docs.vsnexa.com/verification-security/): Trust boundaries and checks
 - [Resources](https://docs.vsnexa.com/resources/): Machine-readable artifacts and source links
+- [Contact](https://docs.vsnexa.com/contact/): Prepare a private documentation-support email ticket
 
 ## Canonical machine endpoints
 

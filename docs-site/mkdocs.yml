@@ -51,6 +51,7 @@ nav:
   - Indexing: indexing.md
   - Verification & security: verification-security.md
   - Resources: resources.md
+  - Contact: contact.md
 
 plugins:
   - search:
@@ -79,6 +80,9 @@ markdown_extensions:
 
 extra_css:
   - assets/stylesheets/extra.css
+
+extra_javascript:
+  - assets/javascripts/contact.js
 
 extra:
   generator: false

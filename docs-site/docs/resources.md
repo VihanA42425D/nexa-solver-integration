@@ -73,3 +73,5 @@ or report a reproducible defect through
 
 For security-sensitive reports, follow the repository
 [security policy](https://github.com/VihanA42425D/nexa-solver-integration/security/policy).
+You can also [send a private documentation ticket](contact.md). The receiving
+mailbox is not published in the page or sent to the browser.

@@ -1,16 +1,20 @@
 # Smart Contracts Reference
 
-Comprehensive reference for all Nexa V6 smart contracts deployed on Base, BNB Smart Chain, and HyperEVM.
+Public solver-facing reference for the Nexa Mainnet V6 contracts published in
+the canonical integration bundle. It is not a reference for unpublished or
+non-solver-facing contracts.
 
 ## Contract Deployment Summary
 
-| Network | Chain ID | Facade Deploy Block | Router Start Block |
+| Network | Chain ID | Facade Deployment Block | Router Indexing Start Block |
 | --- | ---: | ---: | ---: |
-| Base | 8453 | N/A | 50143190 |
-| BNB Smart Chain | 56 | N/A | 116699987 |
-| HyperEVM | 999 | N/A | 43533563 |
+| Base | 8453 | 50320644 | 50143190 |
+| BNB Smart Chain | 56 | 117488361 | 116699987 |
+| HyperEVM | 999 | 43894134 | 43533563 |
 
-**Key Property**: All five core contracts use the **same deterministic address** and **identical runtime bytecode** across all three networks, enabling seamless cross-chain operations.
+Each published contract has its own address. For a given contract, the
+canonical bundle reports the same address and expected runtime code hash on all
+three supported networks. Verify each deployment independently before use.
 
 ---
 
@@ -24,8 +28,10 @@ Comprehensive reference for all Nexa V6 smart contracts deployed on Base, BNB Sm
 
 **Key Methods**:
 - `discoveryURI()` - Returns canonical discovery endpoint
-- `interfaceVersion()` - Returns canonical interface version
+- `RELEASE_ID()` - Returns the published release identifier
+- `DEPLOYMENT_VERSION()` - Returns deployment version 6
 - `chainId()` - Returns current chain identifier
+- `systemState()` - Returns the current public Registry, Router, route count, and live state
 
 **Verification**:
 - [BaseScan](https://basescan.org/address/0x7942d9FcC6cCe078de6a226aDEAbf96C89a46CB6#code)
@@ -41,12 +47,13 @@ Comprehensive reference for all Nexa V6 smart contracts deployed on Base, BNB Sm
 
 **Address (all networks)**: `0x3db7752f052ACFECB3DA99BeE7c6a34D22367141`
 
-**Purpose**: On-chain registry of available routes, solvers, and integration metadata.
+**Purpose**: On-chain registry of public networks, assets, routes, execution generations, and route state.
 
 **Key Methods**:
-- `getRoutes()` - Returns all available routes
 - `getRoute(routeId)` - Returns specific route details
-- `getRouteCount()` - Returns total active routes
+- `routeCount()` - Returns the number of registered route identifiers
+- `routeAt(index)` - Returns a route identifier by registry index
+- `isRouteExecutable(routeId)` - Returns the route's current executable state
 
 **Start Block**: 
 - Base: 50143186
@@ -59,12 +66,12 @@ Comprehensive reference for all Nexa V6 smart contracts deployed on Base, BNB Sm
 
 **Address (all networks)**: `0x9eA675a496b6a2D13B3091F6e6eB3f87183C3938`
 
-**Purpose**: Primary execution router. Handles settlement and execution transaction routing.
+**Purpose**: Public source-chain execution Router for issued Nexa permits.
 
 **Key Methods**:
-- `sourceIntakeEnabled()` - Returns `true` (always accepting source execution)
-- `fillDirect(bytes permit, bytes order)` - Execute order via direct Router path
-- `getFillStatus(bytes32 fillId)` - Query execution status
+- `sourceIntakeEnabled()` - Returns the current source-intake state
+- `previewFillDirect(permit, signature)` - Validates a permit through a view call
+- `fillDirect(permit, signature)` - Executes the issued permit on the source chain
 
 **Start Block**:
 - Base: 50143190
@@ -79,7 +86,8 @@ Comprehensive reference for all Nexa V6 smart contracts deployed on Base, BNB Sm
 
 **Address (all networks)**: `0x534A0f500A7270b9b19d2AFa18DE24DCE93eb522`
 
-**Purpose**: Converts ERC-7683 intent format to Router execution calls.
+**Purpose**: Provides the canonical `EXECUTABLE_RESOLVER` compatibility surface
+for resolving an issued Nexa permit payload to a Router execution call.
 
 **Key Methods**:
 - `resolve(bytes intentData)` - Returns single `Call` targeting Router `fillDirect`
@@ -115,27 +123,27 @@ Comprehensive reference for all Nexa V6 smart contracts deployed on Base, BNB Sm
    - Retrieve signed Feed from returned endpoint
 
 2. **Route Lookup**
-   - Query Registry for current routes
-   - Receive list of available opportunities
+   - Enumerate public route identifiers and route state from the Registry
+   - Use the cryptographically verified signed Feed for live published terms
 
 3. **Permit Signing** (off-chain)
    - Request signing message from API
    - User/bot signs with wallet private key
 
 4. **Execution**
-   - Submit signed Permit to Router `fillDirect(bytes permit, bytes order)`
-   - Router executes settlement transaction
+   - Submit the issued permit and signature to the source Router `fillDirect`
+   - Nexa submits one destination payout transaction after the source fill is observed and confirmed
 
 5. **Verification**
-   - Query `getFillStatus(fillId)` for confirmation
-   - Verify on-chain transaction
+   - Query the public permit-status HTTP endpoint using the issued `fillId`
+   - Verify the source and destination transaction receipts on-chain
 
 ### ERC-7683 Resolution
 
-1. Intent creator publishes order in ERC-7683 format
-2. Resolver (address above) converts to Router call
-3. Router `fillDirect` settles the cross-chain operation
-4. No additional protocol work required
+1. Encode the issued Nexa permit and signature using the canonical payload format
+2. Call the ERC-7683 module off-chain using `eth_call`
+3. Verify that the resolved `Call` targets the canonical Router `fillDirect`
+4. Submit the single source transaction described by the issued permit
 
 ---
 
@@ -143,10 +151,11 @@ Comprehensive reference for all Nexa V6 smart contracts deployed on Base, BNB Sm
 
 ### Key Events
 
-**SourceFillV6** (Facade)
-- Emitted on successful route execution
-- Indexed by block, transaction, route ID
-- Signature: `event SourceFillV6(bytes32 indexed orderId, address indexed solver, ...)`
+**SourceFillV6** (`NexaMainnetRouterV6`)
+- Emitted when the Router accepts the source fill
+- Indexed fields: `fillId`, `routeId`, and `quoteId`
+- Signature: `SourceFillV6(bytes32,bytes32,bytes32,address,address,address,address,uint256,uint128,uint128,uint32,uint64,bytes32,bytes32)`
+- Topic 0: `0x77d880254b141dedc64867f6d2d253eedfc609837b892c4ddfe154a43ea80561`
 
 Registered in Sourcify Signature Database (direct import, no verified association claim).
 
@@ -169,11 +178,13 @@ For complete event list, see [events/events.json](../events/events.json)
 ### Compiler
 
 - **Solidity Version**: `0.8.26+commit.8a97fa7a.Emscripten.clang`
-- **Verification**: All contracts verified on Sourcify v2
+- **Facade verification**: `NexaSolverDiscoveryV6` has exact-match Sourcify
+  evidence on Base, BNB Smart Chain, and HyperEVM. Consult the canonical
+  verification artifacts for the precise evidence published for each contract.
 
 ### Constructor Arguments
 
-Exact constructor parameters, transaction hashes, and deployment blocks are pinned in:
+The Facade constructor parameters, transaction hashes, and deployment blocks are pinned in:
 - [verification/facade-deployment.json](../verification/facade-deployment.json)
 
 ---
@@ -182,14 +193,14 @@ Exact constructor parameters, transaction hashes, and deployment blocks are pinn
 
 Complete ABI specifications for all contracts:
 
-📄 [abi/solver-facing.json](../abi/solver-facing.json)
+[abi/solver-facing.json](../abi/solver-facing.json)
 
 Contains:
 - Facade ABI
 - Registry ABI
 - Router ABI
-- Module Registry ABI
 - ERC-7683 Resolver ABI
+- OIF discovery module ABI
 
 ---
 
@@ -197,7 +208,9 @@ Contains:
 
 ### ERC-165
 
-All contracts implement ERC-165 interface detection:
+The published ERC-7683 and OIF standards modules expose ERC-165 interface
+detection. The public Facade, Registry, and Router ABIs do not publish
+`supportsInterface(bytes4)`.
 
 ```solidity
 function supportsInterface(bytes4 interfaceId) external view returns (bool)
@@ -205,7 +218,9 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 
 ### ERC-7683
 
-Resolver fully compliant with ERC-7683 cross-chain intent settlement standard.
+The canonical compatibility level is `EXECUTABLE_RESOLVER`: the module resolves
+an issued Nexa permit payload off-chain to one Router `Call`. This documentation
+does not claim broader or full ERC-7683 compliance.
 
 ### OIF Integration
 
@@ -215,7 +230,7 @@ Implements Open Intent Framework discovery adapter with execution denial pattern
 
 ## Reading Contracts (No Signing Required)
 
-All verification and discovery reads are **view-only** operations—no transactions, signatures, or gas fees required:
+Verification and discovery reads are **view-only** operations&mdash;they require no transactions, signatures, or gas fees:
 
 ```bash
 npm run facade:read    # Read all Facade methods
@@ -224,17 +239,11 @@ npm run verify:onchain # Verify on-chain bindings
 
 ---
 
-## Custody & Authorization
+## Public scope
 
-This reference covers **solver-facing contracts only**. 
-
-**Not included**:
-- Custody and capital management
-- Authorization and access control infrastructure
-- Clearing and settlement logic beyond Router
-- Operator and business infrastructure
-
-See [Security Boundary](Home.md#security--scope) for scope details.
+This reference covers only the solver-facing contracts and evidence published
+in this repository. See [Security Boundary](Home.md#security--scope) for the
+public documentation boundary.
 
 ---
 

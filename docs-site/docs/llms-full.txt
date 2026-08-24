@@ -20,6 +20,7 @@ No documentation workflow, crawler, Graph package, or Substreams package uses Ne
 - https://docs.vsnexa.com/indexing/
 - https://docs.vsnexa.com/verification-security/
 - https://docs.vsnexa.com/resources/
+- https://docs.vsnexa.com/contact/
 
 ## Canonical artifacts
 

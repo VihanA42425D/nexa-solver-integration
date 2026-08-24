@@ -73,11 +73,16 @@ resolution, and OIF description add zero transactions.
 
 ## Documentation-site security
 
-The site is a static Cloudflare Pages build. It has no application server,
-runtime API proxy, RPC binding, database, authentication state, form handler,
-background worker, or external JavaScript dependency. Security headers deny
-framing and privileged browser capabilities, restrict resources with CSP,
-enforce MIME checks, and retain HTTPS through HSTS.
+The site content is a static Cloudflare Pages build. It has no runtime API
+proxy, RPC binding, database, authentication state, or background job. The
+contact page is the one narrow exception: a same-origin Cloudflare Worker
+validates Turnstile server-side and sends one email to a fixed, secret
+destination. It stores no ticket data, exposes no destination address to the
+browser, accepts no attachments, and cannot invoke Nexa runtime services.
+
+Security headers deny framing and privileged browser capabilities, restrict
+resources with CSP, enforce MIME checks, and retain HTTPS through HSTS. The CSP
+allows Cloudflare's Turnstile origin only for the contact page dependency.
 
 The site does not change `solver.vsnexa.com` routing or its runtime behavior.
 
@@ -114,3 +119,5 @@ checks, OpenAPI byte comparison, and repository secret scanning.
 Report public integration issues through the repository's
 [security policy](https://github.com/VihanA42425D/nexa-solver-integration/security/policy)
 or [issue tracker](https://github.com/VihanA42425D/nexa-solver-integration/issues).
+Use the [documentation contact form](contact.md) to send a private email ticket
+without publishing the receiving mailbox.

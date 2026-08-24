@@ -63,6 +63,7 @@ Chain, and HyperEVM.
 - [Verification and security](verification-security.md)
 - [Passive indexing](indexing.md)
 - [Canonical GitHub repository](https://github.com/VihanA42425D/nexa-solver-integration)
+- [Contact documentation support](contact.md)
 
 **Discovery** &rarr; **Signed Feed** &rarr; **Route** &rarr; **Permit** &rarr; **Resolution** &rarr; **Execution**
 

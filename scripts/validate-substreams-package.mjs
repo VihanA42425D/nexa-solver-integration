@@ -9,6 +9,9 @@ const wasmPath = resolve(
   "indexing/substreams/target/wasm32-unknown-unknown/release/nexa_v6_substreams.wasm",
 );
 const manifests = ["base", "bsc", "hyper-evm"];
+const descriptor = JSON.parse(await readFile(
+  resolve(root, "indexing/indexing-manifest.json"), "utf8",
+));
 const requiredModules = [
   "map_nexa_v6_events", "store_networks", "store_assets", "store_routes",
   "store_router_state", "store_standard_modules",
@@ -43,7 +46,7 @@ for (const network of manifests) {
 
 console.log(JSON.stringify({
   status: "PACKAGE_VALID",
-  externalDeploymentStatus: "UNPUBLISHED",
+  externalDeploymentStatus: descriptor.externalDeploymentStatus,
   manifests: manifests.length,
   wasmBytes: wasm.length,
   wasmSha256: createHash("sha256").update(wasm).digest("hex"),

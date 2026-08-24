@@ -143,6 +143,7 @@
     "./events": "./events/events.json",
     "./indexing/config": "./indexing/nexa-v6-indexing.json",
     "./indexing/manifest": "./indexing/indexing-manifest.json",
+    "./indexing/external-deployments": "./indexing/external-deployments.json",
     "./networks": "./networks/network-ids.json",
     "./onboarding": "./onboarding/nexa-v6-solver-operator.json",
     "./openapi": "./openapi/openapi.json",

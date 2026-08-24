@@ -1,4 +1,4 @@
-import { readFile, readdir } from "node:fs/promises";
+import { access, readFile, readdir } from "node:fs/promises";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Interface, getAddress, id } from "ethers";
@@ -6,10 +6,11 @@ import { buildIndexingArtifacts } from "./generate-indexing.mjs";
 
 const repositoryRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const NETWORKS = Object.freeze([
-  Object.freeze({ graphNetwork: "base", chainId: 8453 }),
-  Object.freeze({ graphNetwork: "bsc", chainId: 56 }),
-  Object.freeze({ graphNetwork: "hyper-evm", chainId: 999 }),
+  Object.freeze({ graphNetwork: "base", chainId: 8453, initialBlock: 50143186 }),
+  Object.freeze({ graphNetwork: "bsc", chainId: 56, initialBlock: 116699981 }),
+  Object.freeze({ graphNetwork: "hyper-evm", chainId: 999, initialBlock: 43533441 }),
 ]);
+const GRAPH_NETWORKS = Object.freeze(["base", "bsc"]);
 const INDEXED_CONTRACTS = Object.freeze(["registry", "router", "standardModuleRegistry"]);
 const SOURCE_FILL_FIELDS = Object.freeze([
   "fillId", "routeId", "quoteId", "payer", "recipient", "sourceAsset",
@@ -19,6 +20,7 @@ const SOURCE_FILL_FIELDS = Object.freeze([
 
 const read = (root, file) => readFile(resolve(root, file), "utf8");
 const readJson = async (root, file) => JSON.parse(await read(root, file));
+const exists = async (root, file) => access(resolve(root, file)).then(() => true, () => false);
 const assert = (condition, code) => {
   if (!condition) throw new Error(code);
 };
@@ -61,15 +63,103 @@ function validateFixture(fixture, config) {
   }
 }
 
+function validateExternalDeployments(external) {
+  assert(external.schema === "NEXA_V6_EXTERNAL_INDEXING_DEPLOYMENTS_V1"
+    && external.version === "1.0.0"
+    && external.authoritative === false,
+  "INDEXING_EXTERNAL_DEPLOYMENT_SCHEMA_INVALID");
+  assert(external.infrastructure?.hosting === "MANAGED_EXTERNAL_INDEXERS"
+    && external.infrastructure.rpcConsumption === "INDEXER_MANAGED"
+    && external.infrastructure.selfHosted === false
+    && external.infrastructure.nexaRpcUsed === false,
+  "INDEXING_EXTERNAL_INFRASTRUCTURE_BOUNDARY_INVALID");
+  const serialized = JSON.stringify(external);
+  assert(!/(?:api[_-]?key|deploy[_-]?key|token|secret|credential|mnemonic|private[_-]?key)/i
+    .test(serialized), "INDEXING_EXTERNAL_DEPLOYMENT_SECRET_FIELD");
+  for (const expected of NETWORKS) {
+    const graph = external.graph[expected.graphNetwork];
+    const substreams = external.substreams[expected.graphNetwork];
+    assert(graph?.chainId === expected.chainId,
+      "INDEXING_EXTERNAL_GRAPH_CHAIN_INVALID:" + expected.graphNetwork);
+    assert(substreams?.chainId === expected.chainId,
+      "INDEXING_EXTERNAL_SUBSTREAMS_CHAIN_INVALID:" + expected.graphNetwork);
+    assert(substreams.packageName
+      === "nexa_v6_indexing_" + expected.graphNetwork.replaceAll("-", "_"),
+    "INDEXING_EXTERNAL_SUBSTREAMS_PACKAGE_INVALID:" + expected.graphNetwork);
+    assert(substreams.version === "v1.0.0"
+      && ["UNPUBLISHED", "PUBLISHED"].includes(substreams.registryStatus),
+    "INDEXING_EXTERNAL_SUBSTREAMS_STATUS_INVALID:" + expected.graphNetwork);
+    assert(substreams.liveValidation?.module === "map_nexa_v6_events"
+      && substreams.liveValidation.startBlock === expected.initialBlock,
+    "INDEXING_EXTERNAL_SUBSTREAMS_VALIDATION_RANGE_INVALID:" + expected.graphNetwork);
+    if (substreams.registryStatus === "PUBLISHED") {
+      assert(typeof substreams.packageId === "string" && substreams.packageId.length > 0
+        && /^https:\/\//.test(substreams.registryUrl)
+        && typeof substreams.publishedAt === "string"
+        && substreams.liveValidation.status === "PASS"
+        && Number.isSafeInteger(substreams.liveValidation.stopBlock)
+        && substreams.liveValidation.stopBlock > expected.initialBlock
+        && Array.isArray(substreams.liveValidation.eventsObserved),
+      "INDEXING_EXTERNAL_SUBSTREAMS_PUBLISHED_EVIDENCE_INVALID:" + expected.graphNetwork);
+    } else {
+      assert(substreams.packageId === null && substreams.registryUrl === null
+        && substreams.packageHash === null && substreams.publishedAt === null
+        && substreams.liveValidation.status === "NOT_RUN"
+        && substreams.liveValidation.stopBlock === null
+        && substreams.liveValidation.eventsObserved === null,
+      "INDEXING_EXTERNAL_SUBSTREAMS_UNPUBLISHED_EVIDENCE_INVALID:" + expected.graphNetwork);
+    }
+  }
+  for (const network of GRAPH_NETWORKS) {
+    const graph = external.graph[network];
+    assert(graph.subgraphSupported === true
+      && graph.indexingMode === "SUBGRAPH_STUDIO_AND_STANDALONE_SUBSTREAMS"
+      && ["UNPUBLISHED", "DEPLOYED"].includes(graph.studioStatus)
+      && graph.networkPublicationStatus === "UNPUBLISHED"
+      && graph.versionLabel === "1.0.0"
+      && graph.cliVersion === "@graphprotocol/graph-cli/0.98.1",
+    "INDEXING_EXTERNAL_GRAPH_STATUS_INVALID:" + network);
+    if (graph.studioStatus === "DEPLOYED") {
+      assert(typeof graph.slug === "string" && graph.slug.length > 0
+        && typeof graph.deploymentId === "string" && graph.deploymentId.length > 0
+        && /^https:\/\//.test(graph.developmentQueryUrl)
+        && !/[?&](?:api[_-]?key|key|token)=/i.test(graph.developmentQueryUrl)
+        && typeof graph.deployedAt === "string"
+        && Number.isSafeInteger(graph.indexedBlock)
+        && graph.indexedBlock > 0
+        && graph.indexingErrors === false
+        && graph.validation === "PASS",
+      "INDEXING_EXTERNAL_GRAPH_DEPLOYED_EVIDENCE_INVALID:" + network);
+    } else {
+      assert(graph.slug === null && graph.deploymentId === null
+        && graph.developmentQueryUrl === null && graph.deployedAt === null
+        && graph.indexedBlock === null && graph.indexingErrors === null
+        && graph.validation === "NOT_RUN",
+      "INDEXING_EXTERNAL_GRAPH_UNPUBLISHED_EVIDENCE_INVALID:" + network);
+    }
+  }
+  const hyper = external.graph["hyper-evm"];
+  assert(hyper.subgraphSupported === false
+    && hyper.studioStatus === "UNSUPPORTED"
+    && hyper.networkPublicationStatus === "NOT_APPLICABLE"
+    && hyper.indexingMode === "STANDALONE_SUBSTREAMS"
+    && hyper.replacement === "STANDALONE_SUBSTREAMS",
+  "INDEXING_HYPEREVM_GRAPH_SUPPORT_INVALID");
+}
+
 export async function validateIndexingPackage(root = repositoryRoot) {
-  const [config, evidence, integration, descriptor, fixtures, publicEvents] = await Promise.all([
+  const [
+    config, evidence, integration, descriptor, fixtures, publicEvents, externalDeployments,
+  ] = await Promise.all([
     readJson(root, "indexing/nexa-v6-indexing.json"),
     readJson(root, "verification/indexing-deployment-evidence.json"),
     readJson(root, "nexa-mainnet-v6.json"),
     readJson(root, "indexing/indexing-manifest.json"),
     readJson(root, "indexing/fixtures/nexa-v6-events.json"),
     readJson(root, "events/events.json"),
+    readJson(root, "indexing/external-deployments.json"),
   ]);
+  validateExternalDeployments(externalDeployments);
 
   const generated = await buildIndexingArtifacts(root);
   for (const [file, expected] of Object.entries(generated)) {
@@ -121,17 +211,28 @@ export async function validateIndexingPackage(root = repositoryRoot) {
     );
 
     const graphPath = "indexing/graph/subgraph." + network.graphNetwork + ".yaml";
-    const graphManifest = await read(root, graphPath);
-    assert(graphManifest.includes("  file: ./schema.graphql"),
-      "GRAPH_SCHEMA_NOT_SHARED:" + network.graphNetwork);
-    assert((graphManifest.match(/file: \.\/src\/mapping\.ts/g) ?? []).length === 3,
-      "GRAPH_MAPPING_NOT_SHARED:" + network.graphNetwork);
-    for (const key of INDEXED_CONTRACTS) {
-      const contract = network.contracts[key];
-      assert(graphManifest.includes("address: '" + contract.address + "'"),
-        "GRAPH_ADDRESS_DRIFT:" + network.graphNetwork + ":" + key);
-      assert(graphManifest.includes("startBlock: " + contract.startBlock),
-        "GRAPH_START_BLOCK_DRIFT:" + network.graphNetwork + ":" + key);
+    if (network.subgraphSupported) {
+      assert(GRAPH_NETWORKS.includes(network.graphNetwork)
+        && network.indexingMode === "SUBGRAPH_STUDIO_AND_STANDALONE_SUBSTREAMS",
+      "GRAPH_SUPPORTED_NETWORK_INVALID:" + network.graphNetwork);
+      const graphManifest = await read(root, graphPath);
+      assert(graphManifest.includes("  file: ./schema.graphql"),
+        "GRAPH_SCHEMA_NOT_SHARED:" + network.graphNetwork);
+      assert((graphManifest.match(/file: \.\/src\/mapping\.ts/g) ?? []).length === 3,
+        "GRAPH_MAPPING_NOT_SHARED:" + network.graphNetwork);
+      for (const key of INDEXED_CONTRACTS) {
+        const contract = network.contracts[key];
+        assert(graphManifest.includes("address: '" + contract.address + "'"),
+          "GRAPH_ADDRESS_DRIFT:" + network.graphNetwork + ":" + key);
+        assert(graphManifest.includes("startBlock: " + contract.startBlock),
+          "GRAPH_START_BLOCK_DRIFT:" + network.graphNetwork + ":" + key);
+      }
+    } else {
+      assert(network.graphNetwork === "hyper-evm"
+        && network.subgraphStudioStatus === "UNSUPPORTED"
+        && network.indexingMode === "STANDALONE_SUBSTREAMS"
+        && !(await exists(root, graphPath)),
+      "GRAPH_UNSUPPORTED_NETWORK_INVALID:" + network.graphNetwork);
     }
 
     const substreamsPath = "indexing/substreams/substreams." + network.graphNetwork + ".yaml";
@@ -187,7 +288,12 @@ export async function validateIndexingPackage(root = repositoryRoot) {
   ]);
   assert(!/ethereum\.call|try_[A-Za-z]|routeCount|setInterval|setTimeout|poll/i.test(graphMapping),
     "GRAPH_MAPPING_NOT_EVENT_ONLY");
-  assert(graphPackage.devDependencies["matchstick-as"] === "0.6.0"
+  assert(graphPackage.devDependencies["@graphprotocol/graph-cli"] === "0.98.1"
+    && graphPackage.devDependencies["matchstick-as"] === "0.6.0"
+    && graphPackage.scripts["codegen:all"]
+      === "graph codegen subgraph.base.yaml && graph codegen subgraph.bsc.yaml"
+    && graphPackage.scripts["build:all"] === "npm run build:base && npm run build:bsc"
+    && !JSON.stringify(graphPackage.scripts).includes("hyper-evm")
     && graphPackage.scripts["test:mapping"] === "graph test --version 0.6.0"
     && graphPackage.scripts.test.includes("test:fixtures")
     && graphPackage.scripts.test.includes("test:mapping"),
@@ -248,21 +354,41 @@ export async function validateIndexingPackage(root = repositoryRoot) {
       "INDEXING_GENERATION_MUST_BE_OFFLINE:" + file);
   }
 
+  const graphPublished = GRAPH_NETWORKS.every(
+    (network) => externalDeployments.graph[network].studioStatus === "DEPLOYED",
+  );
+  const substreamsPublished = NETWORKS.every(
+    ({ graphNetwork }) => externalDeployments.substreams[graphNetwork].registryStatus === "PUBLISHED",
+  );
+  const anyPublished = GRAPH_NETWORKS.some(
+    (network) => externalDeployments.graph[network].studioStatus === "DEPLOYED",
+  ) || NETWORKS.some(
+    ({ graphNetwork }) => externalDeployments.substreams[graphNetwork].registryStatus === "PUBLISHED",
+  );
+  const expectedExternalStatus = graphPublished && substreamsPublished
+    ? "STUDIO_AND_REGISTRY_PUBLISHED"
+    : anyPublished ? "PARTIALLY_PUBLISHED" : "UNPUBLISHED";
   assert(descriptor.status === "PACKAGE_READY"
-    && descriptor.externalDeploymentStatus === "UNPUBLISHED"
+    && descriptor.externalDeploymentStatus === expectedExternalStatus
     && descriptor.authoritative === false
     && descriptor.source === "ONCHAIN_EVENTS",
   "INDEXING_DESCRIPTOR_STATUS_INVALID");
   assert(descriptor.canonicalConfig === "./nexa-v6-indexing.json"
     && descriptor.canonicalFixtures === "./fixtures/nexa-v6-events.json"
+    && descriptor.externalDeployments === "./external-deployments.json"
+    && JSON.stringify(descriptor.externalInfrastructure)
+      === JSON.stringify(externalDeployments.infrastructure)
     && descriptor.canonicalSignedFeed === "https://solver.vsnexa.com/api/v6/solver-feed"
     && descriptor.canonicalDiscovery
       === "https://solver.vsnexa.com/.well-known/nexa-solver.json",
   "INDEXING_DESCRIPTOR_CANONICAL_POINTER_DRIFT");
-  assert(descriptor.graph.deploymentIds === null
-    && descriptor.graph.graphqlUrls === null
-    && descriptor.substreams.registryPackageIds === null,
-  "INDEXING_DESCRIPTOR_ADVERTISES_UNPUBLISHED_IDS");
+  assert(JSON.stringify(descriptor.graph.supportedNetworks) === JSON.stringify(GRAPH_NETWORKS)
+    && JSON.stringify(Object.keys(descriptor.graph.manifests)) === JSON.stringify(GRAPH_NETWORKS)
+    && descriptor.graph.manifests["hyper-evm"] === undefined
+    && JSON.stringify(descriptor.graph.deployments) === JSON.stringify(externalDeployments.graph)
+    && JSON.stringify(descriptor.substreams.deployments)
+      === JSON.stringify(externalDeployments.substreams),
+  "INDEXING_DESCRIPTOR_EXTERNAL_PROJECTION_DRIFT");
   assert(descriptor.executionInvariant.botSourceTransactions === 1
     && descriptor.executionInvariant.nexaDestinationTransactions === 1
     && descriptor.executionInvariant.totalTransactions === 2,

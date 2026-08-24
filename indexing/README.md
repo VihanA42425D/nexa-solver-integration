@@ -11,9 +11,11 @@ Permit. The Graph and Substreams outputs are non-authoritative discovery aids.
 
 nexa-v6-indexing.json is the only generated network/event configuration. It is
 built offline from the public V6 bundle and committed deployment evidence. The
-three Graph manifests and three Substreams manifests are thin generated views of
-that same object. Graph uses one schema and mapping; Substreams uses one Rust
-decoder and protobuf model. Its downstream stores consume the mapped event
+two supported Graph manifests and three Substreams manifests are thin generated
+views of that same object. Graph uses one schema and mapping; Substreams uses one
+Rust decoder and protobuf model. HyperEVM remains in the canonical config and
+Substreams package, but its Graph Studio state is `UNSUPPORTED` and its indexing
+mode is `STANDALONE_SUBSTREAMS`. Its downstream stores consume the mapped event
 stream, so raw logs are decoded exactly once.
 
 Normal generation performs no RPC, HTTP, database, or environment lookup and
@@ -41,7 +43,9 @@ From the repository root:
 
 indexing:substreams:codegen runs Cargo's vendored-protoc build step. Build
 outputs (graph/build, graph/generated, and substreams/target) are intentionally
-untracked. No external deployment identifiers or endpoints are claimed.
+untracked. Public external IDs and endpoints, once validated, live only in
+external-deployments.json; indexing-manifest.json is generated from that
+canonical evidence and must not be hand-maintained.
 The optional indexing:substreams:pack command requires the official Substreams
 CLI and creates three local, ignored SPKG files; it never publishes them.
 indexing:substreams:package:official is the explicit audit alias for that same
@@ -52,11 +56,16 @@ fixture JSON; the JavaScript ABI-decoding checks remain a separate first stage.
 
 ## Networks
 
-| Graph identifier | Chain ID | Registry start | Router start | Module Registry start |
-| --- | ---: | ---: | ---: | ---: |
-| base | 8453 | 50143186 | 50143190 | 50143193 |
-| bsc | 56 | 116699981 | 116699987 | 116699998 |
-| hyper-evm | 999 | 43533441 | 43533563 | 43533624 |
+| Identifier | Chain ID | Graph Studio | Indexing mode | Registry start | Router start | Module Registry start |
+| --- | ---: | --- | --- | ---: | ---: | ---: |
+| base | 8453 | Supported | Subgraph Studio + standalone Substreams | 50143186 | 50143190 | 50143193 |
+| bsc | 56 | Supported | Subgraph Studio + standalone Substreams | 116699981 | 116699987 | 116699998 |
+| hyper-evm | 999 | Unsupported | Standalone Substreams | 43533441 | 43533563 | 43533624 |
 
 The machine-readable package state and paths are in indexing-manifest.json.
-External publication remains UNPUBLISHED.
+Non-secret external deployment evidence is canonical in
+external-deployments.json. Base and BSC are deployed to Graph Studio, and the Base, BSC, and HyperEVM
+Substreams packages are published and live-validated. Exact non-secret IDs, URLs,
+package hashes, validation ranges, and statuses are recorded in
+`external-deployments.json`. External managed indexers consume their own RPC; no
+Graph Node, Firehose, Substreams endpoint, or chain RPC is self-hosted by Nexa.

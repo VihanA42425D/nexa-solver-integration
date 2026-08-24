@@ -8,6 +8,7 @@
   "generatedFrom": [
     "nexa-mainnet-v6.json",
     "verification/indexing-deployment-evidence.json",
+    "indexing/external-deployments.json",
     "events/events.json",
     "standards/nexa-standards.json"
   ],
@@ -15,8 +16,10 @@
   "networks": [
     {
       "graphNetwork": "base",
-      "deploymentSlug": "base",
       "chainId": 8453,
+      "subgraphSupported": true,
+      "subgraphStudioStatus": "DEPLOYED",
+      "indexingMode": "SUBGRAPH_STUDIO_AND_STANDALONE_SUBSTREAMS",
       "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
       "contracts": {
         "registry": {
@@ -411,8 +414,10 @@
     },
     {
       "graphNetwork": "bsc",
-      "deploymentSlug": "bsc",
       "chainId": 56,
+      "subgraphSupported": true,
+      "subgraphStudioStatus": "DEPLOYED",
+      "indexingMode": "SUBGRAPH_STUDIO_AND_STANDALONE_SUBSTREAMS",
       "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
       "contracts": {
         "registry": {
@@ -807,8 +812,10 @@
     },
     {
       "graphNetwork": "hyper-evm",
-      "deploymentSlug": "hyperevm",
       "chainId": 999,
+      "subgraphSupported": false,
+      "subgraphStudioStatus": "UNSUPPORTED",
+      "indexingMode": "STANDALONE_SUBSTREAMS",
       "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
       "contracts": {
         "registry": {

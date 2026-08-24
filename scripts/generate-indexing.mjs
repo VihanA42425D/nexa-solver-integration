@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Interface, ZeroAddress, getAddress } from "ethers";
@@ -12,6 +12,10 @@ const readJson = async (repositoryRoot, file) => JSON.parse(
   await readFile(resolve(repositoryRoot, file), "utf8"),
 );
 const NETWORK_ORDER = Object.freeze(["base", "bsc", "hyper-evm"]);
+const GRAPH_NETWORKS = Object.freeze(new Set(["base", "bsc"]));
+const OBSOLETE_GENERATED_ARTIFACTS = Object.freeze([
+  "indexing/graph/subgraph.hyper-evm.yaml",
+]);
 const CONTRACT_EVENTS = Object.freeze({
   registry: Object.freeze([
     "NetworkRegisteredV6", "NetworkStatusChangedV6",
@@ -293,11 +297,17 @@ function fixtureSet(config) {
   };
 }
 
-export async function buildCanonicalIndexingConfig(repositoryRoot = root) {
-  const [integration, evidence, standardsManifest] = await Promise.all([
+export async function buildCanonicalIndexingConfig(
+  repositoryRoot = root,
+  suppliedExternalDeployments = null,
+) {
+  const [integration, evidence, standardsManifest, externalDeployments] = await Promise.all([
     readJson(repositoryRoot, "nexa-mainnet-v6.json"),
     readJson(repositoryRoot, "verification/indexing-deployment-evidence.json"),
     readJson(repositoryRoot, "standards/nexa-standards.json"),
+    suppliedExternalDeployments
+      ? Promise.resolve(suppliedExternalDeployments)
+      : readJson(repositoryRoot, "indexing/external-deployments.json"),
   ]);
   const eventsBundle = buildIndexedEventsBundle();
   if (integration.releaseId !== evidence.releaseId
@@ -320,7 +330,9 @@ export async function buildCanonicalIndexingConfig(repositoryRoot = root) {
   };
   const networks = NETWORK_ORDER.map((graphNetwork) => {
     const source = evidence.networks[graphNetwork];
+    const graphDeployment = externalDeployments.graph[graphNetwork];
     if (!source) fail(`INDEXING_NETWORK_EVIDENCE_MISSING:${graphNetwork}`);
+    if (!graphDeployment) fail(`INDEXING_EXTERNAL_GRAPH_STATE_MISSING:${graphNetwork}`);
     const contracts = structuredClone(source.contracts);
     if (getAddress(contracts.registry.address) !== getAddress(integration.contracts.NexaMainnetRegistryV6.address)
         || getAddress(contracts.router.address) !== getAddress(integration.contracts.NexaMainnetRouterV6.address)
@@ -333,8 +345,10 @@ export async function buildCanonicalIndexingConfig(repositoryRoot = root) {
     contracts.facade.events = [];
     return {
       graphNetwork,
-      deploymentSlug: source.deploymentSlug,
       chainId: source.chainId,
+      subgraphSupported: graphDeployment.subgraphSupported,
+      subgraphStudioStatus: graphDeployment.studioStatus,
+      indexingMode: graphDeployment.indexingMode,
       releaseId: integration.releaseId,
       contracts,
     };
@@ -349,6 +363,7 @@ export async function buildCanonicalIndexingConfig(repositoryRoot = root) {
     generatedFrom: [
       "nexa-mainnet-v6.json",
       "verification/indexing-deployment-evidence.json",
+      "indexing/external-deployments.json",
       "events/events.json",
       "standards/nexa-standards.json",
     ],
@@ -360,7 +375,21 @@ export async function buildCanonicalIndexingConfig(repositoryRoot = root) {
   };
 }
 
-function indexingDescriptor(config) {
+function externalDeploymentStatus(externalDeployments) {
+  const graphPublished = [...GRAPH_NETWORKS]
+    .every((network) => externalDeployments.graph[network].studioStatus === "DEPLOYED");
+  const substreamsPublished = NETWORK_ORDER
+    .every((network) => externalDeployments.substreams[network].registryStatus === "PUBLISHED");
+  if (graphPublished && substreamsPublished) return "STUDIO_AND_REGISTRY_PUBLISHED";
+  const anyPublished = [...GRAPH_NETWORKS]
+    .some((network) => externalDeployments.graph[network].studioStatus === "DEPLOYED")
+    || NETWORK_ORDER.some(
+      (network) => externalDeployments.substreams[network].registryStatus === "PUBLISHED",
+    );
+  return anyPublished ? "PARTIALLY_PUBLISHED" : "UNPUBLISHED";
+}
+
+function indexingDescriptor(config, externalDeployments) {
   return {
     schema: "NEXA_V6_INDEXING_PACKAGE_MANIFEST_V1",
     version: "1.0.0",
@@ -369,18 +398,26 @@ function indexingDescriptor(config) {
     authoritative: false,
     authority: ["ONCHAIN_REGISTRY_ROUTER", "SIGNED_FEED", "EXECUTION_PERMIT"],
     source: "ONCHAIN_EVENTS",
-    externalDeploymentStatus: "UNPUBLISHED",
+    externalDeploymentStatus: externalDeploymentStatus(externalDeployments),
     canonicalConfig: "./nexa-v6-indexing.json",
     canonicalFixtures: "./fixtures/nexa-v6-events.json",
-    networks: config.networks.map(({ graphNetwork, chainId }) => ({ graphNetwork, chainId })),
+    externalDeployments: "./external-deployments.json",
+    externalInfrastructure: structuredClone(externalDeployments.infrastructure),
+    networks: config.networks.map(({
+      graphNetwork, chainId, subgraphSupported, subgraphStudioStatus, indexingMode,
+    }) => ({
+      graphNetwork, chainId, subgraphSupported, subgraphStudioStatus, indexingMode,
+    })),
     graph: {
       schema: "./graph/schema.graphql",
       sharedMapping: "./graph/src/mapping.ts",
-      manifests: Object.fromEntries(config.networks.map((network) => [
-        network.graphNetwork, `./graph/subgraph.${network.graphNetwork}.yaml`,
-      ])),
-      deploymentIds: null,
-      graphqlUrls: null,
+      supportedNetworks: [...GRAPH_NETWORKS],
+      manifests: Object.fromEntries(config.networks
+        .filter((network) => network.subgraphSupported)
+        .map((network) => [
+          network.graphNetwork, `./graph/subgraph.${network.graphNetwork}.yaml`,
+        ])),
+      deployments: structuredClone(externalDeployments.graph),
     },
     substreams: {
       sharedRust: "./substreams/src",
@@ -388,7 +425,7 @@ function indexingDescriptor(config) {
       manifests: Object.fromEntries(config.networks.map((network) => [
         network.graphNetwork, `./substreams/substreams.${network.graphNetwork}.yaml`,
       ])),
-      registryPackageIds: null,
+      deployments: structuredClone(externalDeployments.substreams),
     },
     indexedContracts: [
       "NexaMainnetRegistryV6", "NexaMainnetRouterV6", "NexaStandardModuleRegistryV6",
@@ -405,18 +442,23 @@ function indexingDescriptor(config) {
 }
 
 export async function buildIndexingArtifacts(repositoryRoot = root) {
-  const config = await buildCanonicalIndexingConfig(repositoryRoot);
+  const externalDeployments = await readJson(repositoryRoot, "indexing/external-deployments.json");
+  const config = await buildCanonicalIndexingConfig(repositoryRoot, externalDeployments);
   const events = buildIndexedEventsBundle();
   const files = {
     "events/events.json": `${JSON.stringify(events, null, 2)}\n`,
     "indexing/nexa-v6-indexing.json": `${JSON.stringify(config, null, 2)}\n`,
-    "indexing/indexing-manifest.json": `${JSON.stringify(indexingDescriptor(config), null, 2)}\n`,
+    "indexing/indexing-manifest.json": `${JSON.stringify(
+      indexingDescriptor(config, externalDeployments), null, 2,
+    )}\n`,
     "indexing/fixtures/nexa-v6-events.json": `${JSON.stringify(fixtureSet(config), null, 2)}\n`,
     "indexing/substreams/src/generated.rs": rustTopicConstants(events.events),
     ...eventAbiFiles(events.events),
   };
   for (const network of config.networks) {
-    files[`indexing/graph/subgraph.${network.graphNetwork}.yaml`] = graphManifest(network, config);
+    if (network.subgraphSupported) {
+      files[`indexing/graph/subgraph.${network.graphNetwork}.yaml`] = graphManifest(network, config);
+    }
     files[`indexing/substreams/substreams.${network.graphNetwork}.yaml`] = substreamsManifest(network, config);
   }
   return files;
@@ -428,6 +470,9 @@ export async function generateIndexing(repositoryRoot = root) {
     const output = resolve(repositoryRoot, file);
     await mkdir(dirname(output), { recursive: true });
     await writeFile(output, content, "utf8");
+  }
+  for (const file of OBSOLETE_GENERATED_ARTIFACTS) {
+    await rm(resolve(repositoryRoot, file), { force: true });
   }
   return Object.keys(files);
 }

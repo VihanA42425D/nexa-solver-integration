@@ -13,9 +13,9 @@ test("canonical Graph/Substreams indexing package passes every repository hard g
     networks: 3,
     events: 9,
     fixtures: 11,
-    generatedArtifacts: 14,
+    generatedArtifacts: 13,
     graphHandlersExecutedByMatchstick: 9,
-    runtimeSourcesScanned: 13,
+    runtimeSourcesScanned: 12,
     generationSourcesScanned: 2,
   });
 });
@@ -37,11 +37,27 @@ test("one canonical config supplies exact per-contract deployment starts to both
   }
 });
 
-test("indexing descriptor is passive, non-authoritative, unpublished and preserves 1+1", async () => {
+test("indexing descriptor projects canonical external state and preserves passive 1+1", async () => {
   const descriptor = await readJson("indexing/indexing-manifest.json");
   assert.equal(descriptor.authoritative, false);
   assert.equal(descriptor.source, "ONCHAIN_EVENTS");
-  assert.equal(descriptor.externalDeploymentStatus, "UNPUBLISHED");
+  assert.equal(descriptor.externalDeploymentStatus, "STUDIO_AND_REGISTRY_PUBLISHED");
+  assert.deepEqual(descriptor.graph.supportedNetworks, ["base", "bsc"]);
+  assert.equal(descriptor.graph.manifests["hyper-evm"], undefined);
+  assert.deepEqual(descriptor.externalInfrastructure, {
+    hosting: "MANAGED_EXTERNAL_INDEXERS",
+    rpcConsumption: "INDEXER_MANAGED",
+    selfHosted: false,
+    nexaRpcUsed: false,
+  });
+  const hyper = descriptor.networks.find(({ graphNetwork }) => graphNetwork === "hyper-evm");
+  assert.deepEqual(hyper, {
+    graphNetwork: "hyper-evm",
+    chainId: 999,
+    subgraphSupported: false,
+    subgraphStudioStatus: "UNSUPPORTED",
+    indexingMode: "STANDALONE_SUBSTREAMS",
+  });
   assert.deepEqual(descriptor.executionInvariant, {
     model: "1_BOT_SOURCE_TX_PLUS_1_NEXA_DESTINATION_TX",
     botSourceTransactions: 1,

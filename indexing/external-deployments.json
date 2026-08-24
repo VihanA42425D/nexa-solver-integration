@@ -1,0 +1,129 @@
+{
+  "schema": "NEXA_V6_EXTERNAL_INDEXING_DEPLOYMENTS_V1",
+  "version": "1.0.0",
+  "authoritative": false,
+  "recordedAt": "2026-08-24T07:44:49.8558049Z",
+  "infrastructure": {
+    "hosting": "MANAGED_EXTERNAL_INDEXERS",
+    "rpcConsumption": "INDEXER_MANAGED",
+    "selfHosted": false,
+    "nexaRpcUsed": false
+  },
+  "graph": {
+    "base": {
+      "chainId": 8453,
+      "subgraphSupported": true,
+      "studioStatus": "DEPLOYED",
+      "networkPublicationStatus": "UNPUBLISHED",
+      "indexingMode": "SUBGRAPH_STUDIO_AND_STANDALONE_SUBSTREAMS",
+      "slug": "nexa-v-6-base",
+      "versionLabel": "1.0.0",
+      "deploymentId": "QmbHjiBK6Mqc3KNQKvefWnadM8pbx8DREMa2Xtx2pwPVip",
+      "developmentQueryUrl": "https://api.studio.thegraph.com/query/1748073/nexa-v-6-base/1.0.0",
+      "deployedAt": "2026-08-24T07:44:49.8558049Z",
+      "cliVersion": "@graphprotocol/graph-cli/0.98.1",
+      "indexedBlock": 50383763,
+      "indexingErrors": false,
+      "validation": "PASS"
+    },
+    "bsc": {
+      "chainId": 56,
+      "subgraphSupported": true,
+      "studioStatus": "DEPLOYED",
+      "networkPublicationStatus": "UNPUBLISHED",
+      "indexingMode": "SUBGRAPH_STUDIO_AND_STANDALONE_SUBSTREAMS",
+      "slug": "nexa-v-6-bsc",
+      "versionLabel": "1.0.0",
+      "deploymentId": "QmWt9pn3icSN1yjTreQufh7TdZ3AojArTf6vwaNxHXSub5",
+      "developmentQueryUrl": "https://api.studio.thegraph.com/query/1748073/nexa-v-6-bsc/1.0.0",
+      "deployedAt": "2026-08-24T07:44:49.8558049Z",
+      "cliVersion": "@graphprotocol/graph-cli/0.98.1",
+      "indexedBlock": 117768793,
+      "indexingErrors": false,
+      "validation": "PASS"
+    },
+    "hyper-evm": {
+      "chainId": 999,
+      "subgraphSupported": false,
+      "studioStatus": "UNSUPPORTED",
+      "networkPublicationStatus": "NOT_APPLICABLE",
+      "indexingMode": "STANDALONE_SUBSTREAMS",
+      "replacement": "STANDALONE_SUBSTREAMS"
+    }
+  },
+  "substreams": {
+    "base": {
+      "chainId": 8453,
+      "registryStatus": "PUBLISHED",
+      "packageName": "nexa_v6_indexing_base",
+      "version": "v1.0.0",
+      "packageId": "nexa-v6-indexing-base@v1.0.0",
+      "registryUrl": "https://substreams.dev/packages/nexa-v6-indexing-base/v1.0.0",
+      "packageHash": "sha256:52a8f996652e56aa54366d305a0e68b0213861479dfc5dd403cd570d1eb806a4",
+      "publishedAt": "2026-08-24T07:44:49.8558049Z",
+      "liveValidation": {
+        "status": "PASS",
+        "module": "map_nexa_v6_events",
+        "startBlock": 50143186,
+        "stopBlock": 50144000,
+        "processedBlocks": 814,
+        "eventsObserved": [
+          "NetworkRegisteredV6",
+          "NetworkStatusChangedV6"
+        ]
+      }
+    },
+    "bsc": {
+      "chainId": 56,
+      "registryStatus": "PUBLISHED",
+      "packageName": "nexa_v6_indexing_bsc",
+      "version": "v1.0.0",
+      "packageId": "nexa-v6-indexing-bsc@v1.0.0",
+      "registryUrl": "https://substreams.dev/packages/nexa-v6-indexing-bsc/v1.0.0",
+      "packageHash": "sha256:1853d6f5080cd61082e404970af7f616799b5ae6af40788c99ffe5c3f762ab3e",
+      "publishedAt": "2026-08-24T07:44:49.8558049Z",
+      "liveValidation": {
+        "status": "PASS",
+        "module": "map_nexa_v6_events",
+        "startBlock": 116699981,
+        "stopBlock": 116719981,
+        "processedBlocks": 20000,
+        "eventsObserved": [
+          "NetworkRegisteredV6",
+          "NetworkStatusChangedV6",
+          "AssetRegisteredV6",
+          "AssetStatusChangedV6",
+          "RouteRegisteredV6",
+          "RouteStatusChangedV6",
+          "StandardModuleConfiguredV6"
+        ]
+      }
+    },
+    "hyper-evm": {
+      "chainId": 999,
+      "registryStatus": "PUBLISHED",
+      "packageName": "nexa_v6_indexing_hyper_evm",
+      "version": "v1.0.0",
+      "packageId": "nexa-v6-indexing-hyper-evm@v1.0.0",
+      "registryUrl": "https://substreams.dev/packages/nexa-v6-indexing-hyper-evm/v1.0.0",
+      "packageHash": "sha256:21285a1678ea20833ec56b40f6b266d57d145a8679838dde4df315d01aacb134",
+      "publishedAt": "2026-08-24T07:44:49.8558049Z",
+      "liveValidation": {
+        "status": "PASS",
+        "module": "map_nexa_v6_events",
+        "startBlock": 43533441,
+        "stopBlock": 43553441,
+        "processedBlocks": 20000,
+        "eventsObserved": [
+          "NetworkRegisteredV6",
+          "NetworkStatusChangedV6",
+          "AssetRegisteredV6",
+          "AssetStatusChangedV6",
+          "RouteRegisteredV6",
+          "RouteStatusChangedV6",
+          "StandardModuleConfiguredV6"
+        ]
+      }
+    }
+  }
+}

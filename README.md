@@ -150,20 +150,26 @@ Examples never require a private key to be committed. Signing stays in the integ
 ## Passive Graph and Substreams indexing
 
 The [indexing package](indexing/README.md) supplies one generated canonical
-configuration, one shared Graph schema/mapping, and one shared Substreams
-Rust/protobuf implementation for Base (8453), BSC (56), and HyperEVM (999).
-All projections consume public on-chain events only. They are non-authoritative,
-have no Nexa runtime dependency, do not ingest the Signed Feed, and are not
-externally published yet.
+configuration, one shared Graph schema/mapping for Base (8453) and BSC (56), and
+one shared Substreams Rust/protobuf implementation for Base, BSC, and HyperEVM
+(999). HyperEVM Subgraphs are unsupported by Subgraph Studio and remain
+standalone-Substreams-only. All projections consume public on-chain events only.
+They are non-authoritative, have no Nexa runtime dependency, and do not ingest
+the Signed Feed. Base and BSC are deployed to Graph Studio; all three network
+packages are published to the Substreams Registry and bounded live validation
+passed. Managed external indexers consume their own RPC infrastructure; Nexa does
+not self-host an indexer or provide production RPC budget to this package.
 
     npm run indexing:generate
     npm run indexing:validate
     npm run indexing:check
 
 Exact per-contract start blocks come from committed offline
-[deployment evidence](verification/indexing-deployment-evidence.json). External
-Graph Studio/Network and Substreams Registry actions are documented separately
-in the [deployment handoff](indexing/DEPLOYMENT_HANDOFF.md).
+[deployment evidence](verification/indexing-deployment-evidence.json). External Graph Studio and Substreams Registry IDs, URLs, package hashes, and
+validation evidence are recorded in
+[indexing/external-deployments.json](indexing/external-deployments.json); the
+operator boundary remains documented in the
+[deployment handoff](indexing/DEPLOYMENT_HANDOFF.md).
 
 ## Zero-touch Solver onboarding
 

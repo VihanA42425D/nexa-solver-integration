@@ -209,7 +209,7 @@ const docsOpenApi = await readFile(join(SITE, "assets", "openapi.json"));
 assert(canonicalOpenApi.equals(docsOpenApi), "Built documentation OpenAPI diverges from canonical source");
 
 const contactHtml = await readFile(join(SITE, "contact", "index.html"), "utf8");
-const contactScript = await readFile(join(SITE, "assets", "javascripts", "contact.js"), "utf8");
+const contactScript = await readFile(join(SITE, "assets", "javascripts", "contact.8ac5ae43aae9.js"), "utf8");
 const ticketWorker = await readFile(join(ROOT, "docs-ticket-worker", "src", "worker.mjs"), "utf8");
 const ticketWorkerConfig = await readFile(join(ROOT, "docs-ticket-worker", "wrangler.jsonc"), "utf8");
 assert(/\bid=(?:"nexa-contact-form"|nexa-contact-form)(?:\s|>)/.test(contactHtml), "Contact page lacks the ticket form");

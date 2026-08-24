@@ -79,10 +79,10 @@ markdown_extensions:
   - pymdownx.superfences
 
 extra_css:
-  - assets/stylesheets/extra.css
+  - assets/stylesheets/extra.58480f676c2f.css
 
 extra_javascript:
-  - assets/javascripts/contact.js
+  - assets/javascripts/contact.8ac5ae43aae9.js
 
 extra:
   generator: false

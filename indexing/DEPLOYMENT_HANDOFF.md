@@ -38,7 +38,7 @@ and Substreams Registry deployments are recorded below.
 
 - Graph Studio Base `nexa-v-6-base` version `1.0.0`: `QmbHjiBK6Mqc3KNQKvefWnadM8pbx8DREMa2Xtx2pwPVip`
 - Graph Studio BSC `nexa-v-6-bsc` version `1.0.0`: `QmWt9pn3icSN1yjTreQufh7TdZ3AojArTf6vwaNxHXSub5`
-- Substreams Base: <https://substreams.dev/packages/nexa-v6-indexing-base/v1.0.0>
+- Substreams Base (publisher `VihanA42425D`): <https://substreams.dev/packages/nexa-v6-indexing-base/v1.0.0>
 - Substreams BSC: <https://substreams.dev/packages/nexa-v6-indexing-bsc/v1.0.0>
 - Substreams HyperEVM: <https://substreams.dev/packages/nexa-v6-indexing-hyper-evm/v1.0.0>
 

@@ -60,7 +60,7 @@
       "packageId": "nexa-v6-indexing-base@v1.0.0",
       "registryUrl": "https://substreams.dev/packages/nexa-v6-indexing-base/v1.0.0",
       "packageHash": "sha256:52a8f996652e56aa54366d305a0e68b0213861479dfc5dd403cd570d1eb806a4",
-      "publishedAt": "2026-08-24T07:44:49.8558049Z",
+      "publishedAt": "2026-08-24T07:35:28.802215Z",
       "liveValidation": {
         "status": "PASS",
         "module": "map_nexa_v6_events",
@@ -71,7 +71,10 @@
           "NetworkRegisteredV6",
           "NetworkStatusChangedV6"
         ]
-      }
+      },
+      "registryNamespace": "VihanA42425D",
+      "registryIdentity": "6eed135e7d5007aef850692150efed903a8e1014",
+      "spkgUrl": "https://spkg.io/v1/packages/nexa-v6-indexing-base/v1.0.0"
     },
     "bsc": {
       "chainId": 56,
@@ -81,7 +84,7 @@
       "packageId": "nexa-v6-indexing-bsc@v1.0.0",
       "registryUrl": "https://substreams.dev/packages/nexa-v6-indexing-bsc/v1.0.0",
       "packageHash": "sha256:1853d6f5080cd61082e404970af7f616799b5ae6af40788c99ffe5c3f762ab3e",
-      "publishedAt": "2026-08-24T07:44:49.8558049Z",
+      "publishedAt": "2026-08-24T07:35:40.875532Z",
       "liveValidation": {
         "status": "PASS",
         "module": "map_nexa_v6_events",
@@ -97,7 +100,10 @@
           "RouteStatusChangedV6",
           "StandardModuleConfiguredV6"
         ]
-      }
+      },
+      "registryNamespace": "VihanA42425D",
+      "registryIdentity": "7b6780074a4684f94a2365c7bf7c63852ed7bc00",
+      "spkgUrl": "https://spkg.io/v1/packages/nexa-v6-indexing-bsc/v1.0.0"
     },
     "hyper-evm": {
       "chainId": 999,
@@ -107,7 +113,7 @@
       "packageId": "nexa-v6-indexing-hyper-evm@v1.0.0",
       "registryUrl": "https://substreams.dev/packages/nexa-v6-indexing-hyper-evm/v1.0.0",
       "packageHash": "sha256:21285a1678ea20833ec56b40f6b266d57d145a8679838dde4df315d01aacb134",
-      "publishedAt": "2026-08-24T07:44:49.8558049Z",
+      "publishedAt": "2026-08-24T07:35:53.706140Z",
       "liveValidation": {
         "status": "PASS",
         "module": "map_nexa_v6_events",
@@ -123,7 +129,10 @@
           "RouteStatusChangedV6",
           "StandardModuleConfiguredV6"
         ]
-      }
+      },
+      "registryNamespace": "VihanA42425D",
+      "registryIdentity": "dec54c43c83030a95814c6c77768b9da95cac97c",
+      "spkgUrl": "https://spkg.io/v1/packages/nexa-v6-indexing-hyper-evm/v1.0.0"
     }
   }
 }

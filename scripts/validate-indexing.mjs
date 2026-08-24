@@ -95,6 +95,11 @@ function validateExternalDeployments(external) {
     if (substreams.registryStatus === "PUBLISHED") {
       assert(typeof substreams.packageId === "string" && substreams.packageId.length > 0
         && /^https:\/\//.test(substreams.registryUrl)
+        && typeof substreams.registryNamespace === "string"
+        && substreams.registryNamespace.length > 0
+        && /^[0-9a-f]{40}$/.test(substreams.registryIdentity)
+        && /^https:\/\/spkg\.io\//.test(substreams.spkgUrl)
+        && /^sha256:[0-9a-f]{64}$/.test(substreams.packageHash)
         && typeof substreams.publishedAt === "string"
         && substreams.liveValidation.status === "PASS"
         && Number.isSafeInteger(substreams.liveValidation.stopBlock)

@@ -3,35 +3,177 @@
   "mode": "PASSIVE_ONCHAIN_ANALYTICS",
   "authoritative": false,
   "ingestion": "DUNE_DIRECT_CHAIN",
-  "status": "PENDING_APPLY",
-  "owner": null,
-  "profileUrl": null,
+  "status": "DUNE_V6_BACKFILLING",
+  "owner": "nexav6",
+  "profileUrl": "https://dune.com/nexav6",
   "capabilities": {
-    "queryReadWrite": null,
-    "materializedViews": null,
+    "queryReadWrite": "AVAILABLE",
+    "materializedViews": "AVAILABLE",
     "dashboardWriteApi": "DUNE_NATIVE_DASHBOARD_API_UNAVAILABLE"
   },
-  "canonicalQuery": null,
+  "canonicalQuery": {
+    "id": 8437473,
+    "name": "Nexa V6 — Canonical Onchain Events",
+    "url": "https://dune.com/queries/8437473",
+    "public": true,
+    "validation": null
+  },
   "materializedView": {
     "name": "result_nexa_v6_events_canonical",
-    "fullName": null,
-    "sourceQueryId": null,
+    "fullName": "dune.nexav6.result_nexa_v6_events_canonical",
+    "sourceQueryId": 8437473,
     "isPrivate": false,
     "performance": "default",
     "cron": "0 * * * *",
     "latestSuccessfulRefresh": null
   },
-  "queries": [],
+  "queries": [
+    {
+      "key": "overview",
+      "name": "Nexa V6 — Protocol Overview",
+      "id": 8437486,
+      "url": "https://dune.com/queries/8437486",
+      "public": true,
+      "validation": null
+    },
+    {
+      "key": "networksCurrent",
+      "name": "Nexa V6 — Current Networks",
+      "id": 8437487,
+      "url": "https://dune.com/queries/8437487",
+      "public": true,
+      "validation": null
+    },
+    {
+      "key": "assetsCurrent",
+      "name": "Nexa V6 — Current Assets",
+      "id": 8437488,
+      "url": "https://dune.com/queries/8437488",
+      "public": true,
+      "validation": null
+    },
+    {
+      "key": "routesCurrent",
+      "name": "Nexa V6 — Current Routes",
+      "id": 8437489,
+      "url": "https://dune.com/queries/8437489",
+      "public": true,
+      "validation": null
+    },
+    {
+      "key": "routeStatusHistory",
+      "name": "Nexa V6 — Route Status History",
+      "id": 8437490,
+      "url": "https://dune.com/queries/8437490",
+      "public": true,
+      "validation": null
+    },
+    {
+      "key": "routerState",
+      "name": "Nexa V6 — Router Source Intake",
+      "id": 8437491,
+      "url": "https://dune.com/queries/8437491",
+      "public": true,
+      "validation": null
+    },
+    {
+      "key": "standardModules",
+      "name": "Nexa V6 — Standard Modules",
+      "id": 8437492,
+      "url": "https://dune.com/queries/8437492",
+      "public": true,
+      "validation": null
+    },
+    {
+      "key": "sourceFills",
+      "name": "Nexa V6 — Source Fills",
+      "id": 8437493,
+      "url": "https://dune.com/queries/8437493",
+      "public": true,
+      "validation": null
+    },
+    {
+      "key": "recentActivity",
+      "name": "Nexa V6 — Recent Protocol Activity",
+      "id": 8437494,
+      "url": "https://dune.com/queries/8437494",
+      "public": true,
+      "validation": null
+    }
+  ],
+  "lifecycle": {
+    "resourceProvisioning": "COMPLETE",
+    "datasetDiscovery": {
+      "Base": "DISCOVERED",
+      "HyperEVM": "DISCOVERED",
+      "BNB Smart Chain": "DISCOVERED"
+    },
+    "decodeBackfill": {
+      "Base": "BACKFILLING",
+      "HyperEVM": "BACKFILLING",
+      "BNB Smart Chain": "BACKFILLING"
+    },
+    "analyticsActivation": {
+      "Base": "GATED",
+      "HyperEVM": "GATED",
+      "BNB Smart Chain": "GATED"
+    }
+  },
   "activeNetworks": [],
-  "pendingNetworks": ["BNB Smart Chain"],
+  "pendingNetworks": [
+    "Base",
+    "HyperEVM",
+    "BNB Smart Chain"
+  ],
   "networkStatus": {
-    "Base": "DISCOVERED",
-    "HyperEVM": "DISCOVERED",
-    "BNB Smart Chain": "PENDING_DECODE"
+    "Base": "BACKFILLING",
+    "HyperEVM": "BACKFILLING",
+    "BNB Smart Chain": "BACKFILLING"
   },
   "sourceBindings": "./source-bindings.json",
+  "duneSourceTables": {
+    "Base": [
+      "nexa_v6_base.nexamainnetregistryv6_evt_networkregisteredv6",
+      "nexa_v6_base.nexamainnetregistryv6_evt_networkstatuschangedv6",
+      "nexa_v6_base.nexamainnetregistryv6_evt_assetregisteredv6",
+      "nexa_v6_base.nexamainnetregistryv6_evt_assetstatuschangedv6",
+      "nexa_v6_base.nexamainnetregistryv6_evt_routeregisteredv6",
+      "nexa_v6_base.nexamainnetregistryv6_evt_routestatuschangedv6",
+      "nexa_v6_base.nexamainnetrouterv6_evt_sourceintakeconfigured",
+      "nexa_v6_base.nexamainnetrouterv6_evt_sourcefillv6",
+      "nexa_v6_base.nexastandardmoduleregistryv6_evt_standardmoduleconfiguredv6"
+    ],
+    "HyperEVM": [
+      "nexa_v6_hyperevm.nexamainnetregistryv6_evt_networkregisteredv6",
+      "nexa_v6_hyperevm.nexamainnetregistryv6_evt_networkstatuschangedv6",
+      "nexa_v6_hyperevm.nexamainnetregistryv6_evt_assetregisteredv6",
+      "nexa_v6_hyperevm.nexamainnetregistryv6_evt_assetstatuschangedv6",
+      "nexa_v6_hyperevm.nexamainnetregistryv6_evt_routeregisteredv6",
+      "nexa_v6_hyperevm.nexamainnetregistryv6_evt_routestatuschangedv6",
+      "nexa_v6_hyperevm.nexamainnetrouterv6_evt_sourceintakeconfigured",
+      "nexa_v6_hyperevm.nexamainnetrouterv6_evt_sourcefillv6",
+      "nexa_v6_hyperevm.nexastandardmoduleregistryv6_evt_standardmoduleconfiguredv6"
+    ],
+    "BNB Smart Chain": [
+      "nexa_v6_bnb.nexamainnetregistryv6_evt_networkregisteredv6",
+      "nexa_v6_bnb.nexamainnetregistryv6_evt_networkstatuschangedv6",
+      "nexa_v6_bnb.nexamainnetregistryv6_evt_assetregisteredv6",
+      "nexa_v6_bnb.nexamainnetregistryv6_evt_assetstatuschangedv6",
+      "nexa_v6_bnb.nexamainnetregistryv6_evt_routeregisteredv6",
+      "nexa_v6_bnb.nexamainnetregistryv6_evt_routestatuschangedv6",
+      "nexa_v6_bnb.nexamainnetrouterv6_evt_sourceintakeconfigured",
+      "nexa_v6_bnb.nexamainnetrouterv6_evt_sourcefillv6",
+      "nexa_v6_bnb.nexastandardmoduleregistryv6_evt_standardmoduleconfiguredv6"
+    ]
+  },
   "latestValidationTime": null,
-  "validation": null,
+  "validation": {
+    "status": "BACKFILLING",
+    "networks": null,
+    "crossCheck": "HISTORICAL_BASELINES_NOT_YET_MET",
+    "sourceFillSchema": "PASS",
+    "sourceIntakePath": "PASS"
+  },
   "signedFeedIngested": false,
   "permitApiIngested": false,
   "nexaRpcUsed": false,

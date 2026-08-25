@@ -14,9 +14,9 @@ authority. Dune is passive and non-authoritative.
 
 ## Coverage
 
-- Base — ACTIVE
-- HyperEVM — ACTIVE
-- BNB Smart Chain — PENDING_DECODE
+- Base — BACKFILLING
+- HyperEVM — BACKFILLING
+- BNB Smart Chain — BACKFILLING
 
 ## Widget order
 
@@ -29,5 +29,6 @@ authority. Dune is passive and non-authoritative.
 7. Standard Modules — current module table
 8. Recent Protocol Activity — chronological event table
 
+Do not publish a final dashboard while a required network remains BACKFILLING.
 Do not add USD volume, TVL, inferred liquidity, live route terms, or execution
-authority claims. Query IDs are populated in the manifest after `--apply`.
+authority claims. Query IDs are recorded in the manifest.

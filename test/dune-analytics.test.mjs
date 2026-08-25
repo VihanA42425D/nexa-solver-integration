@@ -2,6 +2,14 @@ import assert from "node:assert/strict";
 import { readFile, readdir } from "node:fs/promises";
 import { resolve } from "node:path";
 import test from "node:test";
+import {
+  ACTIVATION_BASELINES,
+  buildCanonicalSql,
+  buildSourceBindings,
+  contractEvents,
+  evaluateNetworkStates,
+  schemaTypeMatchesAbi,
+} from "../scripts/sync-dune-v6.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const read = (path) => readFile(resolve(root, path), "utf8");
@@ -18,9 +26,50 @@ const requiredEvents = [
   "SourceIntakeConfigured", "SourceFillV6", "StandardModuleConfiguredV6",
 ];
 
+function fixtureBindings(config) {
+  return Object.fromEntries(["base", "hyperevm", "bsc"].map((slug) => {
+    const duneSlug = slug === "bsc" ? "bnb" : slug;
+    const bindings = contractEvents(config, slug).map((event) => ({
+      contractRole: event.contractKey === "registry"
+        ? "REGISTRY"
+        : (event.contractKey === "router" ? "ROUTER" : "STANDARD_MODULE_REGISTRY"),
+      contract: event.contractName,
+      event: event.eventName,
+      table: `nexa_v6_${duneSlug}.${event.contractName.toLowerCase()}_evt_${event.eventName.toLowerCase()}`,
+      datasetId: `${slug}-${event.eventName}`,
+      status: "QUERYABLE",
+    }));
+    return [slug, { expectedCount: 9, bindings }];
+  }));
+}
+
+function fixtureStateResult(config, discovered, overrides = {}) {
+  const resultRows = [];
+  for (const slug of ["base", "hyperevm", "bsc"]) {
+    for (const event of contractEvents(config, slug)) {
+      const binding = discovered[slug].bindings.find(({ event: name }) => name === event.eventName);
+      const canonicalRows = overrides[`${slug}:${event.eventName}`]
+        ?? ACTIVATION_BASELINES[slug][event.eventName]
+        ?? 0;
+      resultRows.push({
+        network_slug: slug,
+        event_name: event.eventName,
+        table_name: binding.table,
+        table_rows: canonicalRows,
+        canonical_rows: canonicalRows,
+        pre_start_same_address_rows: 0,
+        other_address_rows: 0,
+        min_canonical_block: canonicalRows === 0 ? null : event.startBlock,
+        max_canonical_block: canonicalRows === 0 ? null : event.startBlock,
+      });
+    }
+  }
+  return { result: { rows: resultRows } };
+}
+
 test("Dune manifest records one passive canonical pipeline", async () => {
   const manifest = await json("analytics/dune/dune-manifest.json");
-  assert.equal(manifest.status, "DUNE_BASE_HYPEREVM_ANALYTICS_READY");
+  assert.equal(manifest.status, "DUNE_V6_BACKFILLING");
   assert.equal(manifest.mode, "PASSIVE_ONCHAIN_ANALYTICS");
   assert.equal(manifest.authoritative, false);
   assert.equal(manifest.ingestion, "DUNE_DIRECT_CHAIN");
@@ -33,11 +82,21 @@ test("Dune manifest records one passive canonical pipeline", async () => {
   assert.equal(manifest.materializedView.sourceQueryId, manifest.canonicalQuery.id);
   assert.equal(manifest.materializedView.isPrivate, false);
   assert.equal(manifest.materializedView.cron, "0 * * * *");
-  assert.equal(manifest.materializedView.latestSuccessfulRefresh.state, "QUERY_STATE_COMPLETED");
+  assert.equal(manifest.canonicalQuery.id, 8437473);
   assert.equal(manifest.queries.length, 9);
-  assert.deepEqual(manifest.activeNetworks, ["Base", "HyperEVM"]);
-  assert.deepEqual(manifest.pendingNetworks, ["BNB Smart Chain"]);
-  assert.equal(manifest.networkStatus["BNB Smart Chain"], "PENDING_DECODE");
+  assert.deepEqual(manifest.queries.map(({ id }) => id), [
+    8437486, 8437487, 8437488, 8437489, 8437490,
+    8437491, 8437492, 8437493, 8437494,
+  ]);
+  assert.deepEqual(manifest.activeNetworks, []);
+  assert.deepEqual(manifest.pendingNetworks, ["Base", "HyperEVM", "BNB Smart Chain"]);
+  assert.deepEqual(manifest.networkStatus, {
+    Base: "BACKFILLING", HyperEVM: "BACKFILLING", "BNB Smart Chain": "BACKFILLING",
+  });
+  assert.equal(manifest.lifecycle.resourceProvisioning, "COMPLETE");
+  assert.deepEqual(new Set(Object.values(manifest.lifecycle.datasetDiscovery)), new Set(["DISCOVERED"]));
+  assert.deepEqual(new Set(Object.values(manifest.lifecycle.decodeBackfill)), new Set(["BACKFILLING"]));
+  assert.deepEqual(new Set(Object.values(manifest.lifecycle.analyticsActivation)), new Set(["GATED"]));
   assert.equal(manifest.signedFeedIngested, false);
   assert.equal(manifest.permitApiIngested, false);
   assert.equal(manifest.nexaRpcUsed, false);
@@ -48,22 +107,21 @@ test("Dune manifest records one passive canonical pipeline", async () => {
 test("Dune source bindings contain only discovered Dune metadata", async () => {
   const bindings = await json("analytics/dune/source-bindings.json");
   assert.equal(bindings.project, "nexa_v6");
-  for (const slug of ["base", "hyperevm"]) {
+  for (const slug of ["base", "hyperevm", "bsc"]) {
     const network = bindings.networks[slug];
-    assert.equal(network.status, "ACTIVE");
-    assert.equal(network.decodeBackfillStatus, "QUERYABLE");
+    assert.equal(network.status, "DISCOVERED");
+    assert.equal(network.decodeBackfillStatus, "BACKFILLING");
     assert.equal(network.tables.length, 9);
     assert.deepEqual(new Set(network.tables.map(({ event }) => event)), new Set(requiredEvents));
     for (const table of network.tables) {
-      assert.match(table.table, new RegExp(`^nexa_v6_${slug}\\.`));
+      const duneSlug = slug === "bsc" ? "bnb" : slug;
+      assert.match(table.table, new RegExp(`^nexa_v6_${duneSlug}\\.`));
       assert.equal(table.status, "QUERYABLE");
       for (const forbidden of ["address", "chainId", "startBlock", "abi", "topic0"]) {
         assert.equal(Object.hasOwn(table, forbidden), false);
       }
     }
   }
-  assert.equal(bindings.networks.bsc.status, "PENDING_DECODE");
-  assert.equal(bindings.networks.bsc.tables.length, 0);
   assert.equal(JSON.stringify(bindings).includes("Pancake"), false);
 });
 
@@ -108,6 +166,55 @@ test("all nine public analytics queries reuse only the canonical materialized vi
   }
 });
 
+test("BNB tables and schemas alone cannot pass the historical activation gate", async () => {
+  const config = await json("indexing/nexa-v6-indexing.json");
+  const discovered = fixtureBindings(config);
+  const states = evaluateNetworkStates(config, discovered, fixtureStateResult(config, discovered, {
+    "bsc:RouteStatusChangedV6": 251,
+  }));
+  assert.equal(discovered.bsc.bindings.length, 9);
+  assert.equal(states.base.status, "ACTIVE");
+  assert.equal(states.hyperevm.status, "ACTIVE");
+  assert.equal(states.bsc.status, "BACKFILLING");
+  assert.deepEqual(states.bsc.incompleteHistory, [{
+    event: "RouteStatusChangedV6", minimum: 252, actual: 251,
+  }]);
+  const bindings = buildSourceBindings(discovered, null, states);
+  assert.equal(bindings.networks.bsc.status, "DISCOVERED");
+  assert.equal(bindings.networks.bsc.decodeBackfillStatus, "BACKFILLING");
+});
+
+test("Dune decoded payload types must preserve canonical ABI semantics", () => {
+  assert.equal(schemaTypeMatchesAbi("varbinary", "bytes32"), true);
+  assert.equal(schemaTypeMatchesAbi("varbinary", "address"), true);
+  assert.equal(schemaTypeMatchesAbi("boolean", "bool"), true);
+  assert.equal(schemaTypeMatchesAbi("uint256", "uint128"), true);
+  assert.equal(schemaTypeMatchesAbi("varchar", "uint128"), false);
+  assert.equal(schemaTypeMatchesAbi("bigint", "bytes32"), false);
+});
+
+test("future BNB SQL reuses the canonical generator and requires every collision boundary", async () => {
+  const config = await json("indexing/nexa-v6-indexing.json");
+  const discovered = fixtureBindings(config);
+  const currentSql = buildCanonicalSql(config, discovered, false);
+  const candidateSql = buildCanonicalSql(config, discovered, true);
+  const normalized = (sql) => /WITH normalized AS \(\n([\s\S]*?)\n\),\nranked/.exec(sql)[1];
+  assert.ok(normalized(candidateSql).startsWith(normalized(currentSql)));
+  assert.equal((candidateSql.match(/\bFROM\s+nexa_v6_(?:base|hyperevm|bnb)\./g) ?? []).length, 27);
+  const bnb = config.networks.find(({ graphNetwork }) => graphNetwork === "bsc");
+  for (const contractKey of ["registry", "router", "standardModuleRegistry"]) {
+    const contract = bnb.contracts[contractKey];
+    assert.equal(
+      candidateSql.split(`evt_block_number >= ${contract.startBlock}`).length - 1,
+      contract.events.length,
+    );
+    assert.equal(
+      candidateSql.split(`AND contract_address = ${contract.address.toLowerCase()}`).length - 1,
+      contract.events.length * 3,
+    );
+  }
+});
+
 test("sync script remains external, bounded, and header-authenticated", async () => {
   const source = await read("scripts/sync-dune-v6.mjs");
   assert.match(source, /process\.env\.DUNE_API_KEY/);
@@ -115,8 +222,13 @@ test("sync script remains external, bounded, and header-authenticated", async ()
   assert.doesNotMatch(source, /api_key=/);
   assert.match(source, /maxChecks = 120/);
   assert.match(source, /--activate-bnb/);
-  assert.match(source, /DUNE_BNB_ACTIVATION_GATE_FAILED/);
+  assert.match(source, /DUNE_BNB_BACKFILL_INCOMPLETE/);
+  assert.match(source, /DUNE_BNB_ADDRESS_HISTORY_UNSAFE/);
+  assert.match(source, /\/sql\/execute/);
   assert.match(source, /NO DUNE MUTATIONS REQUIRED/);
+  const main = source.slice(source.indexOf("async function main"));
+  assert.ok(main.indexOf("DUNE_BNB_BACKFILL_INCOMPLETE") < main.indexOf("const canonical = await syncQuery"));
+  assert.match(main, /remoteMutations=\$\{remoteMutationCount\}/);
   const productionRoots = ["src", "docs-ticket-worker"];
   for (const directory of productionRoots) {
     const visit = async (path) => {

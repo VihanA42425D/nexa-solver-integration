@@ -9,21 +9,213 @@
   "networks": {
     "base": {
       "status": "DISCOVERED",
-      "decodeBackfillStatus": "QUERYABLE",
+      "decodeBackfillStatus": "BACKFILLING",
       "lastValidatedAt": null,
-      "tables": []
+      "tables": [
+        {
+          "contractRole": "REGISTRY",
+          "contract": "NexaMainnetRegistryV6",
+          "event": "NetworkRegisteredV6",
+          "table": "nexa_v6_base.nexamainnetregistryv6_evt_networkregisteredv6",
+          "status": "QUERYABLE"
+        },
+        {
+          "contractRole": "REGISTRY",
+          "contract": "NexaMainnetRegistryV6",
+          "event": "NetworkStatusChangedV6",
+          "table": "nexa_v6_base.nexamainnetregistryv6_evt_networkstatuschangedv6",
+          "status": "QUERYABLE"
+        },
+        {
+          "contractRole": "REGISTRY",
+          "contract": "NexaMainnetRegistryV6",
+          "event": "AssetRegisteredV6",
+          "table": "nexa_v6_base.nexamainnetregistryv6_evt_assetregisteredv6",
+          "status": "QUERYABLE"
+        },
+        {
+          "contractRole": "REGISTRY",
+          "contract": "NexaMainnetRegistryV6",
+          "event": "AssetStatusChangedV6",
+          "table": "nexa_v6_base.nexamainnetregistryv6_evt_assetstatuschangedv6",
+          "status": "QUERYABLE"
+        },
+        {
+          "contractRole": "REGISTRY",
+          "contract": "NexaMainnetRegistryV6",
+          "event": "RouteRegisteredV6",
+          "table": "nexa_v6_base.nexamainnetregistryv6_evt_routeregisteredv6",
+          "status": "QUERYABLE"
+        },
+        {
+          "contractRole": "REGISTRY",
+          "contract": "NexaMainnetRegistryV6",
+          "event": "RouteStatusChangedV6",
+          "table": "nexa_v6_base.nexamainnetregistryv6_evt_routestatuschangedv6",
+          "status": "QUERYABLE"
+        },
+        {
+          "contractRole": "ROUTER",
+          "contract": "NexaMainnetRouterV6",
+          "event": "SourceIntakeConfigured",
+          "table": "nexa_v6_base.nexamainnetrouterv6_evt_sourceintakeconfigured",
+          "status": "QUERYABLE"
+        },
+        {
+          "contractRole": "ROUTER",
+          "contract": "NexaMainnetRouterV6",
+          "event": "SourceFillV6",
+          "table": "nexa_v6_base.nexamainnetrouterv6_evt_sourcefillv6",
+          "status": "QUERYABLE"
+        },
+        {
+          "contractRole": "STANDARD_MODULE_REGISTRY",
+          "contract": "NexaStandardModuleRegistryV6",
+          "event": "StandardModuleConfiguredV6",
+          "table": "nexa_v6_base.nexastandardmoduleregistryv6_evt_standardmoduleconfiguredv6",
+          "status": "QUERYABLE"
+        }
+      ]
     },
     "hyperevm": {
       "status": "DISCOVERED",
-      "decodeBackfillStatus": "QUERYABLE",
+      "decodeBackfillStatus": "BACKFILLING",
       "lastValidatedAt": null,
-      "tables": []
+      "tables": [
+        {
+          "contractRole": "REGISTRY",
+          "contract": "NexaMainnetRegistryV6",
+          "event": "NetworkRegisteredV6",
+          "table": "nexa_v6_hyperevm.nexamainnetregistryv6_evt_networkregisteredv6",
+          "status": "QUERYABLE"
+        },
+        {
+          "contractRole": "REGISTRY",
+          "contract": "NexaMainnetRegistryV6",
+          "event": "NetworkStatusChangedV6",
+          "table": "nexa_v6_hyperevm.nexamainnetregistryv6_evt_networkstatuschangedv6",
+          "status": "QUERYABLE"
+        },
+        {
+          "contractRole": "REGISTRY",
+          "contract": "NexaMainnetRegistryV6",
+          "event": "AssetRegisteredV6",
+          "table": "nexa_v6_hyperevm.nexamainnetregistryv6_evt_assetregisteredv6",
+          "status": "QUERYABLE"
+        },
+        {
+          "contractRole": "REGISTRY",
+          "contract": "NexaMainnetRegistryV6",
+          "event": "AssetStatusChangedV6",
+          "table": "nexa_v6_hyperevm.nexamainnetregistryv6_evt_assetstatuschangedv6",
+          "status": "QUERYABLE"
+        },
+        {
+          "contractRole": "REGISTRY",
+          "contract": "NexaMainnetRegistryV6",
+          "event": "RouteRegisteredV6",
+          "table": "nexa_v6_hyperevm.nexamainnetregistryv6_evt_routeregisteredv6",
+          "status": "QUERYABLE"
+        },
+        {
+          "contractRole": "REGISTRY",
+          "contract": "NexaMainnetRegistryV6",
+          "event": "RouteStatusChangedV6",
+          "table": "nexa_v6_hyperevm.nexamainnetregistryv6_evt_routestatuschangedv6",
+          "status": "QUERYABLE"
+        },
+        {
+          "contractRole": "ROUTER",
+          "contract": "NexaMainnetRouterV6",
+          "event": "SourceIntakeConfigured",
+          "table": "nexa_v6_hyperevm.nexamainnetrouterv6_evt_sourceintakeconfigured",
+          "status": "QUERYABLE"
+        },
+        {
+          "contractRole": "ROUTER",
+          "contract": "NexaMainnetRouterV6",
+          "event": "SourceFillV6",
+          "table": "nexa_v6_hyperevm.nexamainnetrouterv6_evt_sourcefillv6",
+          "status": "QUERYABLE"
+        },
+        {
+          "contractRole": "STANDARD_MODULE_REGISTRY",
+          "contract": "NexaStandardModuleRegistryV6",
+          "event": "StandardModuleConfiguredV6",
+          "table": "nexa_v6_hyperevm.nexastandardmoduleregistryv6_evt_standardmoduleconfiguredv6",
+          "status": "QUERYABLE"
+        }
+      ]
     },
     "bsc": {
-      "status": "PENDING_DECODE",
-      "decodeBackfillStatus": "PENDING",
+      "status": "DISCOVERED",
+      "decodeBackfillStatus": "BACKFILLING",
       "lastValidatedAt": null,
-      "tables": []
+      "tables": [
+        {
+          "contractRole": "REGISTRY",
+          "contract": "NexaMainnetRegistryV6",
+          "event": "NetworkRegisteredV6",
+          "table": "nexa_v6_bnb.nexamainnetregistryv6_evt_networkregisteredv6",
+          "status": "QUERYABLE"
+        },
+        {
+          "contractRole": "REGISTRY",
+          "contract": "NexaMainnetRegistryV6",
+          "event": "NetworkStatusChangedV6",
+          "table": "nexa_v6_bnb.nexamainnetregistryv6_evt_networkstatuschangedv6",
+          "status": "QUERYABLE"
+        },
+        {
+          "contractRole": "REGISTRY",
+          "contract": "NexaMainnetRegistryV6",
+          "event": "AssetRegisteredV6",
+          "table": "nexa_v6_bnb.nexamainnetregistryv6_evt_assetregisteredv6",
+          "status": "QUERYABLE"
+        },
+        {
+          "contractRole": "REGISTRY",
+          "contract": "NexaMainnetRegistryV6",
+          "event": "AssetStatusChangedV6",
+          "table": "nexa_v6_bnb.nexamainnetregistryv6_evt_assetstatuschangedv6",
+          "status": "QUERYABLE"
+        },
+        {
+          "contractRole": "REGISTRY",
+          "contract": "NexaMainnetRegistryV6",
+          "event": "RouteRegisteredV6",
+          "table": "nexa_v6_bnb.nexamainnetregistryv6_evt_routeregisteredv6",
+          "status": "QUERYABLE"
+        },
+        {
+          "contractRole": "REGISTRY",
+          "contract": "NexaMainnetRegistryV6",
+          "event": "RouteStatusChangedV6",
+          "table": "nexa_v6_bnb.nexamainnetregistryv6_evt_routestatuschangedv6",
+          "status": "QUERYABLE"
+        },
+        {
+          "contractRole": "ROUTER",
+          "contract": "NexaMainnetRouterV6",
+          "event": "SourceIntakeConfigured",
+          "table": "nexa_v6_bnb.nexamainnetrouterv6_evt_sourceintakeconfigured",
+          "status": "QUERYABLE"
+        },
+        {
+          "contractRole": "ROUTER",
+          "contract": "NexaMainnetRouterV6",
+          "event": "SourceFillV6",
+          "table": "nexa_v6_bnb.nexamainnetrouterv6_evt_sourcefillv6",
+          "status": "QUERYABLE"
+        },
+        {
+          "contractRole": "STANDARD_MODULE_REGISTRY",
+          "contract": "NexaStandardModuleRegistryV6",
+          "event": "StandardModuleConfiguredV6",
+          "table": "nexa_v6_bnb.nexastandardmoduleregistryv6_evt_standardmoduleconfiguredv6",
+          "status": "QUERYABLE"
+        }
+      ]
     }
   }
 }

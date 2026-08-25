@@ -11,6 +11,43 @@ const CANONICAL_NAME = "Nexa V6 — Canonical Onchain Events";
 const MV_NAME = "result_nexa_v6_events_canonical";
 const CRON = "0 * * * *";
 const TAGS = ["nexa-v6", "passive-onchain-analytics"];
+const EXPECTED_QUERY_IDS = Object.freeze({
+  canonical: 8437473,
+  overview: 8437486,
+  networksCurrent: 8437487,
+  assetsCurrent: 8437488,
+  routesCurrent: 8437489,
+  routeStatusHistory: 8437490,
+  routerState: 8437491,
+  standardModules: 8437492,
+  sourceFills: 8437493,
+  recentActivity: 8437494,
+});
+const ACTIVATION_BASELINES = Object.freeze({
+  base: Object.freeze({
+    NetworkRegisteredV6: 3,
+    AssetRegisteredV6: 19,
+    RouteRegisteredV6: 108,
+    RouteStatusChangedV6: 216,
+    StandardModuleConfiguredV6: 2,
+    SourceIntakeConfigured: 1,
+    SourceFillV6: 9,
+  }),
+  hyperevm: Object.freeze({
+    NetworkRegisteredV6: 3,
+    AssetRegisteredV6: 19,
+    RouteRegisteredV6: 108,
+    RouteStatusChangedV6: 216,
+    StandardModuleConfiguredV6: 2,
+  }),
+  bsc: Object.freeze({
+    NetworkRegisteredV6: 3,
+    AssetRegisteredV6: 19,
+    RouteRegisteredV6: 126,
+    RouteStatusChangedV6: 252,
+    StandardModuleConfiguredV6: 2,
+  }),
+});
 const MODES = new Set(["--audit", "--apply", "--activate-bnb"]);
 const mode = process.argv[2] ?? "--audit";
 if (!MODES.has(mode) || process.argv.length > 3) {
@@ -70,14 +107,28 @@ const readJson = async (path) => JSON.parse(await readText(path));
 const stableJson = (value) => JSON.stringify(value, null, 2) + "\n";
 const normalizeSql = (value) => String(value ?? "").replaceAll("\r\n", "\n").trim();
 const sameSet = (left, right) => left.size === right.size && [...left].every((x) => right.has(x));
+const schemaType = (field) => String(field?.type ?? field?.data_type ?? field?.dataType ?? "").toLowerCase();
+const schemaTypeMatchesAbi = (actualType, abiType) => {
+  if (/^(?:address|bytes\d*)$/.test(abiType)) {
+    return /(?:varbinary|binary|bytea|address|bytes)/.test(actualType);
+  }
+  if (abiType === "bool") return /bool/.test(actualType);
+  if (/^(?:u?int)\d*$/.test(abiType)) return /(?:int|decimal|numeric)/.test(actualType);
+  return actualType === abiType.toLowerCase();
+};
 const hex = (column) => `concat('0x', lower(to_hex("${column}")))`;
 const address = (column) => `concat('0x', lower(to_hex("${column}")))`;
 const nullable = (type) => `CAST(NULL AS ${type})`;
+let remoteMutationCount = 0;
 
 const key = process.env.DUNE_API_KEY;
-if (!key) throw new Error("DUNE_API_KEY is required in the process environment");
 
 async function api(path, { method = "GET", body } = {}) {
+  if (!key) throw new Error("DUNE_API_KEY is required in the process environment");
+  if ((method === "PATCH" && path.startsWith("/query/"))
+    || (method === "POST" && (path === "/query" || path === "/materialized-views"))) {
+    remoteMutationCount += 1;
+  }
   const response = await fetch(`${API}${path}`, {
     method,
     headers: {
@@ -131,6 +182,38 @@ function contractEvents(config, slug) {
   });
 }
 
+function assertCanonicalAbis(config, abis) {
+  const abiByContract = {
+    registry: abis.registry,
+    router: abis.router,
+    standardModuleRegistry: abis.standardModuleRegistry,
+  };
+  for (const network of config.networks) {
+    for (const contractKey of requiredContracts) {
+      const canonicalEvents = new Map(abiByContract[contractKey]
+        .filter(({ type }) => type === "event")
+        .map((event) => [event.name, event.inputs.map((input) => ({
+          name: input.name,
+          type: input.type,
+          indexed: input.indexed === true,
+        }))]));
+      const configured = network.contracts[contractKey].events;
+      if (configured.length !== canonicalEvents.size) {
+        throw new Error(`Canonical ABI event-count mismatch: ${network.graphNetwork}/${contractKey}`);
+      }
+      for (const event of configured) {
+        const inputs = canonicalEvents.get(event.name);
+        const fields = event.fields.map(({ name, type, indexed }) => ({
+          name, type, indexed: indexed === true,
+        }));
+        if (!inputs || JSON.stringify(inputs) !== JSON.stringify(fields)) {
+          throw new Error(`Canonical ABI mismatch: ${network.graphNetwork}/${event.name}`);
+        }
+      }
+    }
+  }
+}
+
 async function discoverDatasets(config) {
   const payload = await api("/datasets/search", {
     method: "POST",
@@ -173,15 +256,22 @@ async function discoverDatasets(config) {
       if (!addressTables.get(item.address.toLowerCase())?.has(dataset.full_name)) {
         throw new Error(`Decoded contract-address binding mismatch: ${dataset.full_name}`);
       }
-      const actualFields = new Set((dataset.schema?.fields ?? []).map(({ name }) => name));
+      const schemaFields = dataset.schema?.fields ?? [];
+      const actualFields = new Set(schemaFields.map(({ name }) => name));
       const expectedFields = new Set([...standardColumns, ...item.expectedFields]);
       if (!sameSet(actualFields, expectedFields)) {
         throw new Error(`Decoded schema mismatch: ${dataset.full_name}`);
       }
+      const schemaByName = new Map(schemaFields.map((field) => [field.name, field]));
+      for (const field of item.fields) {
+        const actualType = schemaType(schemaByName.get(field.name));
+        if (!actualType || !schemaTypeMatchesAbi(actualType, field.type)) {
+          throw new Error(`Decoded ABI type mismatch: ${dataset.full_name}/${field.name} (${actualType || "missing"} != ${field.type})`);
+        }
+      }
       bindings.push({
         contractRole: roleByKey[item.contractKey], contract: item.contractName,
-        event: item.eventName, table: dataset.full_name, datasetId: dataset.id ?? null,
-        status: "QUERYABLE",
+        event: item.eventName, table: dataset.full_name, status: "QUERYABLE",
       });
     }
     found[slug] = { expectedCount: expected.length, bindings };
@@ -254,6 +344,114 @@ SELECT
   ${outputColumns.join(",\n  ")}
 FROM ranked
 WHERE duplicate_rank = 1`;
+}
+
+function buildStateValidationSql(config, discovered) {
+  const branches = [];
+  for (const slug of ["base", "hyperevm", "bsc"]) {
+    for (const binding of discovered[slug].bindings) {
+      const event = contractEvents(config, slug).find((candidate) =>
+        candidate.contractName === binding.contract && candidate.eventName === binding.event);
+      if (!event) throw new Error(`Validation binding is not canonical: ${binding.table}`);
+      if (!/^nexa_v6_(?:base|hyperevm|bnb)\.[a-z0-9_]+$/.test(binding.table)) {
+        throw new Error(`Unsafe decoded dataset identifier: ${binding.table}`);
+      }
+      const canonicalAddress = event.address.toLowerCase();
+      branches.push(`SELECT
+  '${slug}' AS network_slug,
+  CAST(${event.chainId} AS bigint) AS chain_id,
+  '${event.eventName}' AS event_name,
+  '${binding.contractRole}' AS contract_role,
+  '${binding.table}' AS table_name,
+  CAST(${event.startBlock} AS bigint) AS start_block,
+  count(*) AS table_rows,
+  count_if(evt_block_number >= ${event.startBlock}
+    AND contract_address = ${canonicalAddress}) AS canonical_rows,
+  count_if(evt_block_number < ${event.startBlock}
+    AND contract_address = ${canonicalAddress}) AS pre_start_same_address_rows,
+  count_if(contract_address <> ${canonicalAddress}) AS other_address_rows,
+  min(CASE WHEN evt_block_number >= ${event.startBlock}
+    AND contract_address = ${canonicalAddress} THEN evt_block_number END) AS min_canonical_block,
+  max(CASE WHEN evt_block_number >= ${event.startBlock}
+    AND contract_address = ${canonicalAddress} THEN evt_block_number END) AS max_canonical_block
+FROM ${binding.table}`);
+    }
+  }
+  if (branches.length < 18) {
+    throw new Error(`Dune validation source is incomplete (${branches.length}/18 minimum)`);
+  }
+  return `-- Ephemeral bounded pre-activation audit; query_id remains 0 and is not saved.
+${branches.join("\nUNION ALL\n")}`;
+}
+
+async function executeSqlOnce(sql, label) {
+  const execution = await api("/sql/execute", {
+    method: "POST",
+    body: { sql },
+  });
+  return waitForExecution(execution.execution_id, label);
+}
+
+function evaluateNetworkStates(config, discovered, result) {
+  const resultRows = rows(result);
+  const bySource = new Map(resultRows.map((row) => [
+    `${row.network_slug}:${row.event_name}`,
+    row,
+  ]));
+  const networks = {};
+  for (const slug of ["base", "hyperevm", "bsc"]) {
+    const counts = {};
+    const tables = [];
+    const missingDatasets = [];
+    const unsafeHistory = [];
+    for (const event of contractEvents(config, slug)) {
+      const binding = discovered[slug].bindings.find((candidate) =>
+        candidate.contract === event.contractName && candidate.event === event.eventName);
+      if (!binding) {
+        counts[event.eventName] = null;
+        missingDatasets.push(event.eventName);
+        continue;
+      }
+      const row = bySource.get(`${slug}:${event.eventName}`);
+      if (!row) throw new Error(`Dune state audit omitted ${slug}/${event.eventName}`);
+      const canonicalRows = Number(row.canonical_rows);
+      const minCanonicalBlock = row.min_canonical_block === null
+        ? null
+        : Number(row.min_canonical_block);
+      if (minCanonicalBlock !== null && minCanonicalBlock < event.startBlock) {
+        unsafeHistory.push(event.eventName);
+      }
+      counts[event.eventName] = canonicalRows;
+      tables.push({
+        event: event.eventName,
+        table: binding.table,
+        canonicalRows,
+        tableRows: Number(row.table_rows),
+        preStartSameAddressRows: Number(row.pre_start_same_address_rows),
+        otherAddressRows: Number(row.other_address_rows),
+        minCanonicalBlock,
+        maxCanonicalBlock: row.max_canonical_block === null ? null : Number(row.max_canonical_block),
+        startBlock: event.startBlock,
+      });
+    }
+    const incompleteHistory = Object.entries(ACTIVATION_BASELINES[slug])
+      .filter(([eventName, minimum]) => (counts[eventName] ?? -1) < minimum)
+      .map(([eventName, minimum]) => ({ event: eventName, minimum, actual: counts[eventName] }));
+    const active = missingDatasets.length === 0
+      && incompleteHistory.length === 0
+      && unsafeHistory.length === 0;
+    networks[slug] = {
+      status: active ? "ACTIVE" : "BACKFILLING",
+      counts,
+      tables,
+      missingDatasets,
+      incompleteHistory,
+      unsafeHistory,
+      schemaValidation: missingDatasets.length === 0 ? "PASS" : "INCOMPLETE",
+      collisionProtection: unsafeHistory.length === 0 ? "PASS" : "UNSAFE",
+    };
+  }
+  return networks;
 }
 
 function buildDerivedQueries(fullMvName) {
@@ -420,7 +618,7 @@ function queryId(query) {
   return Number(query?.query_id ?? query?.queryId ?? query?.id);
 }
 
-async function syncQuery(listed, query, apply) {
+async function syncQuery(listed, query, apply, queryCache = new Map()) {
   const matches = listed.filter((item) => item.name === query.name);
   if (matches.length > 1) throw new Error(`Duplicate canonical Dune query name: ${query.name}`);
   const desired = desiredQuery(query);
@@ -434,7 +632,11 @@ async function syncQuery(listed, query, apply) {
   }
   const id = queryId(matches[0]);
   if (!Number.isInteger(id)) throw new Error(`Dune list returned no query ID: ${query.name}`);
-  const current = await api(`/query/${id}`);
+  let current = queryCache.get(id);
+  if (!current) {
+    current = await api(`/query/${id}`);
+    queryCache.set(id, current);
+  }
   const tags = Array.isArray(current.tags) ? [...current.tags].sort() : [];
   const changed = current.name !== desired.name
     || String(current.description ?? "") !== desired.description
@@ -507,12 +709,17 @@ function localSqlDifferences(canonicalSql, derived) {
   })).then((items) => items.filter(Boolean));
 }
 
-function buildSourceBindings(discovered, timestamp) {
-  const network = (slug, status, decodeBackfillStatus) => ({
-    status, decodeBackfillStatus,
-    lastValidatedAt: status === "ACTIVE" ? timestamp : timestamp,
-    tables: discovered[slug].bindings,
-  });
+function buildSourceBindings(discovered, timestamp, networkStates = null) {
+  const network = (slug) => {
+    const allDatasetsPresent = discovered[slug].bindings.length === discovered[slug].expectedCount;
+    const active = networkStates?.[slug]?.status === "ACTIVE";
+    return {
+      status: active ? "ACTIVE" : (allDatasetsPresent ? "DISCOVERED" : "PENDING_DECODE"),
+      decodeBackfillStatus: active ? "QUERYABLE" : (allDatasetsPresent ? "BACKFILLING" : "PENDING"),
+      lastValidatedAt: timestamp,
+      tables: discovered[slug].bindings,
+    };
+  };
   return {
     schemaVersion: 1,
     generatedFrom: {
@@ -522,9 +729,9 @@ function buildSourceBindings(discovered, timestamp) {
     },
     project: "nexa_v6",
     networks: {
-      base: network("base", "ACTIVE", "QUERYABLE"),
-      hyperevm: network("hyperevm", "ACTIVE", "QUERYABLE"),
-      bsc: network("bsc", "PENDING_DECODE", "PENDING"),
+      base: network("base"),
+      hyperevm: network("hyperevm"),
+      bsc: network("bsc"),
     },
   };
 }
@@ -564,7 +771,65 @@ function mvShortName(view) {
   return String(view?.sql_id ?? view?.name ?? view?.table_name ?? "").split(".").at(-1);
 }
 
-function buildHandoff(resources) {
+async function auditRemoteArchitecture(
+  listedQueries,
+  listedViews,
+  canonicalDefinition,
+  derivedDefinitions,
+  queryCache,
+  bnbPreviouslyActive,
+) {
+  const viewMatches = listedViews.filter((view) => mvShortName(view) === MV_NAME);
+  if (viewMatches.length !== 1) {
+    throw new Error(`Expected exactly one Dune materialized view ${MV_NAME}, found ${viewMatches.length}`);
+  }
+  const identifier = viewMatches[0].sql_id ?? viewMatches[0].name;
+  const view = { ...viewMatches[0], ...(await api(`/materialized-views/${encodeURIComponent(identifier)}`)) };
+  if (mvQueryId(view) !== EXPECTED_QUERY_IDS.canonical) {
+    throw new Error(`Canonical materialized view source mismatch: ${mvQueryId(view)}`);
+  }
+  const fullMvName = view.sql_id ?? (view.name?.includes(".") ? view.name : null);
+  if (fullMvName !== "dune.nexav6.result_nexa_v6_events_canonical") {
+    throw new Error(`Canonical materialized view identity mismatch: ${fullMvName}`);
+  }
+
+  const definitions = [canonicalDefinition, ...derivedDefinitions];
+  for (const definition of definitions) {
+    const expectedId = EXPECTED_QUERY_IDS[definition.key];
+    const listedMatches = listedQueries.filter((query) => queryId(query) === expectedId);
+    if (listedMatches.length !== 1) {
+      throw new Error(`Expected saved Dune query ${expectedId} exactly once, found ${listedMatches.length}`);
+    }
+    const current = await api(`/query/${expectedId}`);
+    queryCache.set(expectedId, current);
+    if (current.name !== definition.name) {
+      throw new Error(`Dune query identity mismatch: ${expectedId}`);
+    }
+    const sql = normalizeSql(current.query_sql);
+    if (definition.key === "canonical") {
+      const decodedSources = sql.match(/\bFROM\s+nexa_v6_(?:base|hyperevm|bnb)\.[a-z0-9_]+/gi) ?? [];
+      const expectedSourceCount = bnbPreviouslyActive ? 27 : 18;
+      if (decodedSources.length !== expectedSourceCount
+        || new Set(decodedSources.map((source) => source.toLowerCase())).size !== expectedSourceCount) {
+        throw new Error(`Canonical query ${expectedId} decoded-source count mismatch: ${decodedSources.length}`);
+      }
+      if (!bnbPreviouslyActive && /\bFROM\s+nexa_v6_bnb\./i.test(sql)) {
+        throw new Error("DUNE_REMOTE_BNB_PREMATURELY_ACTIVE");
+      }
+    } else {
+      if (!sql.includes(fullMvName)) {
+        throw new Error(`Derived query ${expectedId} does not read the canonical MV`);
+      }
+      if (/\bFROM\s+nexa_v6_(?:base|hyperevm|bnb)\./i.test(sql)
+        || /(?:\braw\b[^\n]*\blogs\b|\bgraph\b|\bsubstreams\b)/i.test(sql)) {
+        throw new Error(`Derived query ${expectedId} bypasses the canonical MV`);
+      }
+    }
+  }
+  return { view, fullMvName };
+}
+
+function buildHandoff(resources, networkStates) {
   const byKey = new Map(resources.map((resource) => [resource.query.key, resource]));
   const item = (key, title, recommendation) => {
     const resource = byKey.get(key);
@@ -585,9 +850,9 @@ authority. Dune is passive and non-authoritative.
 
 ## Coverage
 
-- Base — ACTIVE
-- HyperEVM — ACTIVE
-- BNB Smart Chain — PENDING_DECODE
+- Base — ${networkStates.base.status}
+- HyperEVM — ${networkStates.hyperevm.status}
+- BNB Smart Chain — ${networkStates.bsc.status}
 
 ## Widget order
 
@@ -623,13 +888,21 @@ function assertCanonicalEvidence(config, evidence) {
 }
 
 async function main() {
-  const [config, evidence, localManifest, localBindings] = await Promise.all([
+  const [config, evidence, localManifest, localBindings, registryAbi, routerAbi, moduleRegistryAbi] = await Promise.all([
     readJson("indexing/nexa-v6-indexing.json"),
     readJson("verification/indexing-deployment-evidence.json"),
     readJson("analytics/dune/dune-manifest.json"),
     readJson("analytics/dune/source-bindings.json"),
+    readJson("indexing/graph/abis/NexaMainnetRegistryV6.json"),
+    readJson("indexing/graph/abis/NexaMainnetRouterV6.json"),
+    readJson("indexing/graph/abis/NexaStandardModuleRegistryV6.json"),
   ]);
   assertCanonicalEvidence(config, evidence);
+  assertCanonicalAbis(config, {
+    registry: registryAbi,
+    router: routerAbi,
+    standardModuleRegistry: moduleRegistryAbi,
+  });
 
   // The catalog request is deliberately the first Dune call: a minimal read-scope audit.
   const discovered = await discoverDatasets(config);
@@ -638,36 +911,84 @@ async function main() {
       throw new Error(`Decoded activation gate failed for ${networkNames[slug]} (${discovered[slug].bindings.length}/${discovered[slug].expectedCount})`);
     }
   }
-  const bnbReady = discovered.bsc.bindings.length === discovered.bsc.expectedCount;
-  if (mode === "--activate-bnb" && !bnbReady) {
-    throw new Error(`DUNE_BNB_ACTIVATION_GATE_FAILED: ${discovered.bsc.bindings.length}/${discovered.bsc.expectedCount} canonical nexa_v6 datasets available`);
-  }
-  const includeBnb = bnbReady && (mode === "--activate-bnb"
-    || localManifest.networkStatus?.["BNB Smart Chain"] === "ACTIVE");
-  const apply = mode !== "--audit";
-  const targetStatus = includeBnb
-    ? "DUNE_ALL_NETWORKS_ANALYTICS_READY"
-    : "DUNE_BASE_HYPEREVM_ANALYTICS_READY";
-
   // Exactly one list call for saved queries and one for materialized views.
   const listedQueries = queryItems(await api("/queries?limit=1000&offset=0"));
   const listedViews = matviewItems(await api("/materialized-views?limit=10000&offset=0"));
 
-  const canonicalSql = buildCanonicalSql(config, discovered, includeBnb);
-  const canonicalDefinition = {
+  const canonicalBaseSql = buildCanonicalSql(config, discovered, false);
+  const canonicalBaseDefinition = {
     key: "canonical", file: "canonical-events.sql", name: CANONICAL_NAME,
     description: "The sole normalized Nexa V6 decoded-table source for passive Dune analytics.",
-    sql: canonicalSql,
+    sql: canonicalBaseSql,
   };
-  const canonical = await syncQuery(listedQueries, canonicalDefinition, apply);
-
-  const viewMatches = listedViews.filter((view) => mvShortName(view) === MV_NAME);
-  if (viewMatches.length > 1) throw new Error(`Duplicate Dune materialized view: ${MV_NAME}`);
-  let view = viewMatches[0] ?? null;
-  if (view) {
-    const identifier = view.sql_id ?? view.name;
-    view = { ...view, ...(await api(`/materialized-views/${encodeURIComponent(identifier)}`)) };
+  const queryCache = new Map();
+  const architecture = await auditRemoteArchitecture(
+    listedQueries,
+    listedViews,
+    canonicalBaseDefinition,
+    buildDerivedQueries("dune.nexav6.result_nexa_v6_events_canonical"),
+    queryCache,
+    localManifest.networkStatus?.["BNB Smart Chain"] === "ACTIVE",
+  );
+  const stateExecution = await executeSqlOnce(
+    buildStateValidationSql(config, discovered),
+    "Nexa V6 bounded pre-activation state audit",
+  );
+  const networkStates = evaluateNetworkStates(config, discovered, stateExecution);
+  const bnbDatasetsReady = discovered.bsc.bindings.length === discovered.bsc.expectedCount;
+  let bnbCandidateSql = null;
+  if (bnbDatasetsReady) {
+    bnbCandidateSql = buildCanonicalSql(config, discovered, true);
+    const bnbNetwork = config.networks.find(({ graphNetwork }) => graphNetwork === "bsc");
+    for (const contractKey of requiredContracts) {
+      const contract = bnbNetwork.contracts[contractKey];
+      const boundaryCount = bnbCandidateSql.split(`evt_block_number >= ${contract.startBlock}`).length - 1;
+      if (boundaryCount !== contract.events.length) {
+        throw new Error(`DUNE_BNB_ADDRESS_HISTORY_UNSAFE: missing ${contractKey} start-block filters`);
+      }
+    }
   }
+  console.log(JSON.stringify({
+    audit: "DUNE_V6_PREACTIVATION_AUDIT",
+    execution: executionSummary(stateExecution),
+    resources: {
+      canonicalQueryId: EXPECTED_QUERY_IDS.canonical,
+      canonicalMaterializedView: architecture.fullMvName,
+      derivedQueryIds: Object.fromEntries(Object.entries(EXPECTED_QUERY_IDS).filter(([keyName]) => keyName !== "canonical")),
+      canonicalDecodedTableReaderCount: 1,
+      derivedCanonicalMvReaderCount: 9,
+    },
+    networks: networkStates,
+    bnbCandidateGenerated: bnbCandidateSql !== null,
+    remoteMutationCount,
+  }, null, 2));
+  if (networkStates.bsc.unsafeHistory.length > 0) {
+    throw new Error(`DUNE_BNB_ADDRESS_HISTORY_UNSAFE: ${networkStates.bsc.unsafeHistory.join(", ")}`);
+  }
+  if (mode === "--activate-bnb") {
+    const incompleteNetworks = ["base", "hyperevm", "bsc"]
+      .filter((slug) => networkStates[slug].status !== "ACTIVE");
+    if (incompleteNetworks.length > 0) {
+      throw new Error(`DUNE_BNB_BACKFILL_INCOMPLETE: ${JSON.stringify(Object.fromEntries(
+        incompleteNetworks.map((slug) => [slug, networkStates[slug].incompleteHistory]),
+      ))}; remoteMutations=${remoteMutationCount}`);
+    }
+  }
+  if (mode === "--apply" && activeSlugs.some((slug) => networkStates[slug].status !== "ACTIVE")) {
+    throw new Error(`DUNE_BASE_HYPEREVM_BACKFILL_INCOMPLETE; remoteMutations=${remoteMutationCount}`);
+  }
+
+  const includeBnb = networkStates.bsc.status === "ACTIVE" && (mode === "--activate-bnb"
+    || localManifest.networkStatus?.["BNB Smart Chain"] === "ACTIVE");
+  const apply = mode === "--apply" || mode === "--activate-bnb";
+  const targetStatus = includeBnb
+    ? "DUNE_ALL_NETWORKS_ANALYTICS_READY"
+    : "DUNE_BASE_HYPEREVM_ANALYTICS_READY";
+  const canonicalSql = includeBnb ? bnbCandidateSql : canonicalBaseSql;
+  const canonicalDefinition = { ...canonicalBaseDefinition, sql: canonicalSql };
+  const canonical = await syncQuery(listedQueries, canonicalDefinition, apply, queryCache);
+
+  let view = architecture.view;
   if (view && Number.isInteger(mvQueryId(view)) && mvQueryId(view) !== canonical.id) {
     throw new Error(`Materialized view name is bound to another query: ${MV_NAME}`);
   }
@@ -704,16 +1025,12 @@ async function main() {
   const derivedDefinitions = buildDerivedQueries(fullMvName);
   const derived = [];
   for (const definition of derivedDefinitions) {
-    derived.push(await syncQuery(listedQueries, definition, apply));
+    derived.push(await syncQuery(listedQueries, definition, apply, queryCache));
   }
 
   if (!apply) {
     const timestamp = localBindings.networks?.base?.lastValidatedAt;
-    const expectedBindings = buildSourceBindings(discovered, timestamp);
-    if (includeBnb) {
-      expectedBindings.networks.bsc.status = "ACTIVE";
-      expectedBindings.networks.bsc.decodeBackfillStatus = "QUERYABLE";
-    }
+    const expectedBindings = buildSourceBindings(discovered, timestamp, networkStates);
     const localDiffs = await localSqlDifferences(canonicalSql, derivedDefinitions);
     const remoteDiffs = [canonical, ...derived].filter((resource) => resource.changed);
     const bindingDiff = stableJson(expectedBindings) !== stableJson(localBindings);
@@ -721,9 +1038,9 @@ async function main() {
     const manifestDiff = localManifest.canonicalQuery?.id !== canonical.id
       || localManifest.materializedView?.fullName !== fullMvName
       || derived.some((resource) => manifestIds.get(resource.query.name) !== resource.id)
-      || localManifest.networkStatus?.Base !== "ACTIVE"
-      || localManifest.networkStatus?.HyperEVM !== "ACTIVE"
-      || localManifest.networkStatus?.["BNB Smart Chain"] !== (includeBnb ? "ACTIVE" : "PENDING_DECODE");
+      || localManifest.networkStatus?.Base !== networkStates.base.status
+      || localManifest.networkStatus?.HyperEVM !== networkStates.hyperevm.status
+      || localManifest.networkStatus?.["BNB Smart Chain"] !== networkStates.bsc.status;
     if (viewDiffers || remoteDiffs.length || localDiffs.length || bindingDiff || manifestDiff) {
       console.log(JSON.stringify({
         status: "DUNE MUTATIONS REQUIRED", viewDiffers,
@@ -732,9 +1049,9 @@ async function main() {
       }, null, 2));
       return;
     }
-    console.log("Base: ACTIVE");
-    console.log("HyperEVM: ACTIVE");
-    console.log(includeBnb ? "BNB: ACTIVE" : "BNB: PENDING_DECODE");
+    console.log(`Base: ${networkStates.base.status}`);
+    console.log(`HyperEVM: ${networkStates.hyperevm.status}`);
+    console.log(`BNB: ${networkStates.bsc.status}`);
     console.log("NO DUNE MUTATIONS REQUIRED");
     return;
   }
@@ -762,11 +1079,7 @@ async function main() {
   if (!ownerMatch) throw new Error(`Unable to identify Dune owner from ${fullMvName}`);
   const owner = ownerMatch[1];
   const now = new Date().toISOString();
-  const sourceBindings = buildSourceBindings(discovered, now);
-  if (includeBnb) {
-    sourceBindings.networks.bsc.status = "ACTIVE";
-    sourceBindings.networks.bsc.decodeBackfillStatus = "QUERYABLE";
-  }
+  const sourceBindings = buildSourceBindings(discovered, now, networkStates);
   const queryRecords = derived.map((resource) => {
     const execution = validationExecutions.get(resource.query.key);
     const prior = (localManifest.queries ?? []).find(({ name }) => name === resource.query.name);
@@ -805,17 +1118,37 @@ async function main() {
         : (existingRefresh ? executionSummary(existingRefresh) : refreshPrior),
     },
     queries: queryRecords,
-    activeNetworks: includeBnb ? ["Base", "HyperEVM", "BNB Smart Chain"] : ["Base", "HyperEVM"],
-    pendingNetworks: includeBnb ? [] : ["BNB Smart Chain"],
+    lifecycle: {
+      resourceProvisioning: "COMPLETE",
+      datasetDiscovery: Object.fromEntries(Object.entries(networkNames).map(([slug, name]) => [
+        name,
+        discovered[slug].bindings.length === discovered[slug].expectedCount ? "DISCOVERED" : "PENDING",
+      ])),
+      decodeBackfill: Object.fromEntries(Object.entries(networkNames).map(([slug, name]) => [
+        name,
+        networkStates[slug].status === "ACTIVE" ? "COMPLETE" : "BACKFILLING",
+      ])),
+      analyticsActivation: Object.fromEntries(Object.entries(networkNames).map(([slug, name]) => [
+        name,
+        networkStates[slug].status === "ACTIVE" ? "ACTIVE" : "GATED",
+      ])),
+    },
+    activeNetworks: Object.entries(networkNames)
+      .filter(([slug]) => networkStates[slug].status === "ACTIVE")
+      .map(([, name]) => name),
+    pendingNetworks: Object.entries(networkNames)
+      .filter(([slug]) => networkStates[slug].status !== "ACTIVE")
+      .map(([, name]) => name),
     networkStatus: {
-      Base: "ACTIVE", HyperEVM: "ACTIVE",
-      "BNB Smart Chain": includeBnb ? "ACTIVE" : "PENDING_DECODE",
+      Base: networkStates.base.status,
+      HyperEVM: networkStates.hyperevm.status,
+      "BNB Smart Chain": networkStates.bsc.status,
     },
     sourceBindings: "./source-bindings.json",
     duneSourceTables: {
       Base: discovered.base.bindings.map(({ table }) => table),
       HyperEVM: discovered.hyperevm.bindings.map(({ table }) => table),
-      "BNB Smart Chain": includeBnb ? discovered.bsc.bindings.map(({ table }) => table) : [],
+      "BNB Smart Chain": discovered.bsc.bindings.map(({ table }) => table),
     },
     latestValidationTime: now,
     validation: {
@@ -830,15 +1163,28 @@ async function main() {
 
   await writeFile(resolve(DUNE_ROOT, "source-bindings.json"), stableJson(sourceBindings), "utf8");
   await writeFile(resolve(DUNE_ROOT, "dune-manifest.json"), stableJson(manifest), "utf8");
-  await writeFile(resolve(DUNE_ROOT, "DASHBOARD_HANDOFF.md"), buildHandoff(derived), "utf8");
+  await writeFile(resolve(DUNE_ROOT, "DASHBOARD_HANDOFF.md"), buildHandoff(derived, networkStates), "utf8");
 
-  console.log("Base: ACTIVE");
-  console.log("HyperEVM: ACTIVE");
-  console.log(includeBnb ? "BNB: ACTIVE" : "BNB: PENDING_DECODE");
+  console.log(`Base: ${networkStates.base.status}`);
+  console.log(`HyperEVM: ${networkStates.hyperevm.status}`);
+  console.log(`BNB: ${networkStates.bsc.status}`);
   console.log(manifest.status);
 }
 
-main().catch((error) => {
-  console.error(error.message);
-  process.exitCode = 1;
-});
+export {
+  ACTIVATION_BASELINES,
+  EXPECTED_QUERY_IDS,
+  buildCanonicalSql,
+  buildSourceBindings,
+  buildStateValidationSql,
+  contractEvents,
+  evaluateNetworkStates,
+  schemaTypeMatchesAbi,
+};
+
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((error) => {
+    console.error(error.message);
+    process.exitCode = 1;
+  });
+}

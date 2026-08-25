@@ -12,6 +12,7 @@
     "nexa-v6-onboard-verify": "./scripts/verify-onboarding.mjs"
   },
   "files": [
+    "analytics",
     "abi",
     "config",
     "contracts",
@@ -100,6 +101,8 @@
     "indexing:substreams:pack:hyper-evm": "node scripts/pack-substreams.mjs hyper-evm",
     "indexing:substreams:pack": "node scripts/pack-substreams.mjs all",
     "indexing:check": "npm run indexing:generate && npm run indexing:validate && npm run indexing:graph:codegen && npm run indexing:graph:build && npm run indexing:graph:test && npm run indexing:substreams:fmt && npm run indexing:substreams:test && npm run indexing:substreams:build && npm run indexing:substreams:package",
+    "dune:audit": "node scripts/sync-dune-v6.mjs --audit",
+    "dune:apply": "node scripts/sync-dune-v6.mjs --apply",
     "assemble:sdk-release": "node scripts/assemble-sdk-release.mjs",
     "sdk:conformance": "node scripts/verify-sdk-contract.mjs",
     "onboard:verify": "node scripts/verify-onboarding.mjs",
@@ -151,6 +154,9 @@
     "./indexing/config": "./indexing/nexa-v6-indexing.json",
     "./indexing/manifest": "./indexing/indexing-manifest.json",
     "./indexing/external-deployments": "./indexing/external-deployments.json",
+    "./analytics/dune/manifest": "./analytics/dune/dune-manifest.json",
+    "./analytics/dune/source-bindings": "./analytics/dune/source-bindings.json",
+    "./analytics/dune/canonical-sql": "./analytics/dune/sql/canonical-events.sql",
     "./networks": "./networks/network-ids.json",
     "./onboarding": "./onboarding/nexa-v6-solver-operator.json",
     "./openapi": "./openapi/openapi.json",

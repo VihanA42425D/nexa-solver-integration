@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "generatedFrom": {
+    "deployments": "../../indexing/nexa-v6-indexing.json",
+    "deploymentEvidence": "../../verification/indexing-deployment-evidence.json",
+    "events": "../../indexing/graph/abis/"
+  },
+  "project": "nexa_v6",
+  "networks": {
+    "base": {
+      "status": "DISCOVERED",
+      "decodeBackfillStatus": "QUERYABLE",
+      "lastValidatedAt": null,
+      "tables": []
+    },
+    "hyperevm": {
+      "status": "DISCOVERED",
+      "decodeBackfillStatus": "QUERYABLE",
+      "lastValidatedAt": null,
+      "tables": []
+    },
+    "bsc": {
+      "status": "PENDING_DECODE",
+      "decodeBackfillStatus": "PENDING",
+      "lastValidatedAt": null,
+      "tables": []
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "mode": "PASSIVE_ONCHAIN_ANALYTICS",
+  "authoritative": false,
+  "ingestion": "DUNE_DIRECT_CHAIN",
+  "status": "PENDING_APPLY",
+  "owner": null,
+  "profileUrl": null,
+  "capabilities": {
+    "queryReadWrite": null,
+    "materializedViews": null,
+    "dashboardWriteApi": "DUNE_NATIVE_DASHBOARD_API_UNAVAILABLE"
+  },
+  "canonicalQuery": null,
+  "materializedView": {
+    "name": "result_nexa_v6_events_canonical",
+    "fullName": null,
+    "sourceQueryId": null,
+    "isPrivate": false,
+    "performance": "default",
+    "cron": "0 * * * *",
+    "latestSuccessfulRefresh": null
+  },
+  "queries": [],
+  "activeNetworks": [],
+  "pendingNetworks": ["BNB Smart Chain"],
+  "networkStatus": {
+    "Base": "DISCOVERED",
+    "HyperEVM": "DISCOVERED",
+    "BNB Smart Chain": "PENDING_DECODE"
+  },
+  "sourceBindings": "./source-bindings.json",
+  "latestValidationTime": null,
+  "validation": null,
+  "signedFeedIngested": false,
+  "permitApiIngested": false,
+  "nexaRpcUsed": false,
+  "nexaDbUsed": false,
+  "runtimeDependency": false
+}

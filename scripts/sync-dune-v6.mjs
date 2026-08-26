@@ -119,6 +119,7 @@ const schemaTypeMatchesAbi = (actualType, abiType) => {
 const hex = (column) => `concat('0x', lower(to_hex("${column}")))`;
 const address = (column) => `concat('0x', lower(to_hex("${column}")))`;
 const nullable = (type) => `CAST(NULL AS ${type})`;
+const remoteMutations = [];
 let remoteMutationCount = 0;
 
 const key = process.env.DUNE_API_KEY;
@@ -126,8 +127,11 @@ const key = process.env.DUNE_API_KEY;
 async function api(path, { method = "GET", body } = {}) {
   if (!key) throw new Error("DUNE_API_KEY is required in the process environment");
   if ((method === "PATCH" && path.startsWith("/query/"))
-    || (method === "POST" && (path === "/query" || path === "/materialized-views"))) {
+    || (method === "POST" && (path === "/query"
+      || path === "/materialized-views"
+      || /^\/materialized-views\/[^/]+\/refresh$/.test(path)))) {
     remoteMutationCount += 1;
+    remoteMutations.push(`${method} ${path}`);
   }
   const response = await fetch(`${API}${path}`, {
     method,
@@ -419,7 +423,10 @@ function evaluateNetworkStates(config, discovered, result) {
         ? null
         : Number(row.min_canonical_block);
       if (minCanonicalBlock !== null && minCanonicalBlock < event.startBlock) {
-        unsafeHistory.push(event.eventName);
+        unsafeHistory.push(`${event.eventName}:PRE_START_CANONICAL_ROW`);
+      }
+      if (Number(row.other_address_rows) > 0) {
+        unsafeHistory.push(`${event.eventName}:NONCANONICAL_ADDRESS_ROWS`);
       }
       counts[event.eventName] = canonicalRows;
       tables.push({
@@ -462,7 +469,8 @@ function buildDerivedQueries(fullMvName) {
   const queries = [
     {
       key: "overview", file: "overview.sql", name: "Nexa V6 — Protocol Overview",
-      description: "Public passive onchain coverage summary for active Nexa V6 Dune networks.",
+      description: "Public onchain coverage summary for active Nexa V6 Dune networks.",
+      tags: ["nexa-v6", "onchain-analytics"],
       sql: `WITH current_route_status AS (
   SELECT chain_id, route_id, status,
     row_number() OVER (PARTITION BY chain_id, route_id ORDER BY block_number DESC, event_index DESC) AS rn
@@ -610,7 +618,7 @@ function desiredQuery(query) {
     description: query.description,
     query_sql: normalizeSql(query.sql),
     is_private: false,
-    tags: TAGS,
+    tags: query.tags ?? TAGS,
   };
 }
 
@@ -638,15 +646,23 @@ async function syncQuery(listed, query, apply, queryCache = new Map()) {
     queryCache.set(id, current);
   }
   const tags = Array.isArray(current.tags) ? [...current.tags].sort() : [];
-  const changed = current.name !== desired.name
-    || String(current.description ?? "") !== desired.description
-    || normalizeSql(current.query_sql) !== desired.query_sql
-    || current.is_private !== false
-    || JSON.stringify(tags) !== JSON.stringify([...TAGS].sort());
+  const drift = [
+    current.name !== desired.name ? "name" : null,
+    String(current.description ?? "") !== desired.description ? "description" : null,
+    normalizeSql(current.query_sql) !== desired.query_sql ? "sql" : null,
+    current.is_private !== false ? "privacy" : null,
+    JSON.stringify(tags) !== JSON.stringify([...desired.tags].sort()) ? "tags" : null,
+  ].filter(Boolean);
+  const changed = drift.length > 0;
   if (changed && apply) {
     await api(`/query/${id}`, { method: "PATCH", body: desired });
   }
-  return { query, id, changed, reason: changed ? (apply ? "UPDATED" : "UPDATE_REQUIRED") : "UNCHANGED", current };
+  return {
+    query, id, changed,
+    reason: changed ? (apply ? "UPDATED" : "UPDATE_REQUIRED") : "UNCHANGED",
+    drift,
+    current,
+  };
 }
 
 async function waitForExecution(executionId, label, maxChecks = 120) {
@@ -715,7 +731,7 @@ function buildSourceBindings(discovered, timestamp, networkStates = null) {
     const active = networkStates?.[slug]?.status === "ACTIVE";
     return {
       status: active ? "ACTIVE" : (allDatasetsPresent ? "DISCOVERED" : "PENDING_DECODE"),
-      decodeBackfillStatus: active ? "QUERYABLE" : (allDatasetsPresent ? "BACKFILLING" : "PENDING"),
+      decodeBackfillStatus: active ? "COMPLETE" : (allDatasetsPresent ? "BACKFILLING" : "PENDING"),
       lastValidatedAt: timestamp,
       tables: discovered[slug].bindings,
     };
@@ -738,9 +754,13 @@ function buildSourceBindings(discovered, timestamp, networkStates = null) {
 
 function validateOverview(result) {
   const byChain = new Map(rows(result).map((row) => [Number(row.chain_id), row]));
-  const baseline = new Map([[8453, "Base"], [999, "HyperEVM"]]);
+  const baseline = new Map([
+    [8453, { slug: "base", name: "Base" }],
+    [56, { slug: "bsc", name: "BNB Smart Chain" }],
+    [999, { slug: "hyperevm", name: "HyperEVM" }],
+  ]);
   const validation = {};
-  for (const [chainId, name] of baseline) {
+  for (const [chainId, { slug, name }] of baseline) {
     const row = byChain.get(chainId);
     if (!row) throw new Error(`Dune overview missing ${name}`);
     const counts = {
@@ -753,14 +773,63 @@ function validateOverview(result) {
       currentRouteStates: String(row.current_route_states ?? ""),
       latestEventTime: row.latest_indexed_nexa_event_time ?? null,
     };
-    if (counts.registeredNetworks < 3 || counts.registeredAssets < 19
-      || counts.registeredRoutes < 108 || counts.configuredStandardModules < 2
+    const minimum = ACTIVATION_BASELINES[slug];
+    if (counts.registeredNetworks < minimum.NetworkRegisteredV6
+      || counts.registeredAssets < minimum.AssetRegisteredV6
+      || counts.registeredRoutes < minimum.RouteRegisteredV6
+      || counts.configuredStandardModules < minimum.StandardModuleConfiguredV6
+      || (minimum.SourceIntakeConfigured !== undefined
+        && counts.sourceIntakeEvents < minimum.SourceIntakeConfigured)
+      || (minimum.SourceFillV6 !== undefined && counts.sourceFills < minimum.SourceFillV6)
       || !counts.currentRouteStates) {
       throw new Error(`Dune baseline validation failed for ${name}: ${JSON.stringify(counts)}`);
     }
     validation[name] = { status: "PASS", ...counts };
   }
   return validation;
+}
+
+function rowCountsByChain(result) {
+  const counts = { Base: 0, "BNB Smart Chain": 0, HyperEVM: 0 };
+  const nameById = new Map([[8453, "Base"], [56, "BNB Smart Chain"], [999, "HyperEVM"]]);
+  for (const row of rows(result)) {
+    const name = nameById.get(Number(row.chain_id));
+    if (name) counts[name] += 1;
+  }
+  return counts;
+}
+
+function assertChainMinimums(label, counts, minimums) {
+  for (const [name, minimum] of Object.entries(minimums)) {
+    if ((counts[name] ?? 0) < minimum) {
+      throw new Error(`${label} missing ${name}: ${counts[name] ?? 0}/${minimum}`);
+    }
+  }
+}
+
+function validateDownstreamExecutions(executions) {
+  const result = {};
+  const overview = executions.get("overview");
+  result.overview = validateOverview(overview);
+
+  const specs = [
+    ["networksCurrent", "Current Networks", { Base: 3, "BNB Smart Chain": 3, HyperEVM: 3 }],
+    ["assetsCurrent", "Current Assets", { Base: 19, "BNB Smart Chain": 19, HyperEVM: 19 }],
+    ["routesCurrent", "Current Routes", { Base: 108, "BNB Smart Chain": 126, HyperEVM: 108 }],
+    ["routeStatusHistory", "Route Status History", { Base: 216, "BNB Smart Chain": 252, HyperEVM: 216 }],
+    ["routerState", "Router Source Intake", { Base: 1 }],
+    ["standardModules", "Standard Modules", { Base: 2, "BNB Smart Chain": 2, HyperEVM: 2 }],
+    ["sourceFills", "Source Fills", { Base: 9 }],
+    ["recentActivity", "Recent Activity", { Base: 1, "BNB Smart Chain": 1, HyperEVM: 1 }],
+  ];
+  for (const [keyName, label, minimums] of specs) {
+    const execution = executions.get(keyName);
+    if (!execution) throw new Error(`Missing downstream execution result: ${keyName}`);
+    const counts = rowCountsByChain(execution);
+    assertChainMinimums(label, counts, minimums);
+    result[keyName] = { status: "PASS", rowsByChain: counts };
+  }
+  return result;
 }
 
 function mvQueryId(view) {
@@ -911,34 +980,10 @@ async function main() {
       throw new Error(`Decoded activation gate failed for ${networkNames[slug]} (${discovered[slug].bindings.length}/${discovered[slug].expectedCount})`);
     }
   }
-  // Exactly one list call for saved queries and one for materialized views.
-  const listedQueries = queryItems(await api("/queries?limit=1000&offset=0"));
-  const listedViews = matviewItems(await api("/materialized-views?limit=10000&offset=0"));
-
   const canonicalBaseSql = buildCanonicalSql(config, discovered, false);
-  const canonicalBaseDefinition = {
-    key: "canonical", file: "canonical-events.sql", name: CANONICAL_NAME,
-    description: "The sole normalized Nexa V6 decoded-table source for passive Dune analytics.",
-    sql: canonicalBaseSql,
-  };
-  const queryCache = new Map();
-  const architecture = await auditRemoteArchitecture(
-    listedQueries,
-    listedViews,
-    canonicalBaseDefinition,
-    buildDerivedQueries("dune.nexav6.result_nexa_v6_events_canonical"),
-    queryCache,
-    localManifest.networkStatus?.["BNB Smart Chain"] === "ACTIVE",
-  );
-  const stateExecution = await executeSqlOnce(
-    buildStateValidationSql(config, discovered),
-    "Nexa V6 bounded pre-activation state audit",
-  );
-  const networkStates = evaluateNetworkStates(config, discovered, stateExecution);
   const bnbDatasetsReady = discovered.bsc.bindings.length === discovered.bsc.expectedCount;
-  let bnbCandidateSql = null;
-  if (bnbDatasetsReady) {
-    bnbCandidateSql = buildCanonicalSql(config, discovered, true);
+  const bnbCandidateSql = bnbDatasetsReady ? buildCanonicalSql(config, discovered, true) : null;
+  if (bnbCandidateSql) {
     const bnbNetwork = config.networks.find(({ graphNetwork }) => graphNetwork === "bsc");
     for (const contractKey of requiredContracts) {
       const contract = bnbNetwork.contracts[contractKey];
@@ -948,9 +993,78 @@ async function main() {
       }
     }
   }
+  const finalAlreadyActive = localManifest.status === "DUNE_ALL_NETWORKS_ANALYTICS_READY"
+    && ["Base", "HyperEVM", "BNB Smart Chain"]
+      .every((name) => localManifest.networkStatus?.[name] === "ACTIVE");
+  const currentCanonicalSql = finalAlreadyActive ? bnbCandidateSql : canonicalBaseSql;
+  if (!currentCanonicalSql) throw new Error("Canonical BNB source bindings are incomplete");
+  const currentCanonicalDefinition = {
+    key: "canonical", file: "canonical-events.sql", name: CANONICAL_NAME,
+    description: "The sole normalized Nexa V6 decoded-table source for passive Dune analytics.",
+    sql: currentCanonicalSql,
+  };
+  const fullMvName = "dune.nexav6.result_nexa_v6_events_canonical";
+  const derivedDefinitions = buildDerivedQueries(fullMvName);
+
+  // Exactly one list call for saved queries and one for materialized views.
+  const listedQueries = queryItems(await api("/queries?limit=1000&offset=0"));
+  const listedViews = matviewItems(await api("/materialized-views?limit=10000&offset=0"));
+  const queryCache = new Map();
+  const architecture = await auditRemoteArchitecture(
+    listedQueries,
+    listedViews,
+    currentCanonicalDefinition,
+    derivedDefinitions,
+    queryCache,
+    finalAlreadyActive,
+  );
+  const view = architecture.view;
+  const viewDiffers = !view
+    || mvQueryId(view) !== EXPECTED_QUERY_IDS.canonical
+    || (view.is_private !== undefined && view.is_private !== false)
+    || ((view.cron_expression ?? view.schedule?.cron_expression) !== undefined
+      && (view.cron_expression ?? view.schedule?.cron_expression) !== CRON)
+    || (view.performance !== undefined && view.performance !== null
+      && view.performance !== "default" && view.performance !== "medium");
+  if (viewDiffers) throw new Error("DUNE_CANONICAL_MV_CONFIGURATION_UNSAFE");
+
+  const canonicalPreflight = await syncQuery(
+    listedQueries, currentCanonicalDefinition, false, queryCache,
+  );
+  const derivedPreflight = [];
+  for (const definition of derivedDefinitions) {
+    derivedPreflight.push(await syncQuery(listedQueries, definition, false, queryCache));
+  }
+  if (canonicalPreflight.changed || derivedPreflight.some(({ changed }) => changed)) {
+    throw new Error(`DUNE_EXISTING_RESOURCE_DRIFT: ${JSON.stringify([
+      canonicalPreflight,
+      ...derivedPreflight,
+    ].filter(({ changed }) => changed).map(({ query, reason, drift }) => ({
+      id: EXPECTED_QUERY_IDS[query.key], name: query.name, reason, drift,
+    })))}; remoteMutations=${remoteMutationCount}`);
+  }
+
+  let stateExecution = null;
+  let networkStates = null;
+  let auditSource = "LIVE_BOUNDED_DECODED_TABLE_AUDIT";
+  if (mode === "--audit" && finalAlreadyActive) {
+    networkStates = localManifest.validation?.activationAudit ?? null;
+    auditSource = "COMMITTED_FINAL_ACTIVATION_EVIDENCE";
+    if (!networkStates || ["base", "hyperevm", "bsc"]
+      .some((slug) => networkStates[slug]?.status !== "ACTIVE")) {
+      throw new Error("DUNE_FINAL_ACTIVATION_EVIDENCE_MISSING");
+    }
+  } else {
+    stateExecution = await executeSqlOnce(
+      buildStateValidationSql(config, discovered),
+      "Nexa V6 bounded final activation state audit",
+    );
+    networkStates = evaluateNetworkStates(config, discovered, stateExecution);
+  }
   console.log(JSON.stringify({
-    audit: "DUNE_V6_PREACTIVATION_AUDIT",
-    execution: executionSummary(stateExecution),
+    audit: "DUNE_V6_FINAL_ACTIVATION_AUDIT",
+    auditSource,
+    execution: stateExecution ? executionSummary(stateExecution) : null,
     resources: {
       canonicalQueryId: EXPECTED_QUERY_IDS.canonical,
       canonicalMaterializedView: architecture.fullMvName,
@@ -969,7 +1083,7 @@ async function main() {
     const incompleteNetworks = ["base", "hyperevm", "bsc"]
       .filter((slug) => networkStates[slug].status !== "ACTIVE");
     if (incompleteNetworks.length > 0) {
-      throw new Error(`DUNE_BNB_BACKFILL_INCOMPLETE: ${JSON.stringify(Object.fromEntries(
+      throw new Error(`DUNE_DECODE_BACKFILL_INCOMPLETE: ${JSON.stringify(Object.fromEntries(
         incompleteNetworks.map((slug) => [slug, networkStates[slug].incompleteHistory]),
       ))}; remoteMutations=${remoteMutationCount}`);
     }
@@ -979,54 +1093,32 @@ async function main() {
   }
 
   const includeBnb = networkStates.bsc.status === "ACTIVE" && (mode === "--activate-bnb"
-    || localManifest.networkStatus?.["BNB Smart Chain"] === "ACTIVE");
+    || finalAlreadyActive);
   const apply = mode === "--apply" || mode === "--activate-bnb";
   const targetStatus = includeBnb
     ? "DUNE_ALL_NETWORKS_ANALYTICS_READY"
     : "DUNE_BASE_HYPEREVM_ANALYTICS_READY";
   const canonicalSql = includeBnb ? bnbCandidateSql : canonicalBaseSql;
-  const canonicalDefinition = { ...canonicalBaseDefinition, sql: canonicalSql };
-  const canonical = await syncQuery(listedQueries, canonicalDefinition, apply, queryCache);
+  const canonicalDefinition = { ...currentCanonicalDefinition, sql: canonicalSql };
+  const canonical = apply
+    ? await syncQuery(listedQueries, canonicalDefinition, true, queryCache)
+    : canonicalPreflight;
 
-  let view = architecture.view;
-  if (view && Number.isInteger(mvQueryId(view)) && mvQueryId(view) !== canonical.id) {
-    throw new Error(`Materialized view name is bound to another query: ${MV_NAME}`);
-  }
-  const viewDiffers = !view
-    || (Number.isInteger(mvQueryId(view)) && mvQueryId(view) !== canonical.id)
-    || (view.is_private !== undefined && view.is_private !== false)
-    || ((view.cron_expression ?? view.schedule?.cron_expression) !== undefined
-      && (view.cron_expression ?? view.schedule?.cron_expression) !== CRON)
-    || (view.performance !== undefined && view.performance !== null
-      && view.performance !== "default" && view.performance !== "medium");
-  const canonicalNeedsRefresh = canonical.changed || viewDiffers;
-
-  let canonicalExecution = null;
   let refreshExecution = null;
-  let fullMvName = view?.sql_id ?? (view?.name?.includes(".") ? view.name : localManifest.materializedView?.fullName);
-  if (apply && canonicalNeedsRefresh) {
-    canonicalExecution = await executeQueryOnce(canonical.id, CANONICAL_NAME);
-    const upserted = await api("/materialized-views", {
+  if (apply && canonical.changed) {
+    const refreshed = await api(`/materialized-views/${encodeURIComponent(MV_NAME)}/refresh`, {
       method: "POST",
-      body: {
-        cron_expression: CRON, is_private: false, name: MV_NAME,
-        query_id: canonical.id,
-      },
+      body: {},
     });
-    fullMvName = upserted.name;
-    refreshExecution = await waitForExecution(upserted.execution_id, `materialized view ${MV_NAME}`);
+    refreshExecution = await waitForExecution(
+      refreshed.execution_id,
+      `materialized view ${MV_NAME}`,
+    );
   }
-  if (!fullMvName) fullMvName = localManifest.materializedView?.fullName;
-  if (!fullMvName && !apply) {
-    console.log("DUNE MUTATIONS REQUIRED: canonical materialized view is not applied");
-    return;
+  if (mode === "--activate-bnb" && (!canonical.changed || !refreshExecution)) {
+    throw new Error("DUNE_FINAL_ACTIVATION_DID_NOT_MUTATE_CANONICAL_AND_REFRESH_ONCE");
   }
-
-  const derivedDefinitions = buildDerivedQueries(fullMvName);
-  const derived = [];
-  for (const definition of derivedDefinitions) {
-    derived.push(await syncQuery(listedQueries, definition, apply, queryCache));
-  }
+  const derived = derivedPreflight;
 
   if (!apply) {
     const timestamp = localBindings.networks?.base?.lastValidatedAt;
@@ -1058,21 +1150,26 @@ async function main() {
 
   await writeSqlFiles(canonicalSql, derivedDefinitions);
   const validationExecutions = new Map();
-  const validationNeeded = canonicalNeedsRefresh
-    || localManifest.status !== targetStatus
-    || derived.some(({ changed }) => changed);
-  let networkValidation = localManifest.validation?.networks;
-  if (validationNeeded) {
-    const overview = derived.find(({ query }) => query.key === "overview");
-    const overviewExecution = await executeQueryOnce(overview.id, overview.query.name);
-    validationExecutions.set("overview", overviewExecution);
-    networkValidation = validateOverview(overviewExecution);
-    for (const resource of derived.filter(({ query }) => query.key !== "overview")) {
-      validationExecutions.set(resource.query.key, await executeQueryOnce(resource.id, resource.query.name));
-    }
+  for (const resource of derived) {
+    validationExecutions.set(
+      resource.query.key,
+      await executeQueryOnce(resource.id, resource.query.name),
+    );
   }
-  if (!networkValidation?.Base || !networkValidation?.HyperEVM) {
-    throw new Error("Dune network validation results unavailable");
+  const downstreamValidation = validateDownstreamExecutions(validationExecutions);
+  const networkValidation = downstreamValidation.overview;
+  if (!networkValidation.Base || !networkValidation["BNB Smart Chain"]
+    || !networkValidation.HyperEVM) {
+    throw new Error("Dune three-network validation results unavailable");
+  }
+  if (mode === "--activate-bnb") {
+    const expectedMutations = [
+      `PATCH /query/${EXPECTED_QUERY_IDS.canonical}`,
+      `POST /materialized-views/${encodeURIComponent(MV_NAME)}/refresh`,
+    ];
+    if (stableJson(remoteMutations) !== stableJson(expectedMutations)) {
+      throw new Error(`DUNE_UNEXPECTED_MUTATION_SET: ${JSON.stringify(remoteMutations)}`);
+    }
   }
 
   const ownerMatch = /^dune\.([^.]+)\./.exec(fullMvName);
@@ -1086,17 +1183,15 @@ async function main() {
     return {
       key: resource.query.key, name: resource.query.name, id: resource.id,
       url: `https://dune.com/queries/${resource.id}`, public: true,
-      validation: execution ? executionSummary(execution) : prior?.validation,
+      validation: execution ? {
+        ...executionSummary(execution),
+        semantic: downstreamValidation[resource.query.key],
+      } : prior?.validation,
     };
   });
   const canonicalPrior = localManifest.canonicalQuery?.validation;
   const refreshPrior = localManifest.materializedView?.latestSuccessfulRefresh;
-  const canonicalLatest = canonicalExecution
-    ?? (await api(`/query/${canonical.id}/results?limit=1`));
-  const existingRefreshId = view?.last_execution_ids?.[0];
-  const existingRefresh = refreshExecution || !existingRefreshId
-    ? null
-    : await api(`/execution/${existingRefreshId}/results?limit=1`);
+  const canonicalLatest = refreshExecution ?? canonicalPrior;
   const manifest = {
     schemaVersion: 1, mode: "PASSIVE_ONCHAIN_ANALYTICS", authoritative: false,
     ingestion: "DUNE_DIRECT_CHAIN",
@@ -1108,14 +1203,15 @@ async function main() {
     },
     canonicalQuery: {
       id: canonical.id, name: CANONICAL_NAME, url: `https://dune.com/queries/${canonical.id}`,
-      public: true, validation: canonicalLatest ? executionSummary(canonicalLatest) : canonicalPrior,
+      public: true,
+      validation: refreshExecution ? executionSummary(refreshExecution) : canonicalLatest,
     },
     materializedView: {
       name: MV_NAME, fullName: fullMvName, sourceQueryId: canonical.id,
       isPrivate: false, performance: "default", cron: CRON,
       latestSuccessfulRefresh: refreshExecution
         ? executionSummary(refreshExecution)
-        : (existingRefresh ? executionSummary(existingRefresh) : refreshPrior),
+        : refreshPrior,
     },
     queries: queryRecords,
     lifecycle: {
@@ -1153,6 +1249,9 @@ async function main() {
     latestValidationTime: now,
     validation: {
       status: "PASS", networks: networkValidation,
+      activationAudit: networkStates,
+      downstream: downstreamValidation,
+      remoteMutations: [...remoteMutations],
       crossCheck: "PASSED_COMMITTED_INDEXING_BASELINE_LOWER_BOUNDS",
       sourceFillSchema: "PASS",
       sourceIntakePath: "PASS",
@@ -1168,6 +1267,7 @@ async function main() {
   console.log(`Base: ${networkStates.base.status}`);
   console.log(`HyperEVM: ${networkStates.hyperevm.status}`);
   console.log(`BNB: ${networkStates.bsc.status}`);
+  console.log(JSON.stringify({ remoteMutations, downstreamValidation }, null, 2));
   console.log(manifest.status);
 }
 
@@ -1180,6 +1280,7 @@ export {
   contractEvents,
   evaluateNetworkStates,
   schemaTypeMatchesAbi,
+  validateDownstreamExecutions,
 };
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

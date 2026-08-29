@@ -3,14 +3,13 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   SITEMAP_XML as SOLVER_SITEMAP,
-  SOLVER_INDEXNOW_KEY,
-  SOLVER_INDEXNOW_KEY_FILE,
 } from "../src/worker.mjs";
+import indexNowConfig from "../config/indexnow.json" with { type: "json" };
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DOCS_ORIGIN = "https://docs.vsnexa.com";
-const DOCS_KEY = "7e2f3a91-4c86-4b52-a9d0-1f6c8e3b5a74";
-const DOCS_KEY_FILE = `${DOCS_KEY}.txt`;
+const INDEXNOW_KEY = indexNowConfig.key;
+const INDEXNOW_KEY_FILE = indexNowConfig.keyFile;
 const INDEXNOW_ENDPOINT = "https://api.indexnow.org/indexnow";
 const shouldSubmit = process.argv.includes("--submit");
 
@@ -26,28 +25,29 @@ const decodeXml = (value) => value
   .replaceAll("&apos;", "'");
 
 const docsSourceKey = (
-  await readFile(join(ROOT, "docs-site", "docs", DOCS_KEY_FILE), "utf8")
+  await readFile(join(ROOT, "docs-site", "docs", INDEXNOW_KEY_FILE), "utf8")
 ).trim();
-assert(docsSourceKey === DOCS_KEY, "Documentation IndexNow key file is invalid");
+assert(docsSourceKey === INDEXNOW_KEY, "Documentation IndexNow key file is invalid");
 
 const targets = [
   {
     label: "documentation",
     origin: DOCS_ORIGIN,
-    key: DOCS_KEY,
-    keyFile: DOCS_KEY_FILE,
+    key: INDEXNOW_KEY,
+    keyFile: INDEXNOW_KEY_FILE,
     sitemap: await readFile(join(ROOT, "docs-site", "site", "sitemap.xml"), "utf8"),
   },
   {
     label: "solver",
     origin: "https://solver.vsnexa.com",
-    key: SOLVER_INDEXNOW_KEY,
-    keyFile: SOLVER_INDEXNOW_KEY_FILE,
+    key: INDEXNOW_KEY,
+    keyFile: INDEXNOW_KEY_FILE,
     sitemap: SOLVER_SITEMAP,
   },
 ].map((target) => {
   assert(/^[A-Za-z0-9-]{8,128}$/.test(target.key), `Invalid ${target.label} IndexNow key`);
   assert(target.keyFile === `${target.key}.txt`, `Invalid ${target.label} IndexNow filename`);
+  assert(indexNowConfig.hosts.includes(new URL(target.origin).host), `Unapproved ${target.label} IndexNow host`);
   const urlList = [...target.sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)]
     .map((match) => decodeXml(match[1].trim()));
   assert(urlList.length > 0, `${target.label} sitemap has no URLs`);

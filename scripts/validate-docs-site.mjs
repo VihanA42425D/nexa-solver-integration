@@ -2,13 +2,14 @@ import { access, readFile, readdir } from "node:fs/promises";
 import { dirname, extname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { auditRepositoryForSecrets } from "./repo-secret-audit.mjs";
+import indexNowConfig from "../config/indexnow.json" with { type: "json" };
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE = join(ROOT, "docs-site", "docs");
 const SITE = join(ROOT, "docs-site", "site");
 const ORIGIN = "https://docs.vsnexa.com";
-const INDEXNOW_KEY = "7e2f3a91-4c86-4b52-a9d0-1f6c8e3b5a74";
-const INDEXNOW_KEY_FILE = `${INDEXNOW_KEY}.txt`;
+const INDEXNOW_KEY = indexNowConfig.key;
+const INDEXNOW_KEY_FILE = indexNowConfig.keyFile;
 
 const requiredRoutes = [
   ["/", "index.html"],
@@ -287,6 +288,14 @@ for (const file of ["404.html", "search/search_index.json", "_headers", "_redire
 
 const indexNowSourceKey = (await readFile(join(SOURCE, INDEXNOW_KEY_FILE), "utf8")).trim();
 const indexNowBuiltKey = (await readFile(join(SITE, INDEXNOW_KEY_FILE), "utf8")).trim();
+assert(/^[A-Za-z0-9-]{8,128}$/.test(INDEXNOW_KEY), "Canonical IndexNow key is invalid");
+assert(INDEXNOW_KEY_FILE === `${INDEXNOW_KEY}.txt`, "Canonical IndexNow filename is invalid");
+assert(
+  indexNowConfig.hosts.length === 2
+    && indexNowConfig.hosts.includes("docs.vsnexa.com")
+    && indexNowConfig.hosts.includes("solver.vsnexa.com"),
+  "Canonical IndexNow host allowlist is invalid",
+);
 assert(indexNowSourceKey === INDEXNOW_KEY, "IndexNow source key file is invalid");
 assert(indexNowBuiltKey === INDEXNOW_KEY, "IndexNow key file was not copied to the site root");
 
@@ -298,6 +307,10 @@ for (const header of [
   assert(headers.includes(`${header}:`), `Missing security header: ${header}`);
 }
 assert(!headers.includes("X-Robots-Tag: all"), "Global X-Robots-Tag must not index crawler-control files");
+assert(
+  headers.includes(`/${INDEXNOW_KEY_FILE}\n  X-Robots-Tag: noindex, nofollow`),
+  "IndexNow ownership file must be noindex,nofollow",
+);
 for (const path of [
   "/robots.txt", "/sitemap.xml", "/llms.txt", "/llms-full.txt", "/assets/openapi.json",
 ]) {

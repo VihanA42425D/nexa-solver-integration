@@ -1,10 +1,19 @@
 import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import indexNowConfig from "../config/indexnow.json" with { type: "json" };
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DOCS = join(ROOT, "docs-site", "docs");
 const GENERATED = join(DOCS, "generated");
+const INDEXNOW_KEY = indexNowConfig.key;
+const INDEXNOW_KEY_FILE = indexNowConfig.keyFile;
+
+if (!/^[A-Za-z0-9-]{8,128}$/.test(INDEXNOW_KEY)
+    || INDEXNOW_KEY_FILE !== `${INDEXNOW_KEY}.txt`
+    || !indexNowConfig.hosts.includes("docs.vsnexa.com")) {
+  throw new Error("Invalid canonical IndexNow configuration");
+}
 
 const readJson = async (relativePath) => JSON.parse(
   await readFile(join(ROOT, relativePath), "utf8"),
@@ -196,6 +205,7 @@ await Promise.all([
   generateSdk(),
   generateStandards(),
   generateIndexing(),
+  writeFile(join(DOCS, INDEXNOW_KEY_FILE), INDEXNOW_KEY, "utf8"),
   copyFile(join(ROOT, "openapi", "openapi.json"), join(DOCS, "assets", "openapi.json")),
 ]);
 

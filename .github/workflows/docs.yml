@@ -6,6 +6,7 @@ on:
     paths:
       - "docs-site/**"
       - "docs-ticket-worker/**"
+      - "config/indexnow.json"
       - "src/worker.mjs"
       - "public/.well-known/nexa-solver.json"
       - "public/.well-known/nexa-onchain-discovery.json"
@@ -30,6 +31,7 @@ on:
     paths:
       - "docs-site/**"
       - "docs-ticket-worker/**"
+      - "config/indexnow.json"
       - "src/worker.mjs"
       - "public/.well-known/nexa-solver.json"
       - "public/.well-known/nexa-onchain-discovery.json"

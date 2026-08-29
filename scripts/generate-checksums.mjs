@@ -8,6 +8,7 @@ export const CHECKSUM_FILES = Object.freeze([
   "README.md",
   "package.json",
   "package-lock.json",
+  "config/indexnow.json",
   "manifest.json",
   "nexa-mainnet-v6.json",
   "public/.well-known/nexa-solver.json",

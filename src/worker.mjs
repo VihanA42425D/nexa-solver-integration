@@ -2,13 +2,20 @@ import solverManifest from "../public/.well-known/nexa-solver.json" with { type:
 import onchainDiscovery from "../public/.well-known/nexa-onchain-discovery.json" with { type: "json" };
 import standardsManifest from "../public/.well-known/nexa-standards.json" with { type: "json" };
 import openApiDocument from "../openapi/openapi.json" with { type: "json" };
+import indexNowConfig from "../config/indexnow.json" with { type: "json" };
 
 const SOLVER_HOST = "solver.vsnexa.com";
 const APP_HOST = "vsnexa.com";
 const SOLVER_BASE_URL = `https://${SOLVER_HOST}`;
-const SOLVER_INDEXNOW_KEY = "d4b831c2-2f9a-4e65-a741-8b6c0d3f92e1";
-const SOLVER_INDEXNOW_KEY_FILE = `${SOLVER_INDEXNOW_KEY}.txt`;
+const SOLVER_INDEXNOW_KEY = indexNowConfig.key;
+const SOLVER_INDEXNOW_KEY_FILE = indexNowConfig.keyFile;
 const SOLVER_INDEXNOW_PATH = `/${SOLVER_INDEXNOW_KEY_FILE}`;
+
+if (!/^[A-Za-z0-9-]{8,128}$/.test(SOLVER_INDEXNOW_KEY)
+    || SOLVER_INDEXNOW_KEY_FILE !== `${SOLVER_INDEXNOW_KEY}.txt`
+    || !indexNowConfig.hosts.includes(SOLVER_HOST)) {
+  throw new Error("Invalid canonical IndexNow configuration");
+}
 
 const SOLVER_MANIFEST_URL = `${SOLVER_BASE_URL}/.well-known/nexa-solver.json`;
 const OPENAPI_URL = `${SOLVER_BASE_URL}/openapi.json`;

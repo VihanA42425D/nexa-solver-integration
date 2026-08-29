@@ -8,6 +8,8 @@ on:
       - "docs-ticket-worker/**"
       - "scripts/generate-docs-site.mjs"
       - "scripts/validate-docs-site.mjs"
+      - "scripts/validate-docs-external-links.mjs"
+      - "scripts/submit-indexnow.mjs"
       - "scripts/repo-secret-audit.mjs"
       - "openapi/openapi.json"
       - "nexa-mainnet-v6.json"
@@ -24,6 +26,8 @@ on:
       - "docs-ticket-worker/**"
       - "scripts/generate-docs-site.mjs"
       - "scripts/validate-docs-site.mjs"
+      - "scripts/validate-docs-external-links.mjs"
+      - "scripts/submit-indexnow.mjs"
       - "scripts/repo-secret-audit.mjs"
       - "openapi/openapi.json"
       - "nexa-mainnet-v6.json"
@@ -55,6 +59,7 @@ jobs:
       - run: npm ci
       - run: python -m pip install -r docs-site/requirements.txt
       - run: npm run docs:validate
+      - run: npm run docs:indexnow:check
       - run: npm run docs:ticket:check
       - run: node --test test/docs-ticket-worker.test.mjs
       - name: Deploy documentation to Cloudflare Pages
@@ -63,3 +68,7 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_GH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: npx wrangler pages deploy docs-site/site --project-name=nexa-docs --branch=main
+      - name: Notify IndexNow about documentation changes
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        continue-on-error: true
+        run: npm run docs:indexnow:submit

@@ -7,6 +7,8 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE = join(ROOT, "docs-site", "docs");
 const SITE = join(ROOT, "docs-site", "site");
 const ORIGIN = "https://docs.vsnexa.com";
+const INDEXNOW_KEY = "7e2f3a91-4c86-4b52-a9d0-1f6c8e3b5a74";
+const INDEXNOW_KEY_FILE = `${INDEXNOW_KEY}.txt`;
 
 const requiredRoutes = [
   ["/", "index.html"],
@@ -218,6 +220,11 @@ assert(llmsFull.includes("exact: one Bot source transaction plus one Nexa destin
 for (const file of ["404.html", "search/search_index.json", "_headers", "_redirects", "assets/openapi.json"]) {
   assert(await exists(join(SITE, file)), `Missing built static artifact: ${file}`);
 }
+
+const indexNowSourceKey = (await readFile(join(SOURCE, INDEXNOW_KEY_FILE), "utf8")).trim();
+const indexNowBuiltKey = (await readFile(join(SITE, INDEXNOW_KEY_FILE), "utf8")).trim();
+assert(indexNowSourceKey === INDEXNOW_KEY, "IndexNow source key file is invalid");
+assert(indexNowBuiltKey === INDEXNOW_KEY, "IndexNow key file was not copied to the site root");
 
 const headers = await readFile(join(SITE, "_headers"), "utf8");
 for (const header of [

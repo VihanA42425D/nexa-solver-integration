@@ -7,6 +7,17 @@ const SOURCE = join(ROOT, "docs-site", "docs");
 const CONCURRENCY = 3;
 const TIMEOUT_MS = 20_000;
 const LOCAL_ORIGIN = "https://docs.vsnexa.com";
+const SOLVER_ORIGIN = "https://solver.vsnexa.com";
+const PASSIVE_SOLVER_PATHS = new Set([
+  "/",
+  "/robots.txt",
+  "/sitemap.xml",
+  "/.well-known/nexa-solver.json",
+  "/.well-known/nexa-onchain-discovery.json",
+  "/.well-known/nexa-standards.json",
+  "/openapi.json",
+  "/api/v6/solver-discovery",
+]);
 
 const listFiles = async (directory, files = []) => {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
@@ -19,11 +30,17 @@ const listFiles = async (directory, files = []) => {
 
 const sourceFiles = await listFiles(SOURCE);
 const urls = new Set();
+const skippedDynamicSolverUrls = new Set();
 for (const path of sourceFiles) {
   const source = await readFile(path, "utf8");
   for (const match of source.matchAll(/https:\/\/[^\s)<>"'`\[\]]+/g)) {
     const url = match[0].replace(/[.,;:]$/, "");
-    if (new URL(url).origin === LOCAL_ORIGIN || url.endsWith(".git")) continue;
+    const parsed = new URL(url);
+    if (parsed.origin === LOCAL_ORIGIN || url.endsWith(".git")) continue;
+    if (parsed.origin === SOLVER_ORIGIN && !PASSIVE_SOLVER_PATHS.has(parsed.pathname)) {
+      skippedDynamicSolverUrls.add(url);
+      continue;
+    }
     urls.add(url);
   }
 }
@@ -88,5 +105,10 @@ for (const result of results) {
 const broken = results.filter((result) => result.broken);
 if (broken.length > 0) {
   throw new Error(`${broken.length} of ${results.length} external documentation links failed`);
+}
+if (skippedDynamicSolverUrls.size > 0) {
+  console.log(
+    `Skipped ${skippedDynamicSolverUrls.size} dynamic Solver links; runtime contract suites validate them without live probes.`,
+  );
 }
 console.log(`External documentation links passed: ${results.length} checked.`);

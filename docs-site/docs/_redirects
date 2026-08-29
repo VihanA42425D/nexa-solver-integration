@@ -1,0 +1,5 @@
+/openapi.json https://solver.vsnexa.com/openapi.json 301
+/.well-known/nexa-solver.json https://solver.vsnexa.com/.well-known/nexa-solver.json 301
+/.well-known/nexa-onchain-discovery.json https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json 301
+/.well-known/nexa-standards.json https://solver.vsnexa.com/.well-known/nexa-standards.json 301
+/api/v6/solver-discovery https://solver.vsnexa.com/api/v6/solver-discovery 301

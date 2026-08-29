@@ -105,6 +105,23 @@ for (const [route, relativePath] of requiredRoutes) {
     `Missing canonical URL: ${route}`,
   );
   const canonical = attribute(canonicalTag, "href", `Missing canonical href: ${route}`);
+  const manifestLink = tagWithAttribute(
+    html, "link", "href", "https://solver.vsnexa.com/.well-known/nexa-solver.json",
+    `Missing solver manifest discovery link: ${route}`,
+  );
+  assert(
+    attribute(manifestLink, "rel", "") === "alternate"
+      && attribute(manifestLink, "type", "") === "application/json",
+    `Invalid solver manifest discovery link: ${route}`,
+  );
+  const serviceDescLink = tagWithAttribute(
+    html, "link", "rel", "service-desc",
+    `Missing OpenAPI service-desc link: ${route}`,
+  );
+  assert(
+    attribute(serviceDescLink, "href", "") === "https://solver.vsnexa.com/openapi.json",
+    `Invalid OpenAPI service-desc link: ${route}`,
+  );
 
   assert(!titles.has(title), `Duplicate page title: ${title}`);
   assert(!descriptions.has(description), `Duplicate meta description: ${description}`);
@@ -128,7 +145,9 @@ for (const [route, relativePath] of requiredRoutes) {
   );
   const structuredData = JSON.parse(jsonLd);
   const types = new Set((structuredData["@graph"] ?? []).map((entry) => entry["@type"]));
-  const requiredTypes = route === "/" ? ["WebSite", "SoftwareSourceCode"] : ["WebSite", "TechArticle", "SoftwareSourceCode", "BreadcrumbList"];
+  const requiredTypes = route === "/"
+    ? ["WebSite", "SoftwareSourceCode", "WebAPI"]
+    : ["WebSite", "TechArticle", "SoftwareSourceCode", "WebAPI", "BreadcrumbList"];
   for (const type of requiredTypes) {
     assert(types.has(type), `Missing JSON-LD ${type}: ${route}`);
   }
@@ -178,6 +197,10 @@ const robots = await readFile(join(SITE, "robots.txt"), "utf8");
 assert(/^User-agent: \*/m.test(robots), "robots.txt lacks a global crawler rule");
 assert(/^Allow: \/$/m.test(robots), "robots.txt does not allow the documentation site");
 assert(robots.includes(`${ORIGIN}/sitemap.xml`), "robots.txt has the wrong sitemap URL");
+assert(
+  robots.includes("https://solver.vsnexa.com/sitemap.xml"),
+  "robots.txt lacks the canonical solver sitemap",
+);
 
 const sitemap = await readFile(join(SITE, "sitemap.xml"), "utf8");
 for (const [route] of requiredRoutes) {
@@ -192,7 +215,7 @@ for (const [route] of requiredRoutes) {
 assert(llms.includes("https://solver.vsnexa.com/openapi.json"), "llms.txt lacks canonical OpenAPI");
 assert(llmsFull.includes("exact: one Bot source transaction plus one Nexa destination transaction"), "llms-full.txt lacks exact 1+1 context");
 
-for (const file of ["404.html", "search/search_index.json", "_headers", "assets/openapi.json"]) {
+for (const file of ["404.html", "search/search_index.json", "_headers", "_redirects", "assets/openapi.json"]) {
   assert(await exists(join(SITE, file)), `Missing built static artifact: ${file}`);
 }
 
@@ -202,6 +225,29 @@ for (const header of [
   "Referrer-Policy", "Permissions-Policy", "Strict-Transport-Security", "X-Robots-Tag",
 ]) {
   assert(headers.includes(`${header}:`), `Missing security header: ${header}`);
+}
+assert(
+  headers.includes('rel="service-desc"')
+    && headers.includes("https://solver.vsnexa.com/openapi.json"),
+  "Documentation headers lack canonical OpenAPI service discovery",
+);
+assert(
+  headers.includes("https://solver.vsnexa.com/.well-known/nexa-solver.json"),
+  "Documentation headers lack the canonical solver manifest",
+);
+
+const redirects = await readFile(join(SITE, "_redirects"), "utf8");
+for (const [source, target] of [
+  ["/openapi.json", "https://solver.vsnexa.com/openapi.json"],
+  ["/.well-known/nexa-solver.json", "https://solver.vsnexa.com/.well-known/nexa-solver.json"],
+  ["/.well-known/nexa-onchain-discovery.json", "https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json"],
+  ["/.well-known/nexa-standards.json", "https://solver.vsnexa.com/.well-known/nexa-standards.json"],
+  ["/api/v6/solver-discovery", "https://solver.vsnexa.com/api/v6/solver-discovery"],
+]) {
+  assert(
+    redirects.includes(`${source} ${target} 301`),
+    `Missing canonical documentation redirect: ${source}`,
+  );
 }
 
 const canonicalOpenApi = await readFile(join(ROOT, "openapi", "openapi.json"));

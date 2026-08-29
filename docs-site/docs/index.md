@@ -56,6 +56,11 @@ Chain, and HyperEVM.
 
 ## Reference entry points
 
+- [Solver discovery manifest](https://solver.vsnexa.com/.well-known/nexa-solver.json)
+- [Passive on-chain fingerprint](https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json)
+- [Standards manifest](https://solver.vsnexa.com/.well-known/nexa-standards.json)
+- [OpenAPI 3.1 document](https://solver.vsnexa.com/openapi.json)
+- [Solver discovery API](https://solver.vsnexa.com/api/v6/solver-discovery)
 - [API reference](api.md)
 - [SDKs](sdks.md)
 - [Networks and contracts](networks-contracts.md)

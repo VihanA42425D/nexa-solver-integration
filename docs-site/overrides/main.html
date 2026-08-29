@@ -5,6 +5,9 @@
   {% set seo_title = page.meta.title if page and page.meta and page.meta.title else config.site_name %}
   {% set seo_description = page.meta.description if page and page.meta and page.meta.description else config.site_description %}
   {% set seo_url = page.canonical_url if page and page.canonical_url else config.site_url %}
+  <link rel="alternate" type="application/json" title="Nexa V6 Solver Manifest" href="https://solver.vsnexa.com/.well-known/nexa-solver.json">
+  <link rel="service-desc" type="application/vnd.oai.openapi+json;version=3.1" title="Nexa V6 OpenAPI" href="https://solver.vsnexa.com/openapi.json">
+  <link rel="alternate" type="text/plain" title="Nexa V6 LLM Index" href="https://docs.vsnexa.com/llms.txt">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="{{ config.site_name }}">
   <meta property="og:title" content="{{ seo_title }}">
@@ -31,6 +34,29 @@
         "codeRepository": "https://github.com/VihanA42425D/nexa-solver-integration",
         "programmingLanguage": ["JavaScript", "TypeScript", "Python", "Rust", "Go", "Java", "C#"],
         "license": "https://spdx.org/licenses/ISC.html"
+      },
+      {
+        "@type": "WebAPI",
+        "@id": "https://solver.vsnexa.com/#api",
+        "name": "Nexa Mainnet V6 Solver API",
+        "url": "https://solver.vsnexa.com/",
+        "description": "Machine-readable Nexa Mainnet V6 solver discovery, signed route publication, and permit-gated execution API.",
+        "serviceType": "Cross-chain solver discovery and execution API",
+        "documentation": "https://docs.vsnexa.com/api/",
+        "subjectOf": [
+          {
+            "@type": "DigitalDocument",
+            "name": "Nexa V6 Solver Manifest",
+            "url": "https://solver.vsnexa.com/.well-known/nexa-solver.json",
+            "encodingFormat": "application/json"
+          },
+          {
+            "@type": "DigitalDocument",
+            "name": "Nexa V6 OpenAPI 3.1 Document",
+            "url": "https://solver.vsnexa.com/openapi.json",
+            "encodingFormat": "application/vnd.oai.openapi+json;version=3.1"
+          }
+        ]
       }{% if page and page.url %},
       {
         "@type": "TechArticle",

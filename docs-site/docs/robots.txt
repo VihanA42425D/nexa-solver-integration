@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://docs.vsnexa.com/sitemap.xml
+Sitemap: https://solver.vsnexa.com/sitemap.xml

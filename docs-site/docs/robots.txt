@@ -1,3 +1,4 @@
+# Nexa V6 public documentation
 User-agent: *
 Allow: /
 

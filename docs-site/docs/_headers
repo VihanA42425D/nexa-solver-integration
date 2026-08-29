@@ -5,8 +5,31 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
   Strict-Transport-Security: max-age=31536000; includeSubDomains
-  X-Robots-Tag: all
   Link: <https://solver.vsnexa.com/.well-known/nexa-solver.json>; rel="alternate"; type="application/json"; title="Nexa V6 Solver Manifest", <https://solver.vsnexa.com/openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1", <https://docs.vsnexa.com/llms.txt>; rel="alternate"; type="text/plain"; title="Nexa V6 LLM Index"
 
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
+
+/robots.txt
+  X-Robots-Tag: noindex, follow
+
+/sitemap.xml
+  X-Robots-Tag: noindex, follow
+
+/llms.txt
+  X-Robots-Tag: noindex, follow
+
+/llms-full.txt
+  X-Robots-Tag: noindex, follow
+
+/assets/openapi.json
+  X-Robots-Tag: noindex, follow
+
+/7e2f3a91-4c86-4b52-a9d0-1f6c8e3b5a74.txt
+  X-Robots-Tag: noindex, nofollow
+
+https://:project.pages.dev/*
+  X-Robots-Tag: noindex, nofollow
+
+https://:version.:project.pages.dev/*
+  X-Robots-Tag: noindex, nofollow

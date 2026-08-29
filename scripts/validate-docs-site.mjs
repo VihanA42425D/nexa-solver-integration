@@ -102,6 +102,41 @@ for (const [route, relativePath] of requiredRoutes) {
     `Missing meta description: ${route}`,
   );
   const description = attribute(descriptionTag, "content", `Missing description content: ${route}`);
+  assert(title.length >= 20 && title.length <= 60, `Page title must be 20-60 characters: ${route} (${title.length})`);
+  assert(
+    description.length >= 90 && description.length <= 155,
+    `Meta description must be 90-155 characters: ${route} (${description.length})`,
+  );
+  assert(Buffer.byteLength(html) <= 64 * 1024, `HTML exceeds 64 KiB: ${route}`);
+  assert(
+    (html.match(/<h1(?:\s|>)/gi) ?? []).length === 1,
+    `Page must expose exactly one H1: ${route}`,
+  );
+  const articleHtml = firstMatch(
+    html,
+    /<article(?:\s[^>]*)?>([\s\S]*?)<\/article>/i,
+    `Missing article content: ${route}`,
+  );
+  const articleWords = articleHtml
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean).length;
+  assert(
+    articleWords >= 100 && articleWords <= 1_200,
+    `Visible article content must be 100-1,200 words: ${route} (${articleWords})`,
+  );
+  for (const match of articleHtml.matchAll(/<h([23])(?:\s[^>]*)?>([\s\S]*?)<\/h\1>/gi)) {
+    const heading = match[2].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    assert(heading && heading.length <= 80, `H${match[1]} exceeds 80 characters: ${route}`);
+  }
+  const robotsTag = tagWithAttribute(
+    html, "meta", "name", "robots",
+    `Missing robots meta tag: ${route}`,
+  );
+  assert(attribute(robotsTag, "content", "") === "index,follow", `Page is not explicitly indexable: ${route}`);
   const canonicalTag = tagWithAttribute(
     html, "link", "rel", "canonical",
     `Missing canonical URL: ${route}`,
@@ -133,10 +168,23 @@ for (const [route, relativePath] of requiredRoutes) {
   canonicals.add(canonical);
 
   assert(canonical === `${ORIGIN}${route}`, `Unexpected canonical for ${route}: ${canonical}`);
-  for (const property of ["og:title", "og:description", "og:url"]) {
-    tagWithAttribute(html, "meta", "property", property, `Missing Open Graph ${property}: ${route}`);
-  }
+  const openGraph = Object.fromEntries(
+    ["og:title", "og:description", "og:url"].map((property) => {
+      const tag = tagWithAttribute(html, "meta", "property", property, `Missing Open Graph ${property}: ${route}`);
+      return [property, attribute(tag, "content", `Missing Open Graph content: ${route}`)];
+    }),
+  );
+  assert(openGraph["og:title"] === title.replace(/ - Nexa V6 Docs$/, ""), `Open Graph title drift: ${route}`);
+  assert(openGraph["og:description"] === description, `Open Graph description drift: ${route}`);
+  assert(openGraph["og:url"] === canonical, `Open Graph canonical drift: ${route}`);
   tagWithAttribute(html, "meta", "name", "twitter:card", `Missing Twitter card: ${route}`);
+  for (const [name, expected] of [
+    ["twitter:title", openGraph["og:title"]],
+    ["twitter:description", description],
+  ]) {
+    const tag = tagWithAttribute(html, "meta", "name", name, `Missing ${name}: ${route}`);
+    assert(attribute(tag, "content", "") === expected, `${name} drift: ${route}`);
+  }
   const searchDialog = tagWithAttribute(html, "div", "role", "dialog", `Missing search dialog: ${route}`);
   assert(attribute(searchDialog, "aria-label", "").trim(), `Search dialog lacks an accessible name: ${route}`);
 
@@ -145,11 +193,14 @@ for (const [route, relativePath] of requiredRoutes) {
     /<script\s+type=(?:"application\/ld\+json"|'application\/ld\+json'|application\/ld\+json)>([\s\S]*?)<\/script>/i,
     `Missing JSON-LD: ${route}`,
   );
+  assert(jsonLd.length <= 2_500, `JSON-LD exceeds 2,500 characters: ${route}`);
   const structuredData = JSON.parse(jsonLd);
   const types = new Set((structuredData["@graph"] ?? []).map((entry) => entry["@type"]));
   const requiredTypes = route === "/"
     ? ["WebSite", "SoftwareSourceCode", "WebAPI"]
-    : ["WebSite", "TechArticle", "SoftwareSourceCode", "WebAPI", "BreadcrumbList"];
+    : ["/api/", "/resources/"].includes(route)
+      ? ["WebSite", "TechArticle", "SoftwareSourceCode", "WebAPI", "BreadcrumbList"]
+      : ["WebSite", "TechArticle", "BreadcrumbList"];
   for (const type of requiredTypes) {
     assert(types.has(type), `Missing JSON-LD ${type}: ${route}`);
   }
@@ -195,6 +246,16 @@ for (const htmlPath of htmlFiles) {
   }
 }
 
+const notFoundHtml = await readFile(join(SITE, "404.html"), "utf8");
+const notFoundRobots = tagWithAttribute(
+  notFoundHtml, "meta", "name", "robots",
+  "404 page lacks robots metadata",
+);
+assert(
+  attribute(notFoundRobots, "content", "") === "noindex,nofollow",
+  "404 page must be noindex,nofollow",
+);
+
 const robots = await readFile(join(SITE, "robots.txt"), "utf8");
 assert(/^User-agent: \*/m.test(robots), "robots.txt lacks a global crawler rule");
 assert(/^Allow: \/$/m.test(robots), "robots.txt does not allow the documentation site");
@@ -205,12 +266,15 @@ assert(
 );
 
 const sitemap = await readFile(join(SITE, "sitemap.xml"), "utf8");
+assert(Buffer.byteLength(sitemap) <= 32 * 1024, "Sitemap exceeds the 32 KiB project budget");
 for (const [route] of requiredRoutes) {
   assert(sitemap.includes(`<loc>${ORIGIN}${route}</loc>`), `Sitemap lacks ${route}`);
 }
 
 const llms = await readFile(join(SITE, "llms.txt"), "utf8");
 const llmsFull = await readFile(join(SITE, "llms-full.txt"), "utf8");
+assert(Buffer.byteLength(llms) <= 4 * 1024, "llms.txt exceeds the 4 KiB project budget");
+assert(Buffer.byteLength(llmsFull) <= 8 * 1024, "llms-full.txt exceeds the 8 KiB project budget");
 for (const [route] of requiredRoutes) {
   assert(llms.includes(`${ORIGIN}${route}`), `llms.txt lacks ${route}`);
 }
@@ -233,6 +297,20 @@ for (const header of [
 ]) {
   assert(headers.includes(`${header}:`), `Missing security header: ${header}`);
 }
+assert(!headers.includes("X-Robots-Tag: all"), "Global X-Robots-Tag must not index crawler-control files");
+for (const path of [
+  "/robots.txt", "/sitemap.xml", "/llms.txt", "/llms-full.txt", "/assets/openapi.json",
+]) {
+  assert(
+    headers.includes(`${path}\n  X-Robots-Tag: noindex, follow`),
+    `Missing auxiliary noindex rule: ${path}`,
+  );
+}
+assert(
+  headers.includes("https://:project.pages.dev/*\n  X-Robots-Tag: noindex, nofollow")
+    && headers.includes("https://:version.:project.pages.dev/*\n  X-Robots-Tag: noindex, nofollow"),
+  "Cloudflare Pages preview hosts must be noindex",
+);
 assert(
   headers.includes('rel="service-desc"')
     && headers.includes("https://solver.vsnexa.com/openapi.json"),

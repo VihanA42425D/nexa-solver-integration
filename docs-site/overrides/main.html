@@ -5,6 +5,7 @@
   {% set seo_title = page.meta.title if page and page.meta and page.meta.title else config.site_name %}
   {% set seo_description = page.meta.description if page and page.meta and page.meta.description else config.site_description %}
   {% set seo_url = page.canonical_url if page and page.canonical_url else config.site_url %}
+  <meta name="robots" content="{% if page and page.url is defined %}index,follow{% else %}noindex,nofollow{% endif %}">
   <link rel="alternate" type="application/json" title="Nexa V6 Solver Manifest" href="https://solver.vsnexa.com/.well-known/nexa-solver.json">
   <link rel="service-desc" type="application/vnd.oai.openapi+json;version=3.1" title="Nexa V6 OpenAPI" href="https://solver.vsnexa.com/openapi.json">
   <link rel="alternate" type="text/plain" title="Nexa V6 LLM Index" href="https://docs.vsnexa.com/llms.txt">
@@ -26,7 +27,7 @@
         "url": "https://docs.vsnexa.com/",
         "name": {{ config.site_name | tojson }},
         "description": {{ config.site_description | tojson }}
-      },
+      }{% if not page or not page.url or page.url in ["api/", "resources/"] %},
       {
         "@type": "SoftwareSourceCode",
         "@id": "https://docs.vsnexa.com/#source",
@@ -34,7 +35,7 @@
         "codeRepository": "https://github.com/VihanA42425D/nexa-solver-integration",
         "programmingLanguage": ["JavaScript", "TypeScript", "Python", "Rust", "Go", "Java", "C#"],
         "license": "https://spdx.org/licenses/ISC.html"
-      },
+      }{% endif %}{% if not page or not page.url or page.url in ["api/", "resources/"] %},
       {
         "@type": "WebAPI",
         "@id": "https://solver.vsnexa.com/#api",
@@ -42,22 +43,8 @@
         "url": "https://solver.vsnexa.com/",
         "description": "Machine-readable Nexa Mainnet V6 solver discovery, signed route publication, and permit-gated execution API.",
         "serviceType": "Cross-chain solver discovery and execution API",
-        "documentation": "https://docs.vsnexa.com/api/",
-        "subjectOf": [
-          {
-            "@type": "DigitalDocument",
-            "name": "Nexa V6 Solver Manifest",
-            "url": "https://solver.vsnexa.com/.well-known/nexa-solver.json",
-            "encodingFormat": "application/json"
-          },
-          {
-            "@type": "DigitalDocument",
-            "name": "Nexa V6 OpenAPI 3.1 Document",
-            "url": "https://solver.vsnexa.com/openapi.json",
-            "encodingFormat": "application/vnd.oai.openapi+json;version=3.1"
-          }
-        ]
-      }{% if page and page.url %},
+        "documentation": "https://docs.vsnexa.com/api/"
+      }{% endif %}{% if page and page.url %},
       {
         "@type": "TechArticle",
         "@id": {{ (page.canonical_url ~ "#article") | tojson }},

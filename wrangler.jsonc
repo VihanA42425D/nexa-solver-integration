@@ -6,7 +6,43 @@
   "workers_dev": false,
   "routes": [
     {
+      "pattern": "solver.vsnexa.com/",
+      "zone_name": "vsnexa.com"
+    },
+    {
+      "pattern": "solver.vsnexa.com/robots.txt",
+      "zone_name": "vsnexa.com"
+    },
+    {
+      "pattern": "solver.vsnexa.com/sitemap.xml",
+      "zone_name": "vsnexa.com"
+    },
+    {
+      "pattern": "solver.vsnexa.com/llms.txt",
+      "zone_name": "vsnexa.com"
+    },
+    {
       "pattern": "solver.vsnexa.com/d4b831c2-2f9a-4e65-a741-8b6c0d3f92e1.txt",
+      "zone_name": "vsnexa.com"
+    },
+    {
+      "pattern": "solver.vsnexa.com/.well-known/nexa-solver.json",
+      "zone_name": "vsnexa.com"
+    },
+    {
+      "pattern": "solver.vsnexa.com/.well-known/nexa-onchain-discovery.json",
+      "zone_name": "vsnexa.com"
+    },
+    {
+      "pattern": "solver.vsnexa.com/.well-known/nexa-standards.json",
+      "zone_name": "vsnexa.com"
+    },
+    {
+      "pattern": "solver.vsnexa.com/openapi.json",
+      "zone_name": "vsnexa.com"
+    },
+    {
+      "pattern": "solver.vsnexa.com/api/v6/solver-discovery",
       "zone_name": "vsnexa.com"
     }
   ],

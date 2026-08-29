@@ -12,9 +12,13 @@ const SOLVER_INDEXNOW_PATH = `/${SOLVER_INDEXNOW_KEY_FILE}`;
 
 const SOLVER_MANIFEST_URL = `${SOLVER_BASE_URL}/.well-known/nexa-solver.json`;
 const OPENAPI_URL = `${SOLVER_BASE_URL}/openapi.json`;
+const SOLVER_DOCS_URL = "https://docs.vsnexa.com/";
+const SOLVER_ROOT_TITLE = "Nexa V6 Solver API & Discovery";
+const SOLVER_ROOT_DESCRIPTION = "Canonical Nexa Mainnet V6 solver discovery for signed routes, execution permits, ERC-7683 resolution, OpenAPI, and on-chain deployment data.";
 const CRAWLER_LINK_HEADER = [
   `<${SOLVER_MANIFEST_URL}>; rel="alternate"; type="application/json"; title="Nexa V6 Solver Manifest"`,
   `<${OPENAPI_URL}>; rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1"`,
+  `<${SOLVER_DOCS_URL}api/>; rel="describedby"; type="text/html"`,
 ].join(", ");
 
 const EDGE_STATIC_DISCOVERY_PATHS = Object.freeze([
@@ -39,7 +43,18 @@ const LONG_LIVED_ORIGIN_DISCOVERY_PATHS = Object.freeze([
   "/openapi.json",
 ]);
 
-const ROOT_HTML = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Nexa V6 Solver Discovery</title><link rel="canonical" href="${SOLVER_BASE_URL}/"><link rel="alternate" type="application/json" href="${SOLVER_MANIFEST_URL}"><link rel="service-desc" type="application/vnd.oai.openapi+json;version=3.1" href="${OPENAPI_URL}"></head><body><main><h1>Nexa V6 Solver Discovery</h1><p>Machine-readable solver integration and discovery surface for Nexa V6.</p><nav aria-label="Nexa V6 machine discovery"><ul><li><a href="${SOLVER_MANIFEST_URL}">Solver discovery manifest</a></li><li><a href="${SOLVER_BASE_URL}/.well-known/nexa-onchain-discovery.json">On-chain discovery</a></li><li><a href="${SOLVER_BASE_URL}/.well-known/nexa-standards.json">Standards</a></li><li><a href="${OPENAPI_URL}">OpenAPI</a></li><li><a href="${SOLVER_BASE_URL}/api/v6/solver-discovery">Solver discovery API</a></li><li><a href="${SOLVER_BASE_URL}/api/v6/solver-feed">Signed Feed</a></li><li><a href="https://github.com/VihanA42425D/nexa-solver-integration">Public integration repository</a></li></ul></nav></main></body></html>\n`;
+const SOLVER_ROOT_STRUCTURED_DATA = Object.freeze({
+  "@context": "https://schema.org",
+  "@type": "WebAPI",
+  "@id": `${SOLVER_BASE_URL}/#api`,
+  name: SOLVER_ROOT_TITLE,
+  description: SOLVER_ROOT_DESCRIPTION,
+  url: `${SOLVER_BASE_URL}/`,
+  documentation: `${SOLVER_DOCS_URL}api/`,
+  serviceType: "Intra-chain and cross-chain solver discovery and execution API",
+});
+
+const ROOT_HTML = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${SOLVER_ROOT_TITLE}</title><meta name="description" content="${SOLVER_ROOT_DESCRIPTION}"><meta name="robots" content="index,follow"><link rel="canonical" href="${SOLVER_BASE_URL}/"><link rel="alternate" type="application/json" title="Nexa V6 Solver Manifest" href="${SOLVER_MANIFEST_URL}"><link rel="service-desc" type="application/vnd.oai.openapi+json;version=3.1" title="Nexa V6 OpenAPI" href="${OPENAPI_URL}"><link rel="alternate" type="text/plain" title="Nexa V6 LLM Index" href="${SOLVER_BASE_URL}/llms.txt"><meta property="og:type" content="website"><meta property="og:title" content="${SOLVER_ROOT_TITLE}"><meta property="og:description" content="${SOLVER_ROOT_DESCRIPTION}"><meta property="og:url" content="${SOLVER_BASE_URL}/"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="${SOLVER_ROOT_TITLE}"><meta name="twitter:description" content="${SOLVER_ROOT_DESCRIPTION}"><script type="application/ld+json">${JSON.stringify(SOLVER_ROOT_STRUCTURED_DATA)}</script><style>body{margin:0;background:#f6f8fb;color:#172033;font:16px/1.55 system-ui,sans-serif}main{max-width:760px;margin:auto;padding:48px 24px}h1{font-size:2rem}h2{margin-top:2rem}a{color:#075ac8}li{margin:.55rem 0}</style></head><body><main><h1>${SOLVER_ROOT_TITLE}</h1><p>${SOLVER_ROOT_DESCRIPTION}</p><section><h2>Discovery artifacts</h2><ul><li><a href="${SOLVER_MANIFEST_URL}">Solver manifest</a> - entry point, networks, capabilities, and endpoint map.</li><li><a href="${SOLVER_BASE_URL}/.well-known/nexa-onchain-discovery.json">On-chain discovery</a> - canonical deployment addresses, code hashes, and scanner hints.</li><li><a href="${SOLVER_BASE_URL}/.well-known/nexa-standards.json">Standards manifest</a> - ERC-7683 and OIF capability levels.</li><li><a href="${OPENAPI_URL}">OpenAPI 3.1</a> - typed HTTP and SSE operations.</li><li><a href="${SOLVER_BASE_URL}/api/v6/solver-discovery">Discovery API</a> - API-path projection of the solver manifest.</li></ul></section><section><h2>Integrate</h2><p>Use the <a href="${SOLVER_DOCS_URL}quick-start/">quick start</a> and <a href="${SOLVER_DOCS_URL}api/">API guide</a>, or inspect the <a href="https://github.com/VihanA42425D/nexa-solver-integration">public integration repository</a>. Execution remains exactly one Bot source transaction plus one Nexa destination transaction.</p></section></main></body></html>\n`;
 
 const ROBOTS_TEXT = `User-agent: *\nAllow: /\nSitemap: ${SOLVER_BASE_URL}/sitemap.xml\n`;
 
@@ -49,13 +64,14 @@ const LLMS_TEXT = `# Nexa V6\n\nNexa V6 exposes a machine-readable solver integr
 
 const EDGE_STATIC_DISCOVERY = Object.freeze({
   "/": Object.freeze({ body: ROOT_HTML, contentType: "text/html; charset=utf-8" }),
-  "/robots.txt": Object.freeze({ body: ROBOTS_TEXT, contentType: "text/plain; charset=utf-8" }),
-  "/sitemap.xml": Object.freeze({ body: SITEMAP_XML, contentType: "application/xml; charset=utf-8" }),
-  "/llms.txt": Object.freeze({ body: LLMS_TEXT, contentType: "text/plain; charset=utf-8" }),
+  "/robots.txt": Object.freeze({ body: ROBOTS_TEXT, contentType: "text/plain; charset=utf-8", indexable: false }),
+  "/sitemap.xml": Object.freeze({ body: SITEMAP_XML, contentType: "application/xml; charset=utf-8", indexable: false }),
+  "/llms.txt": Object.freeze({ body: LLMS_TEXT, contentType: "text/plain; charset=utf-8", indexable: false }),
   [SOLVER_INDEXNOW_PATH]: Object.freeze({
     body: SOLVER_INDEXNOW_KEY,
     contentType: "text/plain; charset=utf-8",
     indexable: false,
+    follow: false,
   }),
 });
 
@@ -136,9 +152,14 @@ function isEdgeStaticDiscoveryRoute(method, pathname) {
   return ["GET", "HEAD"].includes(method) && EDGE_STATIC_DISCOVERY_PATHS.includes(pathname);
 }
 
-function withCrawlerDiscoveryHeaders(headers) {
+function withCrawlerDiscoveryHeaders(headers, canonicalUrl = "") {
   headers.set("x-robots-tag", "index, follow");
-  headers.set("link", CRAWLER_LINK_HEADER);
+  headers.set(
+    "link",
+    canonicalUrl
+      ? `<${canonicalUrl}>; rel="canonical", ${CRAWLER_LINK_HEADER}`
+      : CRAWLER_LINK_HEADER,
+  );
   return headers;
 }
 
@@ -153,7 +174,7 @@ function edgeStaticDiscoveryResponse(request, pathname) {
     "referrer-policy": "no-referrer",
   }));
   if (artifact.indexable === false) {
-    headers.set("x-robots-tag", "noindex, nofollow");
+    headers.set("x-robots-tag", artifact.follow === false ? "noindex, nofollow" : "noindex, follow");
   } else {
     withCrawlerDiscoveryHeaders(headers);
   }
@@ -174,7 +195,7 @@ function edgeStableDiscoveryResponse(request, pathname) {
       : "public, max-age=60, stale-while-revalidate=60, stale-if-error=300",
     "x-content-type-options": "nosniff",
     "referrer-policy": "no-referrer",
-  })));
+  })), `${SOLVER_BASE_URL}${pathname}`);
   return new Response(request.method === "HEAD" ? null : artifact.body, {
     status: 200,
     headers,
@@ -183,7 +204,10 @@ function edgeStableDiscoveryResponse(request, pathname) {
 
 function decorateOriginDiscoveryResponse(response, pathname) {
   if (response.status !== 200 || !ORIGIN_STABLE_DISCOVERY_PATHS.includes(pathname)) return response;
-  const headers = withCrawlerDiscoveryHeaders(new Headers(response.headers));
+  const headers = withCrawlerDiscoveryHeaders(
+    new Headers(response.headers),
+    `${SOLVER_BASE_URL}${pathname}`,
+  );
   headers.set(
     "cloudflare-cdn-cache-control",
     LONG_LIVED_ORIGIN_DISCOVERY_PATHS.includes(pathname)
@@ -543,6 +567,8 @@ export {
   SITEMAP_XML,
   SOLVER_INDEXNOW_KEY,
   SOLVER_INDEXNOW_KEY_FILE,
+  SOLVER_ROOT_DESCRIPTION,
+  SOLVER_ROOT_TITLE,
   attachTrustedAppAccessIdentity,
   attachTrustedEdgeIdentity,
   decorateOriginDiscoveryResponse,

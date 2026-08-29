@@ -6,6 +6,11 @@ on:
     paths:
       - "docs-site/**"
       - "docs-ticket-worker/**"
+      - "src/worker.mjs"
+      - "public/.well-known/nexa-solver.json"
+      - "public/.well-known/nexa-onchain-discovery.json"
+      - "public/.well-known/nexa-standards.json"
+      - "wrangler.jsonc"
       - "scripts/generate-docs-site.mjs"
       - "scripts/validate-docs-site.mjs"
       - "scripts/validate-docs-external-links.mjs"
@@ -19,11 +24,17 @@ on:
       - "indexing/indexing-manifest.json"
       - "package.json"
       - "test/docs-ticket-worker.test.mjs"
+      - "test/worker.test.mjs"
       - ".github/workflows/docs.yml"
   pull_request:
     paths:
       - "docs-site/**"
       - "docs-ticket-worker/**"
+      - "src/worker.mjs"
+      - "public/.well-known/nexa-solver.json"
+      - "public/.well-known/nexa-onchain-discovery.json"
+      - "public/.well-known/nexa-standards.json"
+      - "wrangler.jsonc"
       - "scripts/generate-docs-site.mjs"
       - "scripts/validate-docs-site.mjs"
       - "scripts/validate-docs-external-links.mjs"
@@ -37,6 +48,7 @@ on:
       - "indexing/indexing-manifest.json"
       - "package.json"
       - "test/docs-ticket-worker.test.mjs"
+      - "test/worker.test.mjs"
       - ".github/workflows/docs.yml"
 
 permissions:
@@ -62,6 +74,7 @@ jobs:
       - run: npm run docs:indexnow:check
       - run: npm run docs:ticket:check
       - run: node --test test/docs-ticket-worker.test.mjs
+      - run: node --test test/worker.test.mjs
       - name: Deploy documentation to Cloudflare Pages
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:

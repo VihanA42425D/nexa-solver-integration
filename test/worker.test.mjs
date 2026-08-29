@@ -10,6 +10,8 @@ import {
   SITEMAP_XML,
   SOLVER_INDEXNOW_KEY,
   SOLVER_INDEXNOW_KEY_FILE,
+  SOLVER_ROOT_DESCRIPTION,
+  SOLVER_ROOT_TITLE,
   handleRequest,
 } from "../src/worker.mjs";
 
@@ -174,9 +176,9 @@ test("Worker serves canonical crawler documents and IndexNow ownership at the Ed
   });
   const expected = new Map([
     ["/", ["text/html; charset=utf-8", ROOT_HTML]],
-    ["/robots.txt", ["text/plain; charset=utf-8", ROBOTS_TEXT]],
-    ["/sitemap.xml", ["application/xml; charset=utf-8", SITEMAP_XML]],
-    ["/llms.txt", ["text/plain; charset=utf-8", LLMS_TEXT]],
+    ["/robots.txt", ["text/plain; charset=utf-8", ROBOTS_TEXT, "noindex, follow"]],
+    ["/sitemap.xml", ["application/xml; charset=utf-8", SITEMAP_XML, "noindex, follow"]],
+    ["/llms.txt", ["text/plain; charset=utf-8", LLMS_TEXT, "noindex, follow"]],
     ["/.well-known/nexa-solver.json", ["application/json; charset=utf-8", JSON.stringify(solverManifest)]],
     ["/.well-known/nexa-onchain-discovery.json", ["application/json; charset=utf-8", JSON.stringify(onchainDiscovery)]],
     ["/.well-known/nexa-standards.json", ["application/json; charset=utf-8", JSON.stringify(standardsManifest)]],
@@ -196,6 +198,12 @@ test("Worker serves canonical crawler documents and IndexNow ownership at the Ed
     assert.equal(response.headers.get("x-robots-tag"), robotsTag);
     if (robotsTag === "index, follow") {
       assert.match(response.headers.get("link"), /rel="service-desc"/);
+      if (pathname !== "/") {
+        assert.match(
+          response.headers.get("link"),
+          new RegExp(`<https://solver\\.vsnexa\\.com${pathname.replaceAll(".", "\\.")}>; rel="canonical"`),
+        );
+      }
     } else {
       assert.equal(response.headers.get("link"), null);
     }
@@ -228,6 +236,27 @@ test("Worker serves canonical crawler documents and IndexNow ownership at the Ed
   );
   assert(Object.isFrozen(EDGE_STABLE_DISCOVERY));
   assert.match(ROOT_HTML, /rel="canonical" href="https:\/\/solver\.vsnexa\.com\/"/);
+  assert.match(ROOT_HTML, new RegExp(`<title>${SOLVER_ROOT_TITLE}</title>`));
+  assert.match(ROOT_HTML, new RegExp(`<meta name="description" content="${SOLVER_ROOT_DESCRIPTION}"`));
+  assert(SOLVER_ROOT_TITLE.length >= 20 && SOLVER_ROOT_TITLE.length <= 60);
+  assert(SOLVER_ROOT_DESCRIPTION.length >= 90 && SOLVER_ROOT_DESCRIPTION.length <= 155);
+  assert.equal((ROOT_HTML.match(/<h1[ >]/g) ?? []).length, 1);
+  assert(Buffer.byteLength(ROOT_HTML) <= 8 * 1024);
+  const rootWords = ROOT_HTML
+    .replace(/<script[\s\S]*?<\/script>/g, " ")
+    .replace(/<style[\s\S]*?<\/style>/g, " ")
+    .replace(/<[^>]+>/g, " ")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean).length;
+  assert(rootWords >= 90 && rootWords <= 250);
+  const rootStructuredData = JSON.parse(
+    ROOT_HTML.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1],
+  );
+  assert.equal(rootStructuredData["@type"], "WebAPI");
+  assert.equal(rootStructuredData.name, SOLVER_ROOT_TITLE);
+  assert.equal(rootStructuredData.description, SOLVER_ROOT_DESCRIPTION);
+  assert.equal(rootStructuredData.documentation, "https://docs.vsnexa.com/api/");
   assert.match(LLMS_TEXT, /Graph and Substreams are non-authoritative passive indexes/);
   assert.equal(originCalls, 0);
   assert.equal(bindingReads, 0);
@@ -270,4 +299,24 @@ test("Worker adds crawler headers and CDN cache policy to stable discovery only"
   );
   assert.equal(post.headers.get("x-robots-tag"), null);
   assert.equal(post.headers.get("link"), null);
+});
+
+test("verification Worker owns only exact static solver discovery routes", async () => {
+  const config = await readJson("../wrangler.jsonc");
+  const patterns = config.routes.map((route) => route.pattern);
+  assert.deepEqual(patterns, [
+    "solver.vsnexa.com/",
+    "solver.vsnexa.com/robots.txt",
+    "solver.vsnexa.com/sitemap.xml",
+    "solver.vsnexa.com/llms.txt",
+    `solver.vsnexa.com/${SOLVER_INDEXNOW_KEY_FILE}`,
+    "solver.vsnexa.com/.well-known/nexa-solver.json",
+    "solver.vsnexa.com/.well-known/nexa-onchain-discovery.json",
+    "solver.vsnexa.com/.well-known/nexa-standards.json",
+    "solver.vsnexa.com/openapi.json",
+    "solver.vsnexa.com/api/v6/solver-discovery",
+  ]);
+  assert(patterns.every((pattern) => !pattern.includes("*")));
+  assert(patterns.every((pattern) => !pattern.includes("/api/v6/solver-feed")));
+  assert(patterns.every((pattern) => !pattern.includes("/api/v6/execution-permits")));
 });

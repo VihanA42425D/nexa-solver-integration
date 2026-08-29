@@ -6,6 +6,9 @@ import openApiDocument from "../openapi/openapi.json" with { type: "json" };
 const SOLVER_HOST = "solver.vsnexa.com";
 const APP_HOST = "vsnexa.com";
 const SOLVER_BASE_URL = `https://${SOLVER_HOST}`;
+const SOLVER_INDEXNOW_KEY = "d4b831c2-2f9a-4e65-a741-8b6c0d3f92e1";
+const SOLVER_INDEXNOW_KEY_FILE = `${SOLVER_INDEXNOW_KEY}.txt`;
+const SOLVER_INDEXNOW_PATH = `/${SOLVER_INDEXNOW_KEY_FILE}`;
 
 const SOLVER_MANIFEST_URL = `${SOLVER_BASE_URL}/.well-known/nexa-solver.json`;
 const OPENAPI_URL = `${SOLVER_BASE_URL}/openapi.json`;
@@ -19,6 +22,7 @@ const EDGE_STATIC_DISCOVERY_PATHS = Object.freeze([
   "/robots.txt",
   "/sitemap.xml",
   "/llms.txt",
+  SOLVER_INDEXNOW_PATH,
 ]);
 
 const ORIGIN_STABLE_DISCOVERY_PATHS = Object.freeze([
@@ -48,6 +52,11 @@ const EDGE_STATIC_DISCOVERY = Object.freeze({
   "/robots.txt": Object.freeze({ body: ROBOTS_TEXT, contentType: "text/plain; charset=utf-8" }),
   "/sitemap.xml": Object.freeze({ body: SITEMAP_XML, contentType: "application/xml; charset=utf-8" }),
   "/llms.txt": Object.freeze({ body: LLMS_TEXT, contentType: "text/plain; charset=utf-8" }),
+  [SOLVER_INDEXNOW_PATH]: Object.freeze({
+    body: SOLVER_INDEXNOW_KEY,
+    contentType: "text/plain; charset=utf-8",
+    indexable: false,
+  }),
 });
 
 const CANONICAL_V6_SOLVER_DISCOVERY_BODY = JSON.stringify(solverManifest);
@@ -136,13 +145,18 @@ function withCrawlerDiscoveryHeaders(headers) {
 function edgeStaticDiscoveryResponse(request, pathname) {
   if (!isEdgeStaticDiscoveryRoute(request.method, pathname)) return null;
   const artifact = EDGE_STATIC_DISCOVERY[pathname];
-  const headers = withCrawlerDiscoveryHeaders(withSolverCors(new Headers({
+  const headers = withSolverCors(new Headers({
     "content-type": artifact.contentType,
     "cache-control": "public, max-age=3600, stale-while-revalidate=300, stale-if-error=86400",
     "cloudflare-cdn-cache-control": "public, max-age=86400, stale-while-revalidate=3600, stale-if-error=86400",
     "x-content-type-options": "nosniff",
     "referrer-policy": "no-referrer",
-  })));
+  }));
+  if (artifact.indexable === false) {
+    headers.set("x-robots-tag", "noindex, nofollow");
+  } else {
+    withCrawlerDiscoveryHeaders(headers);
+  }
   return new Response(request.method === "HEAD" ? null : artifact.body, { status: 200, headers });
 }
 
@@ -527,6 +541,8 @@ export {
   ROOT_HTML,
   SOLVER_HOST,
   SITEMAP_XML,
+  SOLVER_INDEXNOW_KEY,
+  SOLVER_INDEXNOW_KEY_FILE,
   attachTrustedAppAccessIdentity,
   attachTrustedEdgeIdentity,
   decorateOriginDiscoveryResponse,

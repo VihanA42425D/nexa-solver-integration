@@ -8,6 +8,8 @@ import {
   ROBOTS_TEXT,
   ROOT_HTML,
   SITEMAP_XML,
+  SOLVER_INDEXNOW_KEY,
+  SOLVER_INDEXNOW_KEY_FILE,
   handleRequest,
 } from "../src/worker.mjs";
 
@@ -157,7 +159,7 @@ test("event proxy preserves SSE streaming semantics", async () => {
   await reader.cancel();
 });
 
-test("Worker serves all nine canonical crawler documents at the Edge without origin or bindings", async () => {
+test("Worker serves canonical crawler documents and IndexNow ownership at the Edge", async () => {
   const solverManifest = await readJson("../public/.well-known/nexa-solver.json");
   const onchainDiscovery = await readJson("../public/.well-known/nexa-onchain-discovery.json");
   const standardsManifest = await readJson("../public/.well-known/nexa-standards.json");
@@ -180,9 +182,10 @@ test("Worker serves all nine canonical crawler documents at the Edge without ori
     ["/.well-known/nexa-standards.json", ["application/json; charset=utf-8", JSON.stringify(standardsManifest)]],
     ["/openapi.json", ["application/json; charset=utf-8", JSON.stringify(openApiDocument)]],
     ["/api/v6/solver-discovery", ["application/json; charset=utf-8", JSON.stringify(solverManifest)]],
+    [`/${SOLVER_INDEXNOW_KEY_FILE}`, ["text/plain; charset=utf-8", SOLVER_INDEXNOW_KEY, "noindex, nofollow"]],
   ]);
 
-  for (const [pathname, [contentType, body]] of expected) {
+  for (const [pathname, [contentType, body, robotsTag = "index, follow"]] of expected) {
     const response = await handleRequest(
       new Request(`https://solver.vsnexa.com${pathname}`),
       env,
@@ -190,8 +193,12 @@ test("Worker serves all nine canonical crawler documents at the Edge without ori
     );
     assert.equal(response.status, 200);
     assert.equal(response.headers.get("content-type"), contentType);
-    assert.equal(response.headers.get("x-robots-tag"), "index, follow");
-    assert.match(response.headers.get("link"), /rel="service-desc"/);
+    assert.equal(response.headers.get("x-robots-tag"), robotsTag);
+    if (robotsTag === "index, follow") {
+      assert.match(response.headers.get("link"), /rel="service-desc"/);
+    } else {
+      assert.equal(response.headers.get("link"), null);
+    }
     assert.equal(await response.text(), body);
 
     const head = await handleRequest(

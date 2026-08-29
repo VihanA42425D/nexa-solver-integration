@@ -4,6 +4,12 @@
   "main": "./src/worker.mjs",
   "compatibility_date": "2026-08-16",
   "workers_dev": false,
+  "routes": [
+    {
+      "pattern": "solver.vsnexa.com/d4b831c2-2f9a-4e65-a741-8b6c0d3f92e1.txt",
+      "zone_name": "vsnexa.com"
+    }
+  ],
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",

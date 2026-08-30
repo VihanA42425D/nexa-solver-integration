@@ -1047,7 +1047,7 @@
       "SignedFeed": {
         "type": "object",
         "additionalProperties": false,
-        "description": "signedPayload is the only signed authority. routeDetailTemplate is feed-level navigation metadata outside the cryptographic authority. Top-level routes/openRoutes are filterable convenience views and must not be substituted during verification.",
+        "description": "signedPayload is the only signed authority. routeDetailTemplate and actionableRoutes are convenience metadata outside the cryptographic authority. Top-level routes/openRoutes are filterable convenience views and must not be substituted during verification. Actionable economics are estimates, not execution guarantees; Permit issuance performs fresh amount-bound repricing and authorization.",
         "required": [
           "schema",
           "releaseId",
@@ -1056,6 +1056,7 @@
           "validUntil",
           "signedPayload",
           "routeDetailTemplate",
+          "actionableRoutes",
           "routes",
           "openRoutes",
           "feedHash",
@@ -1099,6 +1100,14 @@
             "type": "string",
             "const": "https://solver.vsnexa.com/api/v6/routes/{routeId}",
             "description": "Feed-level read-only navigation template. Replace {routeId} with a route.routeId. This field is not part of signedPayload and is not cryptographic authority."
+          },
+          "actionableRoutes": {
+            "type": "array",
+            "maxItems": 10,
+            "description": "Deterministic, evidence-backed convenience shortlist. Resolve routeId/quoteId against signedPayload.routes before use. Missing evidence excludes only this shortlist and never removes a canonical signed route.",
+            "items": {
+              "$ref": "#/components/schemas/ActionableRoute"
+            }
           },
           "routes": {
             "type": "array",
@@ -1153,6 +1162,78 @@
           "returnedOpenRouteCount": {
             "type": "integer",
             "minimum": 0
+          }
+        }
+      },
+      "ActionableRoute": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "Non-authoritative economic estimate for route selection. Verify the corresponding signed route and obtain an Execution Permit before execution.",
+        "required": [
+          "routeId",
+          "quoteId",
+          "pricingReferenceId",
+          "indicativeNotionalUsd",
+          "executableNotionalUsd",
+          "estimatedSourceGasUsd",
+          "expectedEdgeAfterSourceGasBps",
+          "economicsObservedAt",
+          "economicsValidUntil",
+          "pricingModelVersion"
+        ],
+        "properties": {
+          "routeId": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "quoteId": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "pricingReferenceId": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$",
+            "description": "32-byte hexadecimal value."
+          },
+          "indicativeNotionalUsd": {
+            "type": "string",
+            "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$",
+            "description": "Base-10 USD estimate string; never execution authority."
+          },
+          "executableNotionalUsd": {
+            "type": "string",
+            "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$",
+            "description": "Base-10 USD estimate string; never execution authority."
+          },
+          "estimatedSourceGasUsd": {
+            "type": "string",
+            "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$",
+            "description": "Base-10 USD estimate string; never execution authority."
+          },
+          "expectedEdgeAfterSourceGasBps": {
+            "type": "string",
+            "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$",
+            "description": "Base-10 USD estimate string; never execution authority."
+          },
+          "economicsObservedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "economicsValidUntil": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "pricingModelVersion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         }
       },

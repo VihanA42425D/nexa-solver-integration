@@ -45,6 +45,10 @@ npm run verify:onchain
 7. Request the execution Permit.
 8. Resolve/build the source-chain transaction.
 9. Submit the single source-chain transaction.
+10. Track Fill status to `PAID`.
+
+Route Detail is optional. A client can proceed directly from a verified Feed
+route to the Permit Request Message.
 
 ## Standards integrations
 

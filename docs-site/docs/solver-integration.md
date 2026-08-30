@@ -30,7 +30,7 @@ does not authorize execution.
 Two transports expose the same confirmed active route set:
 
 - HTTP is the recovery and snapshot path.
-- SSE is the incremental path and supports reconnect with `Last-Event-ID`.
+- SSE is the live current-state path and supports reconnect with `Last-Event-ID`.
 
 On every Feed object:
 
@@ -51,8 +51,9 @@ valid quote window. Treat all integer execution amounts as base-10 strings and
 keep route ID, quote ID, source/destination network and asset IDs, amount
 bounds, and execution generation together.
 
-A route-detail read can provide the latest per-route view. It does not replace
-Feed verification or permit issuance.
+A route-detail read can provide the latest per-route view. It is optional and
+does not replace Feed verification or permit issuance. A client may proceed
+directly from a verified Feed route to the Permit Request Message.
 
 ## 4. Request an Execution Permit
 

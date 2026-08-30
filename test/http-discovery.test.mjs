@@ -23,7 +23,7 @@ test("OpenAPI is the complete generated runtime projection with concrete critica
   assert.deepEqual(Object.keys(openapi.paths), Object.values(PUBLIC_PATHS));
   for (const name of [
     "SolverDiscovery", "OnchainDiscoveryFingerprint", "ScannerHints", "StandardsManifest",
-    "SignedFeed", "SignedFeedPayload", "FeedResponse", "Route", "RouteDetailResponse",
+    "SignedFeed", "SignedFeedPayload", "ActionableRoute", "FeedResponse", "Route", "RouteDetailResponse",
     "PermitRequest", "PermitRequestMessageResponse", "ExecutionPermitResponse",
     "PermitStatusResponse", "ErrorResponse",
   ]) assert.ok(openapi.components.schemas[name], name);
@@ -37,6 +37,12 @@ test("OpenAPI is the complete generated runtime projection with concrete critica
     PUBLIC_ENDPOINTS.routeDetailTemplate,
   );
   assert.ok(openapi.components.schemas.SignedFeed.required.includes("routeDetailTemplate"));
+  assert.ok(openapi.components.schemas.SignedFeed.required.includes("actionableRoutes"));
+  assert.equal(openapi.components.schemas.SignedFeed.properties.actionableRoutes.maxItems, 10);
+  assert.equal(
+    openapi.components.schemas.SignedFeed.properties.actionableRoutes.items.$ref,
+    "#/components/schemas/ActionableRoute",
+  );
   assert.match(
     openapi.components.schemas.SignedFeed.properties.routeDetailTemplate.description,
     /not part of signedPayload/i,
@@ -45,7 +51,11 @@ test("OpenAPI is the complete generated runtime projection with concrete critica
     Object.hasOwn(openapi.components.schemas.SignedFeedPayload.properties, "routeDetailTemplate"),
     false,
   );
-  for (const field of ["routeDetailTemplate", "routeDetailUrl", "nextAction", "actions"]) {
+  assert.equal(
+    Object.hasOwn(openapi.components.schemas.SignedFeedPayload.properties, "actionableRoutes"),
+    false,
+  );
+  for (const field of ["routeDetailTemplate", "actionableRoutes", "routeDetailUrl", "nextAction", "actions"]) {
     assert.equal(Object.hasOwn(openapi.components.schemas.Route.properties, field), false);
   }
   assert.equal(

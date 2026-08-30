@@ -119,8 +119,16 @@ Verify every Feed with the published signer and [src/feed-verification.mjs](src/
 `signedPayload` is the cryptographically authoritative object authenticated by
 `feedHash`, `feedSigner` and `feedSignature`; filtered top-level `routes` and
 `openRoutes` are convenience views and must never replace it as the signature
-preimage. Route Detail returns the exact canonical active Feed route, while
-operational metrics remain separate and non-authoritative.
+preimage. Top-level `actionableRoutes` is a small, deterministic convenience
+shortlist with evidence-backed economic estimates. Resolve each item by
+`routeId` and `quoteId` against `signedPayload.routes`; Permit issuance performs
+fresh amount-bound repricing. Route Detail is an optional confirmation read and
+is not required before requesting a Permit.
+
+The canonical direct path is Discovery -> Signed Feed -> verify `signedPayload`
+-> select Route -> Permit Request Message -> Permit -> resolve/preview/build ->
+Execute -> Fill Status. Run `npm run direct:permit` for a complete HTTP example
+that does not call Route Detail.
 
 SSE event IDs are Feed `dataVersion` values. A missing, invalid or older
 `Last-Event-ID` receives the current confirmed Feed immediately; an ID equal to

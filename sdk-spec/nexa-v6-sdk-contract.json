@@ -65,12 +65,19 @@
       "required": ["routeId", "quoteId", "sourceNetworkId", "sourceAssetId", "destinationNetworkId", "destinationAssetId", "minimumFillInRaw", "maxAvailableInRaw", "executionStatus", "permitAvailable", "validUntil"]
     },
     "SignedFeed": {
-      "required": ["routeDetailTemplate", "signedPayload", "feedHash", "feedSigner", "feedSignature"],
+      "required": ["routeDetailTemplate", "actionableRoutes", "signedPayload", "feedHash", "feedSigner", "feedSignature"],
       "signedPayloadRequired": ["schema", "releaseId", "dataVersion", "generatedAt", "validUntil", "routes"],
       "routeDetailTemplate": {
         "const": "https://solver.vsnexa.com/api/v6/routes/{routeId}",
         "authority": "NAVIGATION_METADATA_ONLY",
         "signed": false
+      },
+      "actionableRoutes": {
+        "authority": "CONVENIENCE_ECONOMIC_SHORTLIST_ONLY",
+        "signed": false,
+        "maximumItems": 10,
+        "resolveAgainst": "signedPayload.routes",
+        "requiredItemFields": ["routeId", "quoteId", "pricingReferenceId", "indicativeNotionalUsd", "executableNotionalUsd", "estimatedSourceGasUsd", "expectedEdgeAfterSourceGasBps", "economicsObservedAt", "economicsValidUntil", "pricingModelVersion"]
       }
     },
     "FeedVerification": {

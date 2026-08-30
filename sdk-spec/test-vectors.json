@@ -19,6 +19,20 @@
   "feed": {
     "nowSeconds": 2000000001,
     "routeDetailTemplate": "https://solver.vsnexa.com/api/v6/routes/{routeId}",
+    "actionableRoutes": [
+      {
+        "routeId": "0x1010101010101010101010101010101010101010101010101010101010101010",
+        "quoteId": "0x2020202020202020202020202020202020202020202020202020202020202020",
+        "pricingReferenceId": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "indicativeNotionalUsd": "9",
+        "executableNotionalUsd": "9",
+        "estimatedSourceGasUsd": "0.05",
+        "expectedEdgeAfterSourceGasBps": "12.5",
+        "economicsObservedAt": "2033-05-18T03:33:20.000Z",
+        "economicsValidUntil": "2033-05-18T03:38:20.000Z",
+        "pricingModelVersion": "NEXA_V6_PUBLIC_VECTOR"
+      }
+    ],
     "signedPayload": {
       "schema": "NEXA_MAINNET_V6_SIGNED_FEED_V1",
       "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",

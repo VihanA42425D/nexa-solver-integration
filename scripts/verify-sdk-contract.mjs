@@ -30,12 +30,18 @@ if (vectors.schema !== "NEXA_V6_SDK_TEST_VECTORS_V1"
   throw new Error("Frozen SDK vectors drifted");
 }
 if (!spec.models.SignedFeed.required.includes("routeDetailTemplate")
+    || !spec.models.SignedFeed.required.includes("actionableRoutes")
     || spec.models.SignedFeed.routeDetailTemplate.const !== PUBLIC_ENDPOINTS.routeDetailTemplate
     || spec.models.SignedFeed.routeDetailTemplate.signed !== false
+    || spec.models.SignedFeed.actionableRoutes.signed !== false
+    || spec.models.SignedFeed.actionableRoutes.maximumItems !== 10
     || vectors.feed.routeDetailTemplate !== PUBLIC_ENDPOINTS.routeDetailTemplate
+    || !Array.isArray(vectors.feed.actionableRoutes)
+    || vectors.feed.actionableRoutes.length !== 1
     || Object.hasOwn(vectors.feed.signedPayload, "routeDetailTemplate")
+    || Object.hasOwn(vectors.feed.signedPayload, "actionableRoutes")
     || vectors.feed.signedPayload.routes.some((route) => (
-      ["routeDetailTemplate", "routeDetailUrl", "nextAction", "actions"]
+      ["routeDetailTemplate", "actionableRoutes", "routeDetailUrl", "nextAction", "actions"]
         .some((field) => Object.hasOwn(route, field))
     ))) {
   throw new Error("SignedFeed Route Detail navigation contract drifted");

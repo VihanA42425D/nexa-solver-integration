@@ -45,19 +45,18 @@ npm install nexa-v6-sdk@1.0.0
 
 **API**:
 ```typescript
-import { Nexa } from 'nexa-v6-sdk';
+import { NexaV6Client } from "nexa-v6-sdk";
 
-const solver = new Nexa();
-const discovery = await solver.discover();
-const routes = await solver.getRoutes();
-const route = await solver.getRoute(routeId);
-const verified = await solver.verifyFeed(feedData);
-const message = await solver.requestPermitMessage(routeId);
-const permit = await solver.requestPermit(message, signature);
-const execution = await solver.resolveExecution(permit);
-const preview = await solver.previewExecution(execution);
-const tx = await solver.buildExecutionTx(execution);
-const status = await solver.getFillStatus(fillId);
+const client = new NexaV6Client();
+const routes = await client.getRoutes(); // verifies the Signed Feed
+const permitRequest = { quoteId, requestedAmountInRaw, standard, payer, recipient, idempotencyKey };
+const message = client.requestPermitMessage(permitRequest);
+const requestSignature = await wallet.signMessage(message);
+const permit = await client.requestPermit(permitRequest, requestSignature);
+const execution = await client.resolveExecution(rpcUrl, permit.permit.execution.payload);
+const preview = await client.previewExecution(rpcUrl, permit);
+const tx = client.buildExecutionTx(permit);
+const status = await client.getFillStatus(permit.permit.fillId);
 ```
 
 **Location**: [sdks/typescript/](../sdks/typescript/)
@@ -75,19 +74,16 @@ pip install nexa-v6-sdk==1.0.0
 
 **API**:
 ```python
-from nexa_v6_sdk import Nexa
+from nexa_v6_sdk import NexaV6Client
 
-solver = Nexa()
-discovery = solver.discover()
-routes = solver.get_routes()
-route = solver.get_route(route_id)
-verified = solver.verify_feed(feed_data)
-message = solver.request_permit_message(route_id)
-permit = solver.request_permit(message, signature)
-execution = solver.resolve_execution(permit)
-preview = solver.preview_execution(execution)
-tx = solver.build_execution_tx(execution)
-status = solver.get_fill_status(fill_id)
+client = NexaV6Client()
+routes = client.getRoutes()  # verifies the Signed Feed
+message = client.requestPermitMessage(permit_request)
+permit = client.requestPermit(permit_request, request_signature)
+execution = client.resolveExecution(rpc_url, permit["permit"]["execution"]["payload"])
+preview = client.previewExecution(rpc_url, permit)
+tx = client.buildExecutionTx(permit)
+status = client.getFillStatus(permit["permit"]["fillId"])
 ```
 
 **Location**: [sdks/python/](../sdks/python/)
@@ -106,19 +102,16 @@ nexa-v6-sdk = "1.0.0"
 
 **API**:
 ```rust
-use nexa_v6_sdk::Nexa;
+use nexa_v6_sdk::NexaV6Client;
 
-let solver = Nexa::new();
-let discovery = solver.discover().await?;
-let routes = solver.get_routes().await?;
-let route = solver.get_route(&route_id).await?;
-let verified = solver.verify_feed(&feed_data)?;
-let message = solver.request_permit_message(&route_id).await?;
-let permit = solver.request_permit(&message, &signature).await?;
-let execution = solver.resolve_execution(&permit).await?;
-let preview = solver.preview_execution(&execution).await?;
-let tx = solver.build_execution_tx(&execution)?;
-let status = solver.get_fill_status(&fill_id).await?;
+let client = NexaV6Client::default();
+let routes = client.getRoutes(None)?; // verifies the Signed Feed
+let message = client.requestPermitMessage(&permit_request)?;
+let permit = client.requestPermit(&permit_request, &request_signature)?;
+let execution = client.resolveExecution(&rpc_url, permit["permit"]["execution"]["payload"].as_str().unwrap())?;
+let preview = client.previewExecution(&rpc_url, &permit)?;
+let tx = client.buildExecutionTx(&permit)?;
+let status = client.getFillStatus(permit["permit"]["fillId"].as_str().unwrap())?;
 ```
 
 **Location**: [sdks/rust/](../sdks/rust/)
@@ -134,17 +127,16 @@ No external package registry; vendored directly from this repository.
 ```go
 import "github.com/VihanA42425D/nexa-solver-integration/sdks/go"
 
-solver := nexa.NewSolver()
-discovery, _ := solver.Discover(ctx)
-routes, _ := solver.GetRoutes(ctx)
-route, _ := solver.GetRoute(ctx, routeID)
-verified, _ := solver.VerifyFeed(feedData)
-message, _ := solver.RequestPermitMessage(ctx, routeID)
-permit, _ := solver.RequestPermit(ctx, message, signature)
-execution, _ := solver.ResolveExecution(ctx, permit)
-preview, _ := solver.PreviewExecution(ctx, execution)
-tx, _ := solver.BuildExecutionTx(execution)
-status, _ := solver.GetFillStatus(ctx, fillID)
+client := nexav6.NewClient()
+routes, _ := client.GetRoutes(ctx, nil) // verifies the Signed Feed
+message, _ := client.RequestPermitMessage(permitRequest)
+permit, _ := client.RequestPermit(ctx, permitRequest, requestSignature)
+permitEnvelope := permit["permit"].(map[string]any)
+executionData := permitEnvelope["execution"].(map[string]any)
+execution, _ := client.ResolveExecution(ctx, rpcURL, executionData["payload"].(string))
+preview, _ := client.PreviewExecution(ctx, rpcURL, permit)
+tx, _ := client.BuildExecutionTx(permit)
+status, _ := client.GetFillStatus(ctx, permitEnvelope["fillId"].(string))
 ```
 
 **Naming**: Uses **PascalCase** per Go convention (e.g., `GetRoutes`, `VerifyFeed`).
@@ -168,22 +160,22 @@ status, _ := solver.GetFillStatus(ctx, fillID)
 
 **API**:
 ```java
-import io.github.vihana42425d.NexaSolver;
+import com.fasterxml.jackson.databind.JsonNode;
+import io.github.vihana42425d.nexa.v6.NexaV6Client;
+import java.util.Map;
 
-NexaSolver solver = new NexaSolver();
-Discovery discovery = solver.discover();
-List<Route> routes = solver.getRoutes();
-Route route = solver.getRoute(routeId);
-boolean verified = solver.verifyFeed(feedData);
-String message = solver.requestPermitMessage(routeId);
-Permit permit = solver.requestPermit(message, signature);
-Execution execution = solver.resolveExecution(permit);
-ExecutionPreview preview = solver.previewExecution(execution);
-Transaction tx = solver.buildExecutionTx(execution);
-FillStatus status = solver.getFillStatus(fillId);
+var client = new NexaV6Client();
+var routes = client.getRoutes(Map.of()); // verifies the Signed Feed
+String message = client.requestPermitMessage(permitRequest);
+JsonNode permit = client.requestPermit(permitRequest, requestSignature);
+JsonNode execution = client.resolveExecution(rpcUrl,
+    permit.path("permit").path("execution").path("payload").asText());
+JsonNode preview = client.previewExecution(rpcUrl, permit);
+JsonNode tx = client.buildExecutionTx(permit);
+JsonNode status = client.getFillStatus(permit.path("permit").path("fillId").asText());
 ```
 
-**Location**: [sdks/java/](../sdks/java/)
+**Location**: [sdks/jvm/](../sdks/jvm/)
 
 **Maven Signing**: Artifacts signed with OpenPGP fingerprint `A3A1CA1FF8968B62DB50B4537EFE1BDBD7E89F25`.
 
@@ -202,17 +194,15 @@ dotnet add package VihanA.Nexa.V6.Sdk --version 1.0.0
 ```csharp
 using VihanA.Nexa.V6.Sdk;
 
-var solver = new NexaSolver();
-var discovery = await solver.DiscoverAsync();
-var routes = await solver.GetRoutesAsync();
-var route = await solver.GetRouteAsync(routeId);
-var verified = solver.VerifyFeed(feedData);
-var message = await solver.RequestPermitMessageAsync(routeId);
-var permit = await solver.RequestPermitAsync(message, signature);
-var execution = await solver.ResolveExecutionAsync(permit);
-var preview = await solver.PreviewExecutionAsync(execution);
-var tx = solver.BuildExecutionTx(execution);
-var status = await solver.GetFillStatusAsync(fillId);
+var client = new NexaV6Client();
+var routes = await client.GetRoutes(); // verifies the Signed Feed
+var message = client.RequestPermitMessage(permitRequest);
+var permit = await client.RequestPermit(permitRequest, requestSignature);
+var execution = await client.ResolveExecution(rpcUrl,
+    permit.GetProperty("permit").GetProperty("execution").GetProperty("payload").GetString()!);
+var preview = await client.PreviewExecution(rpcUrl, permit);
+var tx = client.BuildExecutionTx(permit);
+var status = await client.GetFillStatus(permit.GetProperty("permit").GetProperty("fillId").GetString()!);
 ```
 
 **Naming**: Uses **PascalCase** per .NET convention (e.g., `DiscoverAsync`, `VerifyFeed`).
@@ -223,7 +213,8 @@ var status = await solver.GetFillStatusAsync(fillId);
 
 ## Ten Core Operations
 
-All SDKs implement these identical operations:
+All SDKs implement these identical operations. Route Detail is optional; a
+client can proceed from a verified Feed route directly to the Permit Request.
 
 | Operation | Purpose |
 | --- | --- |
@@ -231,11 +222,11 @@ All SDKs implement these identical operations:
 | `getRoutes()` | List all active routes |
 | `getRoute(id)` | Get specific route details |
 | `verifyFeed(data)` | Cryptographically verify signed Feed |
-| `requestPermitMessage(routeId)` | Get message for wallet to sign |
-| `requestPermit(message, sig)` | Submit signed execution Permit |
-| `resolveExecution(permit)` | Convert Permit to executable transaction |
-| `previewExecution(exec)` | Simulate execution without submitting |
-| `buildExecutionTx(exec)` | Construct final transaction bytes |
+| `requestPermitMessage(request)` | Build the exact local message for the payer wallet to sign |
+| `requestPermit(request, signature)` | Submit the complete request and wallet signature |
+| `resolveExecution(rpcUrl, payload)` | Resolve an ERC-7683 execution payload with `eth_call` |
+| `previewExecution(rpcUrl, permit)` | Simulate direct execution without submitting |
+| `buildExecutionTx(permit)` | Construct the single source transaction |
 | `getFillStatus(fillId)` | Query settlement confirmation |
 
 ---

@@ -13,6 +13,7 @@ import {
   SOLVER_ROOT_DESCRIPTION,
   SOLVER_ROOT_TITLE,
   handleRequest,
+  recordEdgeDiscoveryTelemetry,
 } from "../src/worker.mjs";
 
 const readJson = async (path) => JSON.parse(await readFile(new URL(path, import.meta.url), "utf8"));
@@ -260,6 +261,64 @@ test("Worker serves canonical crawler documents and IndexNow ownership at the Ed
   assert.match(LLMS_TEXT, /Graph and Substreams are non-authoritative indexes/);
   assert.equal(originCalls, 0);
   assert.equal(bindingReads, 0);
+});
+
+test("static discovery emits correlatable Edge diagnostics without DB, RPC, HTTP, or raw IP", async () => {
+  const entries = [];
+  const env = enabledEnv();
+  const request = new Request(PUBLIC_ENDPOINTS.openapi, {
+    headers: {
+      "cf-connecting-ip": "203.0.113.19",
+      "user-agent": "ExampleCrawler/1.0",
+      accept: "application/json",
+    },
+  });
+  assert.equal(await recordEdgeDiscoveryTelemetry(request, env, {
+    nowSeconds: 2_000_000_000,
+    logger: { info(label, value) { entries.push({ label, value }); } },
+  }), true);
+  assert.equal(entries.length, 1);
+  assert.equal(entries[0].label, "nexa_v6_edge_discovery");
+  const entry = JSON.parse(entries[0].value);
+  assert.equal(entry.eventType, "OPENAPI_READ");
+  assert.equal(entry.trafficClass, "PUBLIC_AUTOMATION");
+  assert.equal(entry.automationEvidence.pattern, "crawler-token");
+  assert.match(entry.solverFingerprint, /^[0-9a-f]{64}$/);
+  assert.equal(Object.hasOwn(entry, "ip"), false);
+  assert.equal(entries[0].value.includes("203.0.113.19"), false);
+
+  let forwardedFingerprint;
+  const longAgent = `solver-client/${"a".repeat(300)}`;
+  await handleRequest(new Request("https://solver.vsnexa.com/api/v6/solver-feed", {
+    headers: {
+      "cf-connecting-ip": "203.0.113.19",
+      "user-agent": longAgent,
+    },
+  }), env, {
+    nowSeconds: 2_000_000_000,
+    fetchImpl: async (upstream) => {
+      forwardedFingerprint = upstream.headers.get("x-nexa-v6-solver-fingerprint");
+      return new Response("{}", { headers: { "content-type": "application/json" } });
+    },
+  });
+  const longAgentEntry = [];
+  await recordEdgeDiscoveryTelemetry(new Request(PUBLIC_ENDPOINTS.openapi, {
+    headers: {
+      "cf-connecting-ip": "203.0.113.19",
+      "user-agent": longAgent,
+    },
+  }), env, {
+    nowSeconds: 2_000_000_000,
+    logger: { info(_label, value) { longAgentEntry.push(JSON.parse(value)); } },
+  });
+  assert.equal(longAgentEntry[0].solverFingerprint, forwardedFingerprint);
+
+  const internalEntry = [];
+  await recordEdgeDiscoveryTelemetry(new Request(PUBLIC_ENDPOINTS.openapi), env, {
+    nowSeconds: 2_000_000_000,
+    logger: { info(_label, value) { internalEntry.push(JSON.parse(value)); } },
+  });
+  assert.equal(internalEntry[0].trafficClass, "UNATTRIBUTED_DIRECT");
 });
 
 test("Worker adds crawler headers and CDN cache policy to stable discovery only", async () => {

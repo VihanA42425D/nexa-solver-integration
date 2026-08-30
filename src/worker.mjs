@@ -50,6 +50,21 @@ const LONG_LIVED_ORIGIN_DISCOVERY_PATHS = Object.freeze([
   "/openapi.json",
 ]);
 
+const EDGE_DISCOVERY_EVENT_TYPES = Object.freeze({
+  "/": "DISCOVERY_ROOT_READ",
+  "/.well-known/nexa-solver.json": "CANONICAL_DISCOVERY_READ",
+  "/.well-known/nexa-onchain-discovery.json": "ONCHAIN_DISCOVERY_READ",
+  "/.well-known/nexa-standards.json": "STANDARDS_READ",
+  "/openapi.json": "OPENAPI_READ",
+  "/api/v6/solver-discovery": "API_DISCOVERY_READ",
+});
+const EDGE_AUTOMATION_PATTERNS = Object.freeze([
+  Object.freeze({ label: "crawler-token", expression: /(?:bot|crawler|spider|slurp|preview)/i }),
+  Object.freeze({ label: "headless-client", expression: /(?:headless|phantomjs|selenium|playwright)/i }),
+  Object.freeze({ label: "generic-http-client", expression: /(?:curl|wget|python-requests|go-http-client)/i }),
+]);
+const EDGE_SDK_PATTERN = /^(typescript|python|rust|go|jvm|dotnet)\/(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[0-9a-z.-]{1,32})?$/;
+
 const SOLVER_ROOT_STRUCTURED_DATA = Object.freeze({
   "@context": "https://schema.org",
   "@type": "WebAPI",
@@ -67,7 +82,7 @@ const ROBOTS_TEXT = `User-agent: *\nAllow: /\nSitemap: ${SOLVER_BASE_URL}/sitema
 
 const SITEMAP_XML = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>${SOLVER_BASE_URL}/</loc></url>\n  <url><loc>${SOLVER_BASE_URL}/.well-known/nexa-solver.json</loc></url>\n  <url><loc>${SOLVER_BASE_URL}/.well-known/nexa-onchain-discovery.json</loc></url>\n  <url><loc>${SOLVER_BASE_URL}/.well-known/nexa-standards.json</loc></url>\n  <url><loc>${SOLVER_BASE_URL}/openapi.json</loc></url>\n  <url><loc>${SOLVER_BASE_URL}/api/v6/solver-discovery</loc></url>\n</urlset>\n`;
 
-const LLMS_TEXT = `# Nexa V6\n\nNexa V6 exposes a machine-readable solver integration surface.\n\n- Solver discovery manifest: ${SOLVER_MANIFEST_URL}\n- On-chain discovery: ${SOLVER_BASE_URL}/.well-known/nexa-onchain-discovery.json\n- Standards: ${SOLVER_BASE_URL}/.well-known/nexa-standards.json\n- OpenAPI: ${OPENAPI_URL}\n- Signed Feed: ${SOLVER_BASE_URL}/api/v6/solver-feed\n- Public integration repository: https://github.com/VihanA42425D/nexa-solver-integration\n- Graph Base index: https://api.studio.thegraph.com/query/1748073/nexa-v-6-base/1.0.0\n- Graph BSC index: https://api.studio.thegraph.com/query/1748073/nexa-v-6-bsc/1.0.0\n- Substreams Base: https://substreams.dev/packages/nexa-v6-indexing-base/v1.0.0\n- Substreams BSC: https://substreams.dev/packages/nexa-v6-indexing-bsc/v1.0.0\n- Substreams HyperEVM: https://substreams.dev/packages/nexa-v6-indexing-hyper-evm/v1.0.0\n\nThe Signed Feed is authoritative for live route terms. The Execution Permit is the final execution authority. Graph and Substreams are non-authoritative indexes.\n`;
+const LLMS_TEXT = `# Nexa V6\n\nNexa V6 exposes a machine-readable solver integration surface.\n\n- Solver discovery manifest: ${SOLVER_MANIFEST_URL}\n- On-chain discovery: ${SOLVER_BASE_URL}/.well-known/nexa-onchain-discovery.json\n- Standards: ${SOLVER_BASE_URL}/.well-known/nexa-standards.json\n- OpenAPI: ${OPENAPI_URL}\n- Signed Feed: ${SOLVER_BASE_URL}/api/v6/solver-feed\n- Public integration repository: https://github.com/VihanA42425D/nexa-solver-integration\n- Graph Base index: https://api.studio.thegraph.com/query/1748073/nexa-v-6-base/1.0.0\n- Graph BSC index: https://api.studio.thegraph.com/query/1748073/nexa-v-6-bsc/1.0.0\n- Substreams Base: https://substreams.dev/packages/nexa-v6-indexing-base/v1.0.0\n- Substreams BSC: https://substreams.dev/packages/nexa-v6-indexing-bsc/v1.0.0\n- Substreams HyperEVM: https://substreams.dev/packages/nexa-v6-indexing-hyper-evm/v1.0.0\n\nVerify signedPayload before selecting a route. Top-level actionableRoutes is an unsigned economic shortlist; resolve every item against signedPayload.routes. Route Detail is optional before the Permit Request Message. The Execution Permit is the final execution authority. Graph and Substreams are non-authoritative indexes.\n`;
 
 const EDGE_STATIC_DISCOVERY = Object.freeze({
   "/": Object.freeze({ body: ROOT_HTML, contentType: "text/html; charset=utf-8" }),
@@ -247,6 +262,64 @@ async function hmacHex(secret, value) {
   return bytesToHex(await crypto.subtle.sign("HMAC", key, encoder.encode(value)));
 }
 
+function ownBinding(env, name) {
+  const descriptor = env && Object.getOwnPropertyDescriptor(env, name);
+  return descriptor && Object.hasOwn(descriptor, "value") ? descriptor.value : undefined;
+}
+
+async function recordEdgeDiscoveryTelemetry(request, env, options = {}) {
+  const url = new URL(request.url);
+  const eventType = EDGE_DISCOVERY_EVENT_TYPES[url.pathname];
+  if (!eventType || !["GET", "HEAD"].includes(request.method)) return false;
+  const secret = String(
+    options.edgeTelemetrySecret ?? ownBinding(env, "NEXA_V6_EDGE_TELEMETRY_HMAC_SECRET") ?? "",
+  );
+  if (secret.length < 32) return false;
+  const nowSeconds = Number(options.nowSeconds ?? Math.floor(Date.now() / 1000));
+  const epoch = Math.floor(nowSeconds / 86_400);
+  const ip = String(request.headers.get("cf-connecting-ip") ?? "unknown").trim().toLowerCase();
+  const userAgent = String(request.headers.get("user-agent") ?? "").trim().slice(0, 256);
+  const normalizedAgent = (userAgent || "unknown").toLowerCase();
+  const fingerprint = await hmacHex(secret, `solver\n${epoch}\n${ip}\n${normalizedAgent}`);
+  const sdkDeclaration = String(request.headers.get("x-nexa-sdk") ?? "").trim().toLowerCase();
+  const sdkDeclared = EDGE_SDK_PATTERN.test(sdkDeclaration);
+  const automation = EDGE_AUTOMATION_PATTERNS.find(({ expression }) => expression.test(userAgent));
+  const trafficClass = ip === "unknown"
+    ? "UNATTRIBUTED_DIRECT"
+    : sdkDeclared
+      ? "EXTERNAL_SOLVER"
+      : automation ? "PUBLIC_AUTOMATION" : "EXTERNAL_SOLVER";
+  const entry = Object.freeze({
+    schema: "NEXA_V6_EDGE_DISCOVERY_TELEMETRY_V1",
+    eventType,
+    endpointPath: url.pathname,
+    method: request.method,
+    occurredAt: new Date(nowSeconds * 1_000).toISOString(),
+    epoch,
+    solverFingerprint: fingerprint,
+    trafficClass,
+    clientType: sdkDeclared ? "SDK_DECLARED" : "UNKNOWN",
+    sdkDeclaration: sdkDeclared ? sdkDeclaration : null,
+    userAgent: userAgent || null,
+    accept: String(request.headers.get("accept") ?? "").trim().slice(0, 160) || null,
+    automationEvidence: automation
+      ? Object.freeze({ basis: "USER_AGENT_PATTERN", pattern: automation.label })
+      : null,
+  });
+  const logger = options.logger ?? console;
+  (logger.info ?? logger.log).call(logger, "nexa_v6_edge_discovery", JSON.stringify(entry));
+  return true;
+}
+
+async function emitEdgeDiscoveryTelemetry(request, env, options = {}) {
+  const work = recordEdgeDiscoveryTelemetry(request, env, options);
+  if (typeof options.executionContext?.waitUntil === "function") {
+    options.executionContext.waitUntil(work);
+    return;
+  }
+  await work;
+}
+
 function decodeBase64Url(value) {
   const normalized = String(value).replace(/-/g, "+").replace(/_/g, "/");
   const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
@@ -376,8 +449,9 @@ async function attachTrustedEdgeIdentity(headers, request, env, nowSeconds = Mat
   const url = new URL(request.url);
   const epoch = Math.floor(nowSeconds / 86_400);
   const ip = String(request.headers.get("cf-connecting-ip") ?? "unknown").trim().toLowerCase();
-  const agent = String(request.headers.get("user-agent") ?? "unknown").trim().toLowerCase();
-  const fingerprint = await hmacHex(secret, `solver\n${epoch}\n${ip}\n${agent}`);
+  const userAgent = String(request.headers.get("user-agent") ?? "").trim().slice(0, 256);
+  const normalizedAgent = (userAgent || "unknown").toLowerCase();
+  const fingerprint = await hmacHex(secret, `solver\n${epoch}\n${ip}\n${normalizedAgent}`);
   const payload = [fingerprint, String(epoch), String(nowSeconds), request.method, url.pathname].join("\n");
   headers.set("x-nexa-v6-solver-fingerprint", fingerprint);
   headers.set("x-nexa-v6-edge-epoch", String(epoch));
@@ -541,9 +615,15 @@ async function handleRequest(request, env, options = {}) {
   }
 
   const staticDiscovery = edgeStaticDiscoveryResponse(request, incoming.pathname);
-  if (staticDiscovery) return staticDiscovery;
+  if (staticDiscovery) {
+    await emitEdgeDiscoveryTelemetry(request, env, options);
+    return staticDiscovery;
+  }
   const stableDiscovery = edgeStableDiscoveryResponse(request, incoming.pathname);
-  if (stableDiscovery) return stableDiscovery;
+  if (stableDiscovery) {
+    await emitEdgeDiscoveryTelemetry(request, env, options);
+    return stableDiscovery;
+  }
 
   if (request.method === "OPTIONS" && isPublicRoute(request.method, incoming.pathname)) {
     return new Response(null, { status: 204, headers: withSolverCors() });
@@ -586,6 +666,7 @@ export {
   isEdgeStaticDiscoveryRoute,
   isPublicRoute,
   originUrl,
+  recordEdgeDiscoveryTelemetry,
   verifiedAccessEmailFromAssertion,
   withSolverCors,
 };

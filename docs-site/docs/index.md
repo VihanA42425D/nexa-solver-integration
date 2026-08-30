@@ -70,7 +70,7 @@ Chain, and HyperEVM.
 - [Canonical GitHub repository](https://github.com/VihanA42425D/nexa-solver-integration)
 - [Contact documentation support](contact.md)
 
-**Discovery** &rarr; **Signed Feed** &rarr; **Route** &rarr; **Permit** &rarr; **Resolution** &rarr; **Execution**
+**Discovery** &rarr; **Signed Feed verification** &rarr; **Route selection** &rarr; **Permit** &rarr; **Resolution** &rarr; **Execution** &rarr; **Fill status**
 
 ## Integration sequence
 
@@ -79,6 +79,7 @@ well-known discovery
   -> signed Feed (HTTP recovery or confirmed-set SSE)
   -> local Feed verification
   -> route and quote selection
+  -> optional route-detail confirmation
   -> canonical permit-request signature
   -> issued Execution Permit
   -> optional off-chain preview / ERC-7683 resolution

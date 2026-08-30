@@ -105,6 +105,7 @@ function routeSchema() {
 }
 
 function feedSchemas() {
+  const USD_DECIMAL = str("^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$", "Base-10 USD estimate string; never execution authority.");
   return {
     SignedFeedPayload: {
       type: "object",
@@ -120,10 +121,10 @@ function feedSchemas() {
     SignedFeed: {
       type: "object",
       additionalProperties: false,
-      description: "signedPayload is the only signed authority. routeDetailTemplate is feed-level navigation metadata outside the cryptographic authority. Top-level routes/openRoutes are filterable convenience views and must not be substituted during verification.",
+      description: "signedPayload is the only signed authority. routeDetailTemplate and actionableRoutes are convenience metadata outside the cryptographic authority. Top-level routes/openRoutes are filterable convenience views and must not be substituted during verification. Actionable economics are estimates, not execution guarantees; Permit issuance performs fresh amount-bound repricing and authorization.",
       required: [
         "schema", "releaseId", "dataVersion", "generatedAt", "validUntil", "signedPayload",
-        "routeDetailTemplate", "routes", "openRoutes", "feedHash", "feedSigner", "feedSignature", "publicationGasWei",
+        "routeDetailTemplate", "actionableRoutes", "routes", "openRoutes", "feedHash", "feedSigner", "feedSignature", "publicationGasWei",
         "publicationTransactionHashes", "routeCount", "openRouteCount", "returnedRouteCount",
         "returnedOpenRouteCount",
       ],
@@ -136,6 +137,12 @@ function feedSchemas() {
           const: V6_ROUTE_DETAIL_TEMPLATE,
           description: "Feed-level read-only navigation template. Replace {routeId} with a route.routeId. This field is not part of signedPayload and is not cryptographic authority.",
         },
+        actionableRoutes: {
+          type: "array",
+          maxItems: 10,
+          description: "Deterministic, evidence-backed convenience shortlist. Resolve routeId/quoteId against signedPayload.routes before use. Missing evidence excludes only this shortlist and never removes a canonical signed route.",
+          items: ref("ActionableRoute"),
+        },
         routes: { type: "array", items: ref("Route") },
         openRoutes: { type: "array", items: ref("Route") },
         feedHash: BYTES32, feedSigner: ADDRESS,
@@ -145,6 +152,29 @@ function feedSchemas() {
         routeCount: { type: "integer", minimum: 0 }, openRouteCount: { type: "integer", minimum: 0 },
         returnedRouteCount: { type: "integer", minimum: 0 },
         returnedOpenRouteCount: { type: "integer", minimum: 0 },
+      },
+    },
+    ActionableRoute: {
+      type: "object",
+      additionalProperties: false,
+      description: "Non-authoritative economic estimate for route selection. Verify the corresponding signed route and obtain an Execution Permit before execution.",
+      required: [
+        "routeId", "quoteId", "pricingReferenceId", "indicativeNotionalUsd",
+        "executableNotionalUsd", "estimatedSourceGasUsd",
+        "expectedEdgeAfterSourceGasBps", "economicsObservedAt",
+        "economicsValidUntil", "pricingModelVersion",
+      ],
+      properties: {
+        routeId: BYTES32,
+        quoteId: BYTES32,
+        pricingReferenceId: BYTES32,
+        indicativeNotionalUsd: USD_DECIMAL,
+        executableNotionalUsd: USD_DECIMAL,
+        estimatedSourceGasUsd: USD_DECIMAL,
+        expectedEdgeAfterSourceGasBps: USD_DECIMAL,
+        economicsObservedAt: { type: "string", format: "date-time" },
+        economicsValidUntil: { type: "string", format: "date-time" },
+        pricingModelVersion: nullable({ type: "string" }),
       },
     },
     FeedResponse: {

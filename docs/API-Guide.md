@@ -74,7 +74,9 @@ Returns the current **signed** solver Feed containing active routes.
 
 **Important:** `signedPayload` is the authoritative object. Top-level `routes` and `openRoutes` are convenience filters; never replace the signature preimage.
 
-`routeDetailTemplate` is Feed-level navigation metadata for the next read-only step. After selecting a verified route, resolve it with `routeDetailTemplate.replace("{routeId}", route.routeId)`. It is not part of `signedPayload` and carries no cryptographic authority.
+`actionableRoutes` is a small deterministic shortlist of open, permit-eligible routes with fresh evidence-backed economic estimates. Match each item by `routeId` and `quoteId` to `signedPayload.routes` before use. It is outside `signedPayload`; estimates are not guarantees, and Permit issuance performs fresh amount-bound repricing.
+
+`routeDetailTemplate` is optional Feed-level navigation metadata. It can confirm the current canonical route with `routeDetailTemplate.replace("{routeId}", route.routeId)`, but Route Detail is not required before requesting a Permit. It is outside `signedPayload` and carries no cryptographic authority.
 
 #### Stream Feed Events (Server-Sent Events)
 ```
@@ -103,6 +105,8 @@ Returns exact canonical active Feed route for the given `routeId`.
 - `routeId` - Route identifier from current Feed
 
 **Returns**: Complete route detail with operational metrics (non-authoritative, for reference only).
+
+This read is optional. Clients may proceed directly from a verified Feed route to the Permit Request Message.
 
 ---
 
@@ -206,12 +210,12 @@ curl https://solver.vsnexa.com/api/v6/solver-feed
 # ... verify feedHash, feedSigner, feedSignature ...
 
 # 4. Select a route from signedPayload.routes
-ROUTE_ID="<selected-route-id>"
+QUOTE_ID="<selected-quote-id>"
 
 # 5. Request permit message
 curl -X POST https://solver.vsnexa.com/api/v6/execution-permits/request-message \
   -H "Content-Type: application/json" \
-  -d '{"routeId":"'"$ROUTE_ID"'"}'
+  -d '{"quoteId":"'"$QUOTE_ID"'","requestedAmountInRaw":"1000000","standard":"DIRECT","payer":"0x...","recipient":"0x...","idempotencyKey":"solver-example-001"}'
 
 # 6. Sign message with wallet (off-chain)
 # ... wallet signs message ...
@@ -219,12 +223,15 @@ curl -X POST https://solver.vsnexa.com/api/v6/execution-permits/request-message 
 # 7. Submit permit
 curl -X POST https://solver.vsnexa.com/api/v6/execution-permits \
   -H "Content-Type: application/json" \
-  -d '{"signedMessage":"...", "signature":"...", "routeId":"'"$ROUTE_ID"'"}'
+  -d '{"quoteId":"'"$QUOTE_ID"'","requestedAmountInRaw":"1000000","standard":"DIRECT","payer":"0x...","recipient":"0x...","idempotencyKey":"solver-example-001","requestSignature":"0x..."}'
 
 # Response contains fillId
 FILL_ID="<fill-id-from-response>"
 
-# 8. Monitor status
+# 8. Resolve/preview/build and execute the one source transaction
+# ... use the issued Permit ...
+
+# 9. Monitor Fill status
 curl https://solver.vsnexa.com/api/v6/execution-permits/$FILL_ID
 ```
 

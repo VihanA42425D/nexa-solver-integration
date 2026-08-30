@@ -71,6 +71,7 @@
   ],
   "scripts": {
     "discover": "node examples/discover-open-routes.mjs",
+    "direct:permit": "node examples/direct-feed-to-permit.mjs",
     "facade:read": "node examples/read-discovery-facade.mjs",
     "permit:request": "node examples/request-execution-permit.mjs",
     "package:verify": "node scripts/verify-package.mjs",

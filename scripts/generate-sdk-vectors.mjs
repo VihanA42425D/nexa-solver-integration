@@ -124,6 +124,18 @@ const vectors = {
   feed: {
     nowSeconds: 2000000001,
     routeDetailTemplate: PUBLIC_ENDPOINTS.routeDetailTemplate,
+    actionableRoutes: [{
+      routeId: route.routeId,
+      quoteId: route.quoteId,
+      pricingReferenceId: "0x" + "aa".repeat(32),
+      indicativeNotionalUsd: "9",
+      executableNotionalUsd: "9",
+      estimatedSourceGasUsd: "0.05",
+      expectedEdgeAfterSourceGasBps: "12.5",
+      economicsObservedAt: "2033-05-18T03:33:20.000Z",
+      economicsValidUntil: "2033-05-18T03:38:20.000Z",
+      pricingModelVersion: "NEXA_V6_PUBLIC_VECTOR",
+    }],
     signedPayload,
     canonicalPayload,
     preimageUtf8: feedPreimage,

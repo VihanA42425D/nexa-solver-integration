@@ -230,6 +230,7 @@ for (const schema of [
   "StandardsManifest",
   "SignedFeed",
   "SignedFeedPayload",
+  "ActionableRoute",
   "FeedResponse",
   "Route",
   "RouteDetailResponse",
@@ -260,8 +261,11 @@ const routeSchema = openapi.components.schemas.Route;
 if (signedFeedSchema.properties.routeDetailTemplate.const
       !== PUBLIC_ENDPOINTS.routeDetailTemplate
     || !signedFeedSchema.required.includes("routeDetailTemplate")
+    || !signedFeedSchema.required.includes("actionableRoutes")
+    || signedFeedSchema.properties.actionableRoutes.maxItems !== 10
     || Object.hasOwn(signedPayloadSchema.properties, "routeDetailTemplate")
-    || ["routeDetailTemplate", "routeDetailUrl", "nextAction", "actions"]
+    || Object.hasOwn(signedPayloadSchema.properties, "actionableRoutes")
+    || ["routeDetailTemplate", "actionableRoutes", "routeDetailUrl", "nextAction", "actions"]
       .some((field) => Object.hasOwn(routeSchema.properties, field))) {
   throw new Error("SignedFeed Route Detail navigation boundary drift");
 }

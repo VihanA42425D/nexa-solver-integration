@@ -31,6 +31,11 @@ signature. Consumers must recompute the canonical hash, recover the signer, and
 check expiry before exposing routes to selection logic. Query filters reduce
 the returned route set but do not relax verification.
 
+`actionableRoutes` is an unsigned convenience shortlist. Match its `routeId`
+and `quoteId` to `signedPayload.routes` before selection. Its economics are
+estimates; Permit issuance performs fresh amount-bound repricing. Route Detail
+is an optional confirmation read, not a prerequisite for a Permit request.
+
 ## Confirmed-set SSE
 
 The event stream publishes changes to the confirmed active set. Use

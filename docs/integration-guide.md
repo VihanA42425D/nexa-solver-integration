@@ -17,12 +17,15 @@ const { routes } = await client.getRoutes({ sourceChainId: 8453 });
 
 For execution:
 
-1. Discover and verify routes.
-2. Request the Permit message.
-3. Sign the exact message with the payer wallet.
+1. Read Discovery and the Signed Feed.
+2. Verify `signedPayload`, then select a Route.
+3. Request the Permit message and sign it with the payer wallet.
 4. Request the Permit.
-5. Preview/build the execution transaction.
-6. Submit the source transaction.
+5. Resolve, preview, or build the execution transaction.
+6. Submit the source transaction and track Fill status.
+
+Route Detail is an optional canonical confirmation read, not a prerequisite for
+the Permit path.
 
 Never substitute an unverified convenience projection for the signed Feed payload.
 
@@ -41,9 +44,11 @@ Discovery document
   -> verify onchain identities
   -> verify Signed Feed
   -> select route
-  -> request/sign Permit
-  -> resolve transaction
-  -> submit
+  -> request/sign Permit message
+  -> obtain Permit
+  -> resolve/preview/build transaction
+  -> execute
+  -> Fill status
 ```
 
 The machine-readable onboarding record is available at [onboarding/nexa-v6-solver-operator.json](../onboarding/nexa-v6-solver-operator.json).

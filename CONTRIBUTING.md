@@ -11,7 +11,7 @@ Public contributions should focus on:
 - public discovery / OpenAPI quality
 - ERC-7683 compatibility
 - OIF discovery metadata
-- passive indexing packages
+- external indexing packages
 - examples and documentation
 - deterministic verification tooling
 
@@ -36,7 +36,7 @@ npm run indexing:check
 
 Do not propose changes that:
 
-- make a passive indexer authoritative for execution
+- make an external indexer authoritative for execution
 - replace Signed Feed verification
 - bypass the Execution Permit
 - add duplicate raw-chain decoding when a canonical projection already exists

@@ -37,7 +37,7 @@ test("one canonical config supplies exact per-contract deployment starts to both
   }
 });
 
-test("indexing descriptor projects canonical external state and preserves passive 1+1", async () => {
+test("indexing descriptor projects canonical external state and preserves exact 1+1", async () => {
   const descriptor = await readJson("indexing/indexing-manifest.json");
   assert.equal(descriptor.authoritative, false);
   assert.equal(descriptor.source, "ONCHAIN_EVENTS");

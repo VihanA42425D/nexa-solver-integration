@@ -40,7 +40,7 @@ if (fingerprint.facade !== facadeDefinition.address
     || fingerprint.events.SourceFillV6.topic0 !== id(
       fingerprint.events.SourceFillV6.signature,
     )) {
-  throw new Error("Passive onchain fingerprint does not match the public surface");
+  throw new Error("Onchain fingerprint does not match the public surface");
 }
 
 const expectedHashes = new Map();
@@ -64,7 +64,7 @@ for (const [networkName, rpcUrl] of Object.entries(rpcByNetwork)) {
         !== network.verification.onchainIdentity.blockNumber
       || chainFingerprint.deploymentTransactionHash
         !== network.verification.onchainIdentity.transactionHash) {
-    throw new Error(`${networkName}: passive deployment evidence mismatch`);
+    throw new Error(`${networkName}: deployment evidence mismatch`);
   }
   const provider = new JsonRpcProvider(rpcUrl, network.chainId, { staticNetwork: true });
   try {
@@ -167,7 +167,7 @@ for (const [networkName, rpcUrl] of Object.entries(rpcByNetwork)) {
         if (supportsErc165 !== true || supportsNexaModule !== true
             || standard.moduleAddress !== fingerprint.erc7683.resolver
             || standard.id !== fingerprint.erc7683.standardId) {
-          throw new Error(`${networkName}: ERC-7683 passive fingerprint mismatch`);
+          throw new Error(`${networkName}: ERC-7683 fingerprint mismatch`);
         }
         erc165 = { supportsErc165, supportsNexaModule };
       }

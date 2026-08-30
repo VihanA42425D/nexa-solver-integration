@@ -97,7 +97,7 @@ test("SSE contract documents current-state Last-Event-ID behavior without replay
   );
 });
 
-test("scanner hints remain an additive passive zero-write projection", async () => {
+test("scanner hints remain an additive zero-write projection", async () => {
   const fingerprint = await buildOnchainDiscovery();
   const hints = fingerprint.scannerHints;
   assert.equal(hints.schema, "NEXA_MAINNET_V6_SCANNER_HINTS_V1");

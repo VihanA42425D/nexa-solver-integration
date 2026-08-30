@@ -89,7 +89,7 @@ The frozen V1.0.0 SDK contract defines canonical behavior across all platforms:
 | `sdk-spec/` | Cross-language behavior contract and test vectors |
 | `sdks/` | Implementations for all supported languages |
 | `distribution/` | External wallet/aggregator onboarding ledger |
-| `indexing/` | Passive Graph/Substreams packages |
+| `indexing/` | Graph/Substreams packages |
 
 ## Standards & Integration
 

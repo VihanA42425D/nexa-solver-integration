@@ -3,7 +3,7 @@
   "protocol": "Nexa V6",
   "deploymentVersion": 6,
   "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",
-  "purpose": "PASSIVE_INDEXER_EXACT_START_BLOCKS",
+  "purpose": "EXTERNAL_INDEXER_EXACT_START_BLOCKS",
   "source": "OFFLINE_CONFIRMED_DEPLOYMENT_RECEIPTS",
   "liveRpcUsedDuringExport": false,
   "networks": {

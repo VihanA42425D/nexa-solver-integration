@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "mode": "PASSIVE_ONCHAIN_ANALYTICS",
+  "mode": "EXTERNAL_ONCHAIN_ANALYTICS",
   "authoritative": false,
   "ingestion": "DUNE_DIRECT_CHAIN",
   "status": "DUNE_V6_BACKFILLING",

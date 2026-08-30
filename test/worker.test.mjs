@@ -257,7 +257,7 @@ test("Worker serves canonical crawler documents and IndexNow ownership at the Ed
   assert.equal(rootStructuredData.name, SOLVER_ROOT_TITLE);
   assert.equal(rootStructuredData.description, SOLVER_ROOT_DESCRIPTION);
   assert.equal(rootStructuredData.documentation, "https://docs.vsnexa.com/api/");
-  assert.match(LLMS_TEXT, /Graph and Substreams are non-authoritative passive indexes/);
+  assert.match(LLMS_TEXT, /Graph and Substreams are non-authoritative indexes/);
   assert.equal(originCalls, 0);
   assert.equal(bindingReads, 0);
 });

@@ -166,7 +166,7 @@ if (onchainDiscovery.status !== "ACTIVE"
     || onchainDiscovery.sourcify.sourceFillV6Signature.status !== "REGISTERED"
     || onchainDiscovery.sourcify.sourceFillV6Signature.topic0 !== sourceFill.topic0
     || onchainDiscovery.sourcify.sourceFillV6Signature.hasVerifiedContractAssociation !== false) {
-  throw new Error("Passive onchain discovery identity drift");
+  throw new Error("Onchain discovery identity drift");
 }
 const scannerHints = onchainDiscovery.scannerHints;
 if (scannerHints?.schema !== "NEXA_MAINNET_V6_SCANNER_HINTS_V1"
@@ -192,7 +192,7 @@ for (const [slug, chainId] of Object.entries(expectedNetworks)) {
       || chain.explorer !== evidence.explorer.url
       || chain.sourcify !== evidence.sourcify.url
       || chain.sourcifyMatchId !== evidence.sourcify.reference) {
-    throw new Error(`Passive discovery evidence mismatch: ${slug}`);
+    throw new Error(`Discovery evidence mismatch: ${slug}`);
   }
 }
 

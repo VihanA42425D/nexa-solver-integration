@@ -31,11 +31,6 @@ signature. Consumers must recompute the canonical hash, recover the signer, and
 check expiry before exposing routes to selection logic. Query filters reduce
 the returned route set but do not relax verification.
 
-The Feed-level `routeDetailTemplate` identifies the next read-only request.
-After selecting a verified route, use
-`routeDetailTemplate.replace("{routeId}", route.routeId)`. This navigation
-metadata is outside `signedPayload`; only `signedPayload` is signed authority.
-
 ## Confirmed-set SSE
 
 The event stream publishes changes to the confirmed active set. Use

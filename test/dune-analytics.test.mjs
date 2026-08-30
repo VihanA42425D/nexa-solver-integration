@@ -68,11 +68,11 @@ function fixtureStateResult(config, discovered, overrides = {}) {
   return { result: { rows: resultRows } };
 }
 
-test("Dune manifest records one passive canonical pipeline", async () => {
+test("Dune manifest records one canonical external pipeline", async () => {
   const manifest = await json("analytics/dune/dune-manifest.json");
   const final = manifest.status === "DUNE_ALL_NETWORKS_ANALYTICS_READY";
   assert.ok(final || manifest.status === "DUNE_V6_BACKFILLING");
-  assert.equal(manifest.mode, "PASSIVE_ONCHAIN_ANALYTICS");
+  assert.equal(manifest.mode, "EXTERNAL_ONCHAIN_ANALYTICS");
   assert.equal(manifest.authoritative, false);
   assert.equal(manifest.ingestion, "DUNE_DIRECT_CHAIN");
   assert.equal(manifest.capabilities.queryReadWrite, "AVAILABLE");

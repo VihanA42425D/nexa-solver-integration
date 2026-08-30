@@ -20,7 +20,7 @@ Returns canonical solver metadata, contact, and basic integration info.
 ```
 GET /.well-known/nexa-onchain-discovery.json
 ```
-Passive fingerprint containing:
+On-chain fingerprint containing:
 - Facade selector and CREATE2 evidence
 - Registry/Router identities
 - ERC-7683 Resolver address

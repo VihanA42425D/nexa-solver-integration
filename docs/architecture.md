@@ -26,7 +26,7 @@ The authority chain is intentionally narrow:
 2. **Signed Feed** is authoritative for current live route terms.
 3. **Execution Permit** is the final execution authority.
 
-Passive indexers and analytics systems are never execution authorities.
+External indexers and analytics systems are never execution authorities.
 
 ## Public discovery surfaces
 
@@ -45,7 +45,7 @@ flowchart TB
     F --> R
 ```
 
-## Passive indexing
+## External indexing
 
 ```mermaid
 flowchart LR
@@ -76,5 +76,5 @@ The public integration does not add intermediary execution transactions. The doc
 - [Solver-facing ABI](../abi/solver-facing.json)
 - [OpenAPI](../openapi/openapi.json)
 - [Standards](../standards/nexa-standards.json)
-- [Passive indexing package](../indexing/README.md)
+- [External indexing package](../indexing/README.md)
 - [Verification evidence](../verification)

@@ -1,9 +1,9 @@
 ---
-title: Passive Graph and Substreams indexing
-description: External, passive, non-authoritative Nexa V6 indexing packages for The Graph and Substreams across supported networks.
+title: Graph and Substreams indexing
+description: External, non-authoritative Nexa V6 indexing packages for The Graph and Substreams across supported networks.
 ---
 
-# Passive indexing
+# External indexing
 
 The indexing package is an external projection of public Nexa V6 events. It is
 designed for discovery, analytics, and backfill - not for route authorization or

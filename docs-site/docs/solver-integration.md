@@ -18,7 +18,7 @@ https://solver.vsnexa.com/.well-known/nexa-solver.json
 ```
 
 Validate schema, deployment version and status, release ID, Feed signer, and
-endpoint URLs. The passive on-chain fingerprint and solver-facing Discovery
+endpoint URLs. The on-chain fingerprint and solver-facing Discovery
 Facade let scanners independently correlate the public document with deployed
 code and state without submitting a transaction.
 

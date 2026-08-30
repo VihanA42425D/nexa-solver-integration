@@ -1,6 +1,6 @@
 # Nexa V6 Documentation
 
-Nexa V6 is a public cross-chain solver integration surface for **Base**, **BNB Smart Chain**, and **HyperEVM**. It exposes machine-readable discovery, verified onchain identities, a signed live route feed, execution permits, ERC-7683 compatibility, OIF discovery metadata, SDKs, and passive indexing packages.
+Nexa V6 is a public cross-chain solver integration surface for **Base**, **BNB Smart Chain**, and **HyperEVM**. It exposes machine-readable discovery, verified onchain identities, a signed live route feed, execution permits, ERC-7683 compatibility, OIF discovery metadata, SDKs, and external indexing packages.
 
 ## Start in 60 seconds
 
@@ -37,7 +37,7 @@ The SDK verifies the signed Feed before returning routes. Wallet signing remains
 
 ## Public indexing
 
-Nexa publishes non-authoritative passive indexing packages for The Graph and Substreams.
+Nexa publishes non-authoritative external indexing packages for The Graph and Substreams.
 
 See the repository [indexing package](../indexing/README.md) for manifests, package IDs, deployment evidence, and validation results.
 

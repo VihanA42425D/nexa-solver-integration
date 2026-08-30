@@ -10,7 +10,7 @@ description: Canonical machine endpoints, source packages, examples, verificatio
 | Resource | URL |
 | --- | --- |
 | Solver discovery | [`/.well-known/nexa-solver.json`](https://solver.vsnexa.com/.well-known/nexa-solver.json) |
-| Passive on-chain fingerprint | [`/.well-known/nexa-onchain-discovery.json`](https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json) |
+| On-chain fingerprint | [`/.well-known/nexa-onchain-discovery.json`](https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json) |
 | Standards manifest | [`/.well-known/nexa-standards.json`](https://solver.vsnexa.com/.well-known/nexa-standards.json) |
 | OpenAPI | [`/openapi.json`](https://solver.vsnexa.com/openapi.json) |
 | Solver discovery projection | [`/api/v6/solver-discovery`](https://solver.vsnexa.com/api/v6/solver-discovery) |
@@ -61,7 +61,7 @@ into requests.
 - Use the permit envelope for one fill's authorized execution.
 - Use the on-chain contracts and receipts for state and completion.
 - Use SDKs and examples to implement these checks.
-- Use Graph/Substreams and documentation for passive discovery only.
+- Use Graph/Substreams and documentation for discovery only.
 
 ## Contributing and support
 

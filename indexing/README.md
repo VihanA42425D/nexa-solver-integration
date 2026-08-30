@@ -1,4 +1,4 @@
-# Nexa V6 passive indexing package
+# Nexa V6 external indexing package
 
 This package projects public V6 on-chain events for discovery and analytics.
 

@@ -3,7 +3,7 @@ name = "nexa-v6-substreams"
 version = "1.0.0"
 edition = "2021"
 license = "ISC"
-description = "Shared passive Nexa V6 Substreams event projection."
+description = "Shared Nexa V6 Substreams event projection."
 
 [lib]
 name = "nexa_v6_substreams"

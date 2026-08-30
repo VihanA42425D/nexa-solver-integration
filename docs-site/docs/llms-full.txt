@@ -4,7 +4,7 @@ Nexa Mainnet V6 publishes a public, accountless discovery surface for solvers on
 
 The execution invariant is exact: one Bot source transaction plus one Nexa destination transaction, for a total of two. ERC-7683 is exposed as an executable resolver. Resolver calls are off-chain `eth_call` operations and add no transaction. OIF is discovery-and-description only and is not executable. Do not infer OIF execution support from discoverability.
 
-Authority is layered. The on-chain Registry and Router define deployment identity and executable state. The signed Feed defines live published commercial terms. The Execution Permit authorizes one specific fill. Graph and Substreams outputs, search results, documentation, and cached HTTP responses are passive, non-authoritative projections and must be checked against the canonical layers before execution.
+Authority is layered. The on-chain Registry and Router define deployment identity and executable state. The signed Feed defines live published commercial terms. The Execution Permit authorizes one specific fill. Graph and Substreams outputs, search results, documentation, and cached HTTP responses are non-authoritative projections and must be checked against the canonical layers before execution.
 
 ## Documentation map
 

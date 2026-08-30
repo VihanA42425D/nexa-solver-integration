@@ -19,7 +19,7 @@ Canonical discovery URI:
 https://solver.vsnexa.com/.well-known/nexa-solver.json
 ```
 
-Passive onchain fingerprint for scanners and indexers:
+On-chain fingerprint for scanners and indexers:
 
 ```text
 https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json
@@ -163,7 +163,7 @@ Maven Central artifacts are signed with OpenPGP fingerprint
 
 Examples never require a private key to be committed. Signing stays in the integrating wallet or bot.
 
-## Passive Graph and Substreams indexing
+## Graph and Substreams indexing
 
 The [indexing package](indexing/README.md) supplies one generated canonical
 configuration, one shared Graph schema/mapping for Base (8453) and BSC (56), and
@@ -171,7 +171,7 @@ one shared Substreams Rust/protobuf implementation for Base, BSC, and HyperEVM
 (999). HyperEVM Subgraphs are unsupported by Subgraph Studio and remain
 standalone-Substreams-only. Base and BSC are available through Graph Studio; all
 three network packages are published to the Substreams Registry. Treat every
-index result as a passive discovery aid and verify it against the signed Feed,
+index result as a discovery aid and verify it against the signed Feed,
 Execution Permit, and on-chain Registry/Router state before execution.
 
     npm run indexing:generate
@@ -202,7 +202,7 @@ other EVM wallets with bridge routing.
 | --- | --- |
 | [manifest.json](manifest.json) | final ACTIVE artifact index |
 | [nexa-mainnet-v6.json](nexa-mainnet-v6.json) | canonical public integration bundle |
-| [public/.well-known/nexa-onchain-discovery.json](public/.well-known/nexa-onchain-discovery.json) | passive onchain selectors, events, CREATE2 and Sourcify fingerprint |
+| [public/.well-known/nexa-onchain-discovery.json](public/.well-known/nexa-onchain-discovery.json) | on-chain selectors, events, CREATE2 and Sourcify fingerprint |
 | [public/.well-known/nexa-standards.json](public/.well-known/nexa-standards.json) | stable HTTP projection of canonical ERC-7683/OIF metadata |
 | [openapi/openapi.json](openapi/openapi.json) | generated, fully typed OpenAPI 3.1 solver surface |
 | [onboarding/nexa-v6-solver-operator.json](onboarding/nexa-v6-solver-operator.json) | fixed Solver/Aggregator onboarding record |
@@ -212,7 +212,7 @@ other EVM wallets with bridge routing.
 | [standards/nexa-standards.json](standards/nexa-standards.json) | canonical standards machine manifest |
 | [standards/test-vectors.json](standards/test-vectors.json) | deterministic ERC-7683 and OIF vectors |
 | [events/events.json](events/events.json) | canonical indexed V6 event signatures and topics |
-| [indexing](indexing) | passive Graph/Substreams package, canonical config and deployment handoff |
+| [indexing](indexing) | Graph/Substreams package, canonical config and deployment handoff |
 | [verification](verification) | source, deployment, identity, signature and checksums |
 | [examples](examples) | discovery, Permit, Facade and resolution clients |
 | [sdk-spec](sdk-spec) | frozen cross-language behavior and byte-level vectors |

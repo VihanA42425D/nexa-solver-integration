@@ -136,7 +136,7 @@ package:
   name: nexa_v6_indexing_${network.graphNetwork.replaceAll("-", "_")}
   version: v1.0.0
   url: https://github.com/VihanA42425D/nexa-solver-integration
-  description: Passive non-authoritative Nexa V6 onchain event projection.
+  description: Non-authoritative Nexa V6 onchain event projection.
 network: ${network.graphNetwork}
 protobuf:
   files:

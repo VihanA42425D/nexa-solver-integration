@@ -186,7 +186,7 @@ test("only V6 public endpoint catalog is exported", () => {
   ]);
 });
 
-test("passive onchain fingerprint pins both discovery beacons without a transaction", async () => {
+test("onchain fingerprint pins both discovery beacons without a transaction", async () => {
   const surface = await loadPublicSurface();
   const fingerprint = surface.onchainDiscovery;
   assert.equal(fingerprint.schema, "NEXA_MAINNET_V6_ONCHAIN_DISCOVERY_FINGERPRINT_V1");

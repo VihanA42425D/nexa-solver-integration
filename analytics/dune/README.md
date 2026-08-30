@@ -1,6 +1,6 @@
 # Nexa V6 Dune analytics
 
-This package defines the public, passive Dune projection of canonical Nexa V6
+This package defines the public Dune projection of canonical Nexa V6
 onchain events. One normalized query feeds one hourly public materialized view,
 and every derived query reads only that view. Decoded datasets remain outside
 the active projection until their historical backfill passes the activation

@@ -24,7 +24,7 @@ deployment, permit, or on-chain verification.
 - Start at the canonical well-known URI over HTTPS.
 - Pin the expected schema, deployment version, active status, and release ID.
 - Compare the Facade, Registry, Router, and standards module addresses and
-  runtime code hashes with the passive fingerprint.
+  runtime code hashes with the on-chain fingerprint.
 - Read the Facade system state on each intended chain using your own RPC.
 - Require live state and the canonical discovery URI.
 - Review explorer and Sourcify verification evidence, but verify runtime code
@@ -73,7 +73,7 @@ resolution, and OIF description add zero transactions.
 
 ## Public verification evidence
 
-- [Passive on-chain fingerprint](https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json)
+- [On-chain fingerprint](https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json)
 - [Facade deployment evidence](https://github.com/VihanA42425D/nexa-solver-integration/blob/main/verification/facade-deployment.json)
 - [Deterministic on-chain identity](https://github.com/VihanA42425D/nexa-solver-integration/blob/main/verification/onchain-identity.json)
 - [Exact-match Sourcify and explorer references](networks-contracts.md#how-to-verify-a-deployment)

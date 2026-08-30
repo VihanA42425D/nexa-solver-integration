@@ -10,7 +10,7 @@ const API = "https://api.dune.com/api/v1";
 const CANONICAL_NAME = "Nexa V6 — Canonical Onchain Events";
 const MV_NAME = "result_nexa_v6_events_canonical";
 const CRON = "0 * * * *";
-const TAGS = ["nexa-v6", "passive-onchain-analytics"];
+const TAGS = ["nexa-v6", "onchain-analytics"];
 const EXPECTED_QUERY_IDS = Object.freeze({
   canonical: 8437473,
   overview: 8437486,
@@ -911,11 +911,11 @@ Dune API. Assemble the public dashboard from these public queries.
 
 ## Header text
 
-Nexa V6 passive onchain analytics
+Nexa V6 onchain analytics
 
 Registry and Router events describe onchain identity and state. Signed Feed
 data supplies live route terms. Execution Permits supply final execution
-authority. Dune is passive and non-authoritative.
+authority. Dune is non-authoritative.
 
 ## Coverage
 
@@ -1000,7 +1000,7 @@ async function main() {
   if (!currentCanonicalSql) throw new Error("Canonical BNB source bindings are incomplete");
   const currentCanonicalDefinition = {
     key: "canonical", file: "canonical-events.sql", name: CANONICAL_NAME,
-    description: "The sole normalized Nexa V6 decoded-table source for passive Dune analytics.",
+    description: "The sole normalized Nexa V6 decoded-table source for Dune analytics.",
     sql: currentCanonicalSql,
   };
   const fullMvName = "dune.nexav6.result_nexa_v6_events_canonical";
@@ -1193,7 +1193,7 @@ async function main() {
   const refreshPrior = localManifest.materializedView?.latestSuccessfulRefresh;
   const canonicalLatest = refreshExecution ?? canonicalPrior;
   const manifest = {
-    schemaVersion: 1, mode: "PASSIVE_ONCHAIN_ANALYTICS", authoritative: false,
+    schemaVersion: 1, mode: "EXTERNAL_ONCHAIN_ANALYTICS", authoritative: false,
     ingestion: "DUNE_DIRECT_CHAIN",
     status: targetStatus,
     owner, profileUrl: `https://dune.com/${owner}`,

@@ -6,11 +6,11 @@ the dashboard in Dune.
 
 ## Header text
 
-Nexa V6 passive onchain analytics
+Nexa V6 onchain analytics
 
 Registry and Router events describe onchain identity and state. Signed Feed
 data supplies live route terms. Execution Permits supply final execution
-authority. Dune is passive and non-authoritative.
+authority. Dune is non-authoritative.
 
 ## Coverage
 

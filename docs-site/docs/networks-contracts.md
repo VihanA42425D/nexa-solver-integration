@@ -15,7 +15,7 @@ projection, not a separate deployment registry.
 
 For every chain you intend to use:
 
-1. Fetch the canonical passive on-chain fingerprint from the discovery
+1. Fetch the canonical on-chain fingerprint from the discovery
    manifest.
 2. Require the expected chain ID, release ID, addresses, runtime code hashes,
    selectors, and same-address evidence.
@@ -54,7 +54,7 @@ description only; it is not an alternate execution route.
 
 ## Canonical sources
 
-- [Passive on-chain fingerprint](https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json)
+- [On-chain fingerprint](https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json)
 - [Solver discovery manifest](https://solver.vsnexa.com/.well-known/nexa-solver.json)
 - [Solver-facing ABI](https://github.com/VihanA42425D/nexa-solver-integration/blob/main/abi/solver-facing.json)
 - [Verification evidence](https://github.com/VihanA42425D/nexa-solver-integration/tree/main/verification)

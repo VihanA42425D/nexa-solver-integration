@@ -2,7 +2,7 @@
   "name": "@nexa/v6-graph-indexing",
   "version": "1.0.0",
   "private": true,
-  "description": "Shared passive Nexa V6 subgraph implementation for Base and BSC.",
+  "description": "Shared Nexa V6 subgraph implementation for Base and BSC.",
   "scripts": {
     "codegen": "graph codegen subgraph.base.yaml",
     "codegen:all": "graph codegen subgraph.base.yaml && graph codegen subgraph.bsc.yaml",

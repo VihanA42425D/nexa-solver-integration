@@ -23,14 +23,14 @@ This project follows semantic versioning for the published integration package a
 - Frozen cross-language SDK contract and deterministic vectors.
 - Published SDK implementations for TypeScript/Node, Python, Rust, JVM, and .NET, plus Go source.
 - Scanner-grade onchain discovery fingerprint.
-- Passive Graph and Substreams indexing package.
+- Graph and Substreams indexing package.
 - Graph Studio deployments for Base and BNB Smart Chain.
 - Published Substreams packages for Base, BNB Smart Chain, and HyperEVM.
 - Public crawler discovery entry points including `robots.txt`, `sitemap.xml`, and `llms.txt`.
 
 ### Architecture
 
-- Passive external indexers remain non-authoritative.
+- External indexers remain non-authoritative.
 - No indexer is inserted into the execution authority chain.
 - Live route terms remain authorized by the Signed Feed.
 - Final execution remains authorized by the Execution Permit.

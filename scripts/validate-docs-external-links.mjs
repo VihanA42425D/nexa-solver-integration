@@ -8,7 +8,7 @@ const CONCURRENCY = 3;
 const TIMEOUT_MS = 20_000;
 const LOCAL_ORIGIN = "https://docs.vsnexa.com";
 const SOLVER_ORIGIN = "https://solver.vsnexa.com";
-const PASSIVE_SOLVER_PATHS = new Set([
+const STATIC_SOLVER_PATHS = new Set([
   "/",
   "/robots.txt",
   "/sitemap.xml",
@@ -37,7 +37,7 @@ for (const path of sourceFiles) {
     const url = match[0].replace(/[.,;:]$/, "");
     const parsed = new URL(url);
     if (parsed.origin === LOCAL_ORIGIN || url.endsWith(".git")) continue;
-    if (parsed.origin === SOLVER_ORIGIN && !PASSIVE_SOLVER_PATHS.has(parsed.pathname)) {
+    if (parsed.origin === SOLVER_ORIGIN && !STATIC_SOLVER_PATHS.has(parsed.pathname)) {
       skippedDynamicSolverUrls.add(url);
       continue;
     }

@@ -73,7 +73,7 @@ npm run describe:oif
 
 ## 5. Scanner / explorer integration
 
-Use the passive onchain fingerprint:
+Use the on-chain fingerprint:
 
 ```text
 https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json
@@ -83,7 +83,7 @@ It provides stable selectors, event metadata, deployment evidence, runtime hashe
 
 ## 6. Indexer integration
 
-For passive indexing, use the published Graph/Substreams artifacts.
+For external indexing, use the published Graph/Substreams artifacts.
 
 - [Indexing package](../indexing/README.md)
 - [External deployment evidence](../indexing/external-deployments.json)

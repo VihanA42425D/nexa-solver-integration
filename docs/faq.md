@@ -2,7 +2,7 @@
 
 ## What is Nexa V6?
 
-Nexa V6 is a public cross-chain solver integration surface with machine-readable discovery, verified onchain identities, signed live route terms, execution permits, SDKs, and passive indexing support.
+Nexa V6 is a public cross-chain solver integration surface with machine-readable discovery, verified onchain identities, signed live route terms, execution permits, SDKs, and external indexing support.
 
 ## Which networks are supported?
 
@@ -28,7 +28,7 @@ A valid Nexa **Execution Permit**.
 
 ## Are Graph or Substreams authoritative?
 
-No. They are passive, non-authoritative discovery/indexing projections.
+No. They are non-authoritative discovery/indexing projections.
 
 ## How should index results be used?
 

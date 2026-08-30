@@ -54,7 +54,7 @@
         "operationId": "getOnchainDiscovery",
         "responses": {
           "200": {
-            "description": "Passive onchain fingerprint and scanner hints.",
+            "description": "On-chain fingerprint and scanner hints.",
             "content": {
               "application/json": {
                 "schema": {

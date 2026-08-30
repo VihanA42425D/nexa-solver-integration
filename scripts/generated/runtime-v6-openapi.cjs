@@ -937,7 +937,7 @@ function buildV6OpenApiDocument(baseUrl) {
           responses: {
             200: jsonResponse(
               ref("OnchainDiscoveryFingerprint"),
-              "Passive onchain fingerprint and scanner hints.",
+              "On-chain fingerprint and scanner hints.",
             ),
           },
         },

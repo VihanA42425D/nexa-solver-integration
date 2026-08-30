@@ -254,6 +254,17 @@ if (openapi.openapi !== "3.1.0"
     || !openapi.paths[PUBLIC_PATHS.executionPermits].post.responses["429"]) {
   throw new Error("OpenAPI runtime semantics drift");
 }
+const signedFeedSchema = openapi.components.schemas.SignedFeed;
+const signedPayloadSchema = openapi.components.schemas.SignedFeedPayload;
+const routeSchema = openapi.components.schemas.Route;
+if (signedFeedSchema.properties.routeDetailTemplate.const
+      !== PUBLIC_ENDPOINTS.routeDetailTemplate
+    || !signedFeedSchema.required.includes("routeDetailTemplate")
+    || Object.hasOwn(signedPayloadSchema.properties, "routeDetailTemplate")
+    || ["routeDetailTemplate", "routeDetailUrl", "nextAction", "actions"]
+      .some((field) => Object.hasOwn(routeSchema.properties, field))) {
+  throw new Error("SignedFeed Route Detail navigation boundary drift");
+}
 const generatedStandardsManifest = await buildStandardsManifest(root);
 same(generatedStandardsManifest, standardsManifest, "Generated standards manifest is stale");
 if (await read("standards/nexa-standards.json")

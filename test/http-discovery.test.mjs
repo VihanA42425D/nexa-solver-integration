@@ -33,6 +33,22 @@ test("OpenAPI is the complete generated runtime projection with concrete critica
   );
   assert.match(openapi.components.schemas.SignedFeed.description, /only signed authority/i);
   assert.equal(
+    openapi.components.schemas.SignedFeed.properties.routeDetailTemplate.const,
+    PUBLIC_ENDPOINTS.routeDetailTemplate,
+  );
+  assert.ok(openapi.components.schemas.SignedFeed.required.includes("routeDetailTemplate"));
+  assert.match(
+    openapi.components.schemas.SignedFeed.properties.routeDetailTemplate.description,
+    /not part of signedPayload/i,
+  );
+  assert.equal(
+    Object.hasOwn(openapi.components.schemas.SignedFeedPayload.properties, "routeDetailTemplate"),
+    false,
+  );
+  for (const field of ["routeDetailTemplate", "routeDetailUrl", "nextAction", "actions"]) {
+    assert.equal(Object.hasOwn(openapi.components.schemas.Route.properties, field), false);
+  }
+  assert.equal(
     openapi.components.schemas.RouteDetailResponse.properties.route.$ref,
     "#/components/schemas/Route",
   );

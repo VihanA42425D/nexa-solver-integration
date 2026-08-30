@@ -3,6 +3,7 @@
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { PUBLIC_ENDPOINTS } from "../src/public-endpoints.mjs";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const read = (file) => readFile(resolve(root, file), "utf8");
@@ -27,6 +28,17 @@ if (vectors.schema !== "NEXA_V6_SDK_TEST_VECTORS_V1"
     || vectors.specVersion !== spec.specVersion
     || vectors.feed.feedHash !== "0x2d07c27ec87174cda4aa46b990ec8b78ab22dbb61313b11e7db8a98aafe87414") {
   throw new Error("Frozen SDK vectors drifted");
+}
+if (!spec.models.SignedFeed.required.includes("routeDetailTemplate")
+    || spec.models.SignedFeed.routeDetailTemplate.const !== PUBLIC_ENDPOINTS.routeDetailTemplate
+    || spec.models.SignedFeed.routeDetailTemplate.signed !== false
+    || vectors.feed.routeDetailTemplate !== PUBLIC_ENDPOINTS.routeDetailTemplate
+    || Object.hasOwn(vectors.feed.signedPayload, "routeDetailTemplate")
+    || vectors.feed.signedPayload.routes.some((route) => (
+      ["routeDetailTemplate", "routeDetailUrl", "nextAction", "actions"]
+        .some((field) => Object.hasOwn(route, field))
+    ))) {
+  throw new Error("SignedFeed Route Detail navigation contract drifted");
 }
 if (!spec.canonicalization.feedSignature.includes("no EIP-191 prefix")
     || !spec.canonicalization.permitRequestSignature.includes("EIP-191")) {

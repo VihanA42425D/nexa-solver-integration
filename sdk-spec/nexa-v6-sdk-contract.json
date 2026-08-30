@@ -65,8 +65,13 @@
       "required": ["routeId", "quoteId", "sourceNetworkId", "sourceAssetId", "destinationNetworkId", "destinationAssetId", "minimumFillInRaw", "maxAvailableInRaw", "executionStatus", "permitAvailable", "validUntil"]
     },
     "SignedFeed": {
-      "required": ["signedPayload", "feedHash", "feedSigner", "feedSignature"],
-      "signedPayloadRequired": ["schema", "releaseId", "dataVersion", "generatedAt", "validUntil", "routes"]
+      "required": ["routeDetailTemplate", "signedPayload", "feedHash", "feedSigner", "feedSignature"],
+      "signedPayloadRequired": ["schema", "releaseId", "dataVersion", "generatedAt", "validUntil", "routes"],
+      "routeDetailTemplate": {
+        "const": "https://solver.vsnexa.com/api/v6/routes/{routeId}",
+        "authority": "NAVIGATION_METADATA_ONLY",
+        "signed": false
+      }
     },
     "FeedVerification": {
       "required": ["valid", "computedHash", "expectedHash", "recoveredSigner", "declaredSigner", "expectedSigner", "expired"]

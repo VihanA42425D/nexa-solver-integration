@@ -1047,7 +1047,7 @@
       "SignedFeed": {
         "type": "object",
         "additionalProperties": false,
-        "description": "signedPayload is the only signed authority. Top-level routes/openRoutes are filterable convenience views and must not be substituted during verification.",
+        "description": "signedPayload is the only signed authority. routeDetailTemplate is feed-level navigation metadata outside the cryptographic authority. Top-level routes/openRoutes are filterable convenience views and must not be substituted during verification.",
         "required": [
           "schema",
           "releaseId",
@@ -1055,6 +1055,7 @@
           "generatedAt",
           "validUntil",
           "signedPayload",
+          "routeDetailTemplate",
           "routes",
           "openRoutes",
           "feedHash",
@@ -1093,6 +1094,11 @@
           },
           "signedPayload": {
             "$ref": "#/components/schemas/SignedFeedPayload"
+          },
+          "routeDetailTemplate": {
+            "type": "string",
+            "const": "https://solver.vsnexa.com/api/v6/routes/{routeId}",
+            "description": "Feed-level read-only navigation template. Replace {routeId} with a route.routeId. This field is not part of signedPayload and is not cryptographic authority."
           },
           "routes": {
             "type": "array",

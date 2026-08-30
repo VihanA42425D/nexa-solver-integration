@@ -18,6 +18,7 @@
   },
   "feed": {
     "nowSeconds": 2000000001,
+    "routeDetailTemplate": "https://solver.vsnexa.com/api/v6/routes/{routeId}",
     "signedPayload": {
       "schema": "NEXA_MAINNET_V6_SIGNED_FEED_V1",
       "releaseId": "0xcc0dc051739f2dafaebd2eb5663937850dcc3e7951e38f437e00fcd9fa6c8ff6",

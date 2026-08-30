@@ -17,6 +17,7 @@ const V6_HTTP_PATHS = Object.freeze({
   permitStatusTemplate: "/api/v6/execution-permits/{fillId}",
 });
 const V6_PUBLIC_SOLVER_BASE_URL = "https://solver.vsnexa.com";
+const V6_ROUTE_DETAIL_TEMPLATE = `${V6_PUBLIC_SOLVER_BASE_URL}${V6_HTTP_PATHS.routeDetailTemplate}`;
 function deepFreeze(value) {
   if (!value || typeof value !== "object" || Object.isFrozen(value)) return value;
   for (const child of Object.values(value)) deepFreeze(child);
@@ -119,10 +120,10 @@ function feedSchemas() {
     SignedFeed: {
       type: "object",
       additionalProperties: false,
-      description: "signedPayload is the only signed authority. Top-level routes/openRoutes are filterable convenience views and must not be substituted during verification.",
+      description: "signedPayload is the only signed authority. routeDetailTemplate is feed-level navigation metadata outside the cryptographic authority. Top-level routes/openRoutes are filterable convenience views and must not be substituted during verification.",
       required: [
         "schema", "releaseId", "dataVersion", "generatedAt", "validUntil", "signedPayload",
-        "routes", "openRoutes", "feedHash", "feedSigner", "feedSignature", "publicationGasWei",
+        "routeDetailTemplate", "routes", "openRoutes", "feedHash", "feedSigner", "feedSignature", "publicationGasWei",
         "publicationTransactionHashes", "routeCount", "openRouteCount", "returnedRouteCount",
         "returnedOpenRouteCount",
       ],
@@ -130,6 +131,11 @@ function feedSchemas() {
         schema: { const: "NEXA_MAINNET_V6_SIGNED_FEED_V1" },
         releaseId: BYTES32, dataVersion: UINT, generatedAt: UNIX, validUntil: UNIX,
         signedPayload: ref("SignedFeedPayload"),
+        routeDetailTemplate: {
+          type: "string",
+          const: V6_ROUTE_DETAIL_TEMPLATE,
+          description: "Feed-level read-only navigation template. Replace {routeId} with a route.routeId. This field is not part of signedPayload and is not cryptographic authority.",
+        },
         routes: { type: "array", items: ref("Route") },
         openRoutes: { type: "array", items: ref("Route") },
         feedHash: BYTES32, feedSigner: ADDRESS,

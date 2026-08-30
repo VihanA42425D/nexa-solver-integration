@@ -74,6 +74,8 @@ Returns the current **signed** solver Feed containing active routes.
 
 **Important:** `signedPayload` is the authoritative object. Top-level `routes` and `openRoutes` are convenience filters; never replace the signature preimage.
 
+`routeDetailTemplate` is Feed-level navigation metadata for the next read-only step. After selecting a verified route, resolve it with `routeDetailTemplate.replace("{routeId}", route.routeId)`. It is not part of `signedPayload` and carries no cryptographic authority.
+
 #### Stream Feed Events (Server-Sent Events)
 ```
 GET /api/v6/solver-feed/events

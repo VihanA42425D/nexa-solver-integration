@@ -10,6 +10,7 @@ import {
   verifyMessage,
 } from "ethers";
 import { canonical, computeFeedHash } from "../src/feed-verification.mjs";
+import { PUBLIC_ENDPOINTS } from "../src/public-endpoints.mjs";
 
 const FEED_DOMAIN = "NEXA_MAINNET_V6_SIGNED_FEED_V1";
 const PERMIT_DOMAIN = "NEXA_MAINNET_V6_EXECUTION_PERMIT_REQUEST_V1";
@@ -122,6 +123,7 @@ const vectors = {
   },
   feed: {
     nowSeconds: 2000000001,
+    routeDetailTemplate: PUBLIC_ENDPOINTS.routeDetailTemplate,
     signedPayload,
     canonicalPayload,
     preimageUtf8: feedPreimage,

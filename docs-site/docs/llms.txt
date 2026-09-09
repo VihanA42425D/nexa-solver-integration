@@ -5,6 +5,7 @@
 ## Start here
 
 - [Documentation overview](https://docs.vsnexa.com/): Scope, authority, and integration map
+- [Use Nexa](https://docs.vsnexa.com/use-nexa/): Direct DEX, Aggregator API, and solver integration entry points
 - [Quick start](https://docs.vsnexa.com/quick-start/): Minimal safe solver workflow
 - [Solver integration](https://docs.vsnexa.com/solver-integration/): Discovery-to-settlement lifecycle
 - [API](https://docs.vsnexa.com/api/): HTTP and SSE surface
@@ -21,6 +22,9 @@
 
 ## Canonical machine endpoints
 
+- [Nexa DEX](https://dex.vsnexa.com/)
+- [Aggregator discovery](https://api.vsnexa.com/.well-known/nexa-aggregator.json)
+- [Aggregator OpenAPI](https://api.vsnexa.com/openapi.json)
 - [Solver discovery](https://solver.vsnexa.com/.well-known/nexa-solver.json)
 - [On-chain fingerprint](https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json)
 - [Standards manifest](https://solver.vsnexa.com/.well-known/nexa-standards.json)

@@ -3,6 +3,8 @@
   "keyFile": "5777b084ef07467b9f9be3f2f0cc22d0.txt",
   "hosts": [
     "docs.vsnexa.com",
-    "solver.vsnexa.com"
+    "solver.vsnexa.com",
+    "api.vsnexa.com",
+    "dex.vsnexa.com"
   ]
 }

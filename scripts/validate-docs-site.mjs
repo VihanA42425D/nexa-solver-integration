@@ -13,6 +13,7 @@ const INDEXNOW_KEY_FILE = indexNowConfig.keyFile;
 
 const requiredRoutes = [
   ["/", "index.html"],
+  ["/use-nexa/", "use-nexa/index.html"],
   ["/quick-start/", "quick-start/index.html"],
   ["/solver-integration/", "solver-integration/index.html"],
   ["/api/", "api/index.html"],
@@ -262,8 +263,12 @@ assert(/^User-agent: \*/m.test(robots), "robots.txt lacks a global crawler rule"
 assert(/^Allow: \/$/m.test(robots), "robots.txt does not allow the documentation site");
 assert(robots.includes(`${ORIGIN}/sitemap.xml`), "robots.txt has the wrong sitemap URL");
 assert(
-  robots.includes("https://solver.vsnexa.com/sitemap.xml"),
-  "robots.txt lacks the canonical solver sitemap",
+  [
+    "https://solver.vsnexa.com/sitemap.xml",
+    "https://api.vsnexa.com/sitemap.xml",
+    "https://dex.vsnexa.com/sitemap.xml",
+  ].every((url) => robots.includes(url)),
+  "robots.txt lacks a canonical public sitemap",
 );
 
 const sitemap = await readFile(join(SITE, "sitemap.xml"), "utf8");
@@ -291,9 +296,11 @@ const indexNowBuiltKey = (await readFile(join(SITE, INDEXNOW_KEY_FILE), "utf8"))
 assert(/^[A-Za-z0-9-]{8,128}$/.test(INDEXNOW_KEY), "Canonical IndexNow key is invalid");
 assert(INDEXNOW_KEY_FILE === `${INDEXNOW_KEY}.txt`, "Canonical IndexNow filename is invalid");
 assert(
-  indexNowConfig.hosts.length === 2
+  indexNowConfig.hosts.length === 4
     && indexNowConfig.hosts.includes("docs.vsnexa.com")
-    && indexNowConfig.hosts.includes("solver.vsnexa.com"),
+    && indexNowConfig.hosts.includes("solver.vsnexa.com")
+    && indexNowConfig.hosts.includes("api.vsnexa.com")
+    && indexNowConfig.hosts.includes("dex.vsnexa.com"),
   "Canonical IndexNow host allowlist is invalid",
 );
 assert(indexNowSourceKey === INDEXNOW_KEY, "IndexNow source key file is invalid");

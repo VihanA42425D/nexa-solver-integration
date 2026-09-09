@@ -8,6 +8,7 @@
   <meta name="robots" content="{% if page and page.url is defined %}index,follow{% else %}noindex,nofollow{% endif %}">
   <link rel="alternate" type="application/json" title="Nexa V6 Solver Manifest" href="https://solver.vsnexa.com/.well-known/nexa-solver.json">
   <link rel="service-desc" type="application/vnd.oai.openapi+json;version=3.1" title="Nexa V6 OpenAPI" href="https://solver.vsnexa.com/openapi.json">
+  <link rel="service-desc" type="application/vnd.oai.openapi+json;version=3.1" title="Nexa Aggregator API" href="https://api.vsnexa.com/openapi.json">
   <link rel="alternate" type="text/plain" title="Nexa V6 LLM Index" href="https://docs.vsnexa.com/llms.txt">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="{{ config.site_name }}">
@@ -44,6 +45,24 @@
         "description": "Machine-readable Nexa Mainnet V6 solver discovery, signed route publication, and permit-gated execution API.",
         "serviceType": "Cross-chain solver discovery and execution API",
         "documentation": "https://docs.vsnexa.com/api/"
+      }{% endif %}{% if page and page.url == "use-nexa/" %},
+      {
+        "@type": "WebAPI",
+        "@id": "https://api.vsnexa.com/#api",
+        "name": "Nexa Aggregator API",
+        "url": "https://api.vsnexa.com/",
+        "description": "Public quote, build, status, network, and token API for Nexa integrations.",
+        "serviceType": "Cross-chain quote and execution API",
+        "documentation": "https://docs.vsnexa.com/use-nexa/"
+      },
+      {
+        "@type": "WebApplication",
+        "@id": "https://dex.vsnexa.com/#app",
+        "name": "Nexa DEX",
+        "url": "https://dex.vsnexa.com/",
+        "description": "A direct web interface for requesting and executing supported Nexa quotes.",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web"
       }{% endif %}{% if page and page.url %},
       {
         "@type": "TechArticle",

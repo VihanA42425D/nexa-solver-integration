@@ -5,6 +5,20 @@ description: Canonical machine endpoints, source packages, examples, verificatio
 
 # Public resources
 
+## Products and APIs
+
+| Resource | URL |
+| --- | --- |
+| Nexa DEX | [dex.vsnexa.com](https://dex.vsnexa.com) |
+| Aggregator API | [api.vsnexa.com](https://api.vsnexa.com) |
+| Aggregator discovery | [`/.well-known/nexa-aggregator.json`](https://api.vsnexa.com/.well-known/nexa-aggregator.json) |
+| Aggregator OpenAPI | [`/openapi.json`](https://api.vsnexa.com/openapi.json) |
+| Solver API | [solver.vsnexa.com](https://solver.vsnexa.com) |
+| Documentation | [docs.vsnexa.com](https://docs.vsnexa.com) |
+
+Use the [Nexa access guide](use-nexa.md) to choose between the direct web
+interface, the Aggregator API, and the solver integration surface.
+
 ## Canonical machine endpoints
 
 | Resource | URL |

@@ -42,6 +42,7 @@ theme:
 
 nav:
   - Overview: index.md
+  - Use Nexa: use-nexa.md
   - Quick start: quick-start.md
   - Solver integration: solver-integration.md
   - API: api.md

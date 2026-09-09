@@ -4,3 +4,5 @@ Allow: /
 
 Sitemap: https://docs.vsnexa.com/sitemap.xml
 Sitemap: https://solver.vsnexa.com/sitemap.xml
+Sitemap: https://api.vsnexa.com/sitemap.xml
+Sitemap: https://dex.vsnexa.com/sitemap.xml

@@ -12,6 +12,22 @@ const INDEXNOW_KEY = indexNowConfig.key;
 const INDEXNOW_KEY_FILE = indexNowConfig.keyFile;
 const INDEXNOW_ENDPOINT = "https://api.indexnow.org/indexnow";
 const shouldSubmit = process.argv.includes("--submit");
+const API_SITEMAP = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://api.vsnexa.com/</loc></url>
+  <url><loc>https://api.vsnexa.com/.well-known/nexa-aggregator.json</loc></url>
+  <url><loc>https://api.vsnexa.com/openapi.json</loc></url>
+  <url><loc>https://api.vsnexa.com/v1/docs</loc></url>
+  <url><loc>https://api.vsnexa.com/v1/chains</loc></url>
+  <url><loc>https://api.vsnexa.com/v1/tokens</loc></url>
+  <url><loc>https://api.vsnexa.com/v1/health</loc></url>
+</urlset>
+`;
+const DEX_SITEMAP = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://dex.vsnexa.com/</loc></url>
+</urlset>
+`;
 
 const assert = (condition, message) => {
   if (!condition) throw new Error(message);
@@ -43,6 +59,20 @@ const targets = [
     key: INDEXNOW_KEY,
     keyFile: INDEXNOW_KEY_FILE,
     sitemap: SOLVER_SITEMAP,
+  },
+  {
+    label: "aggregator API",
+    origin: "https://api.vsnexa.com",
+    key: INDEXNOW_KEY,
+    keyFile: INDEXNOW_KEY_FILE,
+    sitemap: API_SITEMAP,
+  },
+  {
+    label: "DEX",
+    origin: "https://dex.vsnexa.com",
+    key: INDEXNOW_KEY,
+    keyFile: INDEXNOW_KEY_FILE,
+    sitemap: DEX_SITEMAP,
   },
 ].map((target) => {
   assert(/^[A-Za-z0-9-]{8,128}$/.test(target.key), `Invalid ${target.label} IndexNow key`);

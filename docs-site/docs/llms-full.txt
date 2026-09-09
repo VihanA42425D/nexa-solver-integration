@@ -9,6 +9,7 @@ Authority is layered. The on-chain Registry and Router define deployment identit
 ## Documentation map
 
 - https://docs.vsnexa.com/
+- https://docs.vsnexa.com/use-nexa/
 - https://docs.vsnexa.com/quick-start/
 - https://docs.vsnexa.com/solver-integration/
 - https://docs.vsnexa.com/api/
@@ -22,6 +23,9 @@ Authority is layered. The on-chain Registry and Router define deployment identit
 
 ## Canonical artifacts
 
+- https://dex.vsnexa.com/
+- https://api.vsnexa.com/.well-known/nexa-aggregator.json
+- https://api.vsnexa.com/openapi.json
 - https://solver.vsnexa.com/.well-known/nexa-solver.json
 - https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json
 - https://solver.vsnexa.com/.well-known/nexa-standards.json

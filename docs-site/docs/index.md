@@ -12,6 +12,7 @@ verified route Feed, and permit-gated execution path across Base, BNB Smart
 Chain, and HyperEVM.
 
 [Start the integration](quick-start.md){ .md-button .md-button--primary }
+[Use Nexa](use-nexa.md){ .md-button }
 [Inspect the API](api.md){ .md-button }
 
 </div>
@@ -56,6 +57,9 @@ Chain, and HyperEVM.
 
 ## Reference entry points
 
+- [Nexa DEX](https://dex.vsnexa.com)
+- [Aggregator API](https://api.vsnexa.com)
+- [Aggregator OpenAPI](https://api.vsnexa.com/openapi.json)
 - [Solver discovery manifest](https://solver.vsnexa.com/.well-known/nexa-solver.json)
 - [On-chain fingerprint](https://solver.vsnexa.com/.well-known/nexa-onchain-discovery.json)
 - [Standards manifest](https://solver.vsnexa.com/.well-known/nexa-standards.json)

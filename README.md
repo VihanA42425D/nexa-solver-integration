@@ -9,6 +9,13 @@
 
 **Documentation:** [docs.vsnexa.com](https://docs.vsnexa.com/)
 
+## Public entry points
+
+- [Nexa DEX](https://dex.vsnexa.com) - direct wallet interface for supported quotes and execution.
+- [Aggregator API](https://api.vsnexa.com) - public quote, build, status, network, and token API.
+- [Aggregator OpenAPI](https://api.vsnexa.com/openapi.json) - machine-readable integration contract.
+- [Solver API](https://solver.vsnexa.com) - signed Feed, permit, status, and discovery surface.
+
 This is the machine-readable integration surface for Nexa solvers, indexers and intent frameworks. It publishes the verified onchain Discovery Facade, Registry and Router bindings, signed Feed protocol, ERC-7683 resolver, OIF discovery module, ABI, OpenAPI, events, network IDs and reproducible verification evidence.
 
 ## Start here

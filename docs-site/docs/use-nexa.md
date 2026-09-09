@@ -39,12 +39,12 @@ Choose the public surface that matches what you are building.
 | --- | --- |
 | Discovery | [`/.well-known/nexa-aggregator.json`](https://api.vsnexa.com/.well-known/nexa-aggregator.json) |
 | OpenAPI | [`/openapi.json`](https://api.vsnexa.com/openapi.json) |
-| Quote | `POST https://api.vsnexa.com/v1/quote` |
-| Build | `POST https://api.vsnexa.com/v1/build` |
-| Status | `GET https://api.vsnexa.com/v1/status` |
-| Chains | `GET https://api.vsnexa.com/v1/chains` |
-| Tokens | `GET https://api.vsnexa.com/v1/tokens` |
-| Health | `GET https://api.vsnexa.com/v1/health` |
+| Quote | `POST /v1/quote` |
+| Build | `POST /v1/build` |
+| Status | `GET /v1/status` |
+| Chains | `GET /v1/chains` |
+| Tokens | `GET /v1/tokens` |
+| Health | `GET /v1/health` |
 
 Use the published OpenAPI document as the field-level contract. Quotes expire;
 applications should display the returned terms and obtain a fresh quote when
@@ -55,4 +55,3 @@ the validity window has passed.
 The DEX guides a connected wallet through network selection, quote review,
 token approval when required, execution, and status tracking. The wallet
 remains in the user's control throughout the flow.
-

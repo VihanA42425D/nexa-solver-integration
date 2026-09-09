@@ -17,10 +17,6 @@ const API_SITEMAP = `<?xml version="1.0" encoding="UTF-8"?>
   <url><loc>https://api.vsnexa.com/</loc></url>
   <url><loc>https://api.vsnexa.com/.well-known/nexa-aggregator.json</loc></url>
   <url><loc>https://api.vsnexa.com/openapi.json</loc></url>
-  <url><loc>https://api.vsnexa.com/v1/docs</loc></url>
-  <url><loc>https://api.vsnexa.com/v1/chains</loc></url>
-  <url><loc>https://api.vsnexa.com/v1/tokens</loc></url>
-  <url><loc>https://api.vsnexa.com/v1/health</loc></url>
 </urlset>
 `;
 const DEX_SITEMAP = `<?xml version="1.0" encoding="UTF-8"?>

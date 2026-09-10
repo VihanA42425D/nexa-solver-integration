@@ -204,7 +204,11 @@ for (const [route, relativePath] of requiredRoutes) {
     ? ["WebSite", "SoftwareSourceCode", "WebAPI"]
     : ["/api/", "/resources/"].includes(route)
       ? ["WebSite", "TechArticle", "SoftwareSourceCode", "WebAPI", "BreadcrumbList"]
-      : ["WebSite", "TechArticle", "BreadcrumbList"];
+      : route === "/aggregator-api/"
+        ? ["WebSite", "TechArticle", "WebAPI", "BreadcrumbList"]
+        : route === "/dex/"
+          ? ["WebSite", "TechArticle", "WebApplication", "BreadcrumbList"]
+          : ["WebSite", "TechArticle", "BreadcrumbList"];
   for (const type of requiredTypes) {
     assert(types.has(type), `Missing JSON-LD ${type}: ${route}`);
   }

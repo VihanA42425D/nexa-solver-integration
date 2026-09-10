@@ -45,7 +45,7 @@
         "description": "Machine-readable Nexa Mainnet V6 solver discovery, signed route publication, and permit-gated execution API.",
         "serviceType": "Cross-chain solver discovery and execution API",
         "documentation": "https://docs.vsnexa.com/api/"
-      }{% endif %}{% if page and page.url == "use-nexa/" %},
+      }{% endif %}{% if page and page.url in ["use-nexa/", "aggregator-api/"] %},
       {
         "@type": "WebAPI",
         "@id": "https://api.vsnexa.com/#api",
@@ -53,8 +53,8 @@
         "url": "https://api.vsnexa.com/",
         "description": "Public quote, build, status, network, and token API for Nexa integrations.",
         "serviceType": "Cross-chain quote and execution API",
-        "documentation": "https://docs.vsnexa.com/use-nexa/"
-      },
+        "documentation": {% if page.url == "aggregator-api/" %}"https://docs.vsnexa.com/aggregator-api/"{% else %}"https://docs.vsnexa.com/use-nexa/"{% endif %}
+      }{% endif %}{% if page and page.url in ["use-nexa/", "dex/"] %},
       {
         "@type": "WebApplication",
         "@id": "https://dex.vsnexa.com/#app",

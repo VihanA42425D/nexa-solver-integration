@@ -10,6 +10,7 @@ This project follows semantic versioning for the published integration package a
 
 - Added a GitHub Pages-ready documentation entry point.
 - Added focused quick-start, architecture, integration, and FAQ guides.
+- Added the public [Nexa DEX](https://dex.vsnexa.com/) entry point and end-user guide.
 - Added contribution and release-note guidance for public repository engagement.
 
 ## [6.3.0]

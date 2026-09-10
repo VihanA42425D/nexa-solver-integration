@@ -6,9 +6,11 @@ Public Nexa Solver discovery and execution integration for **Base**, **BNB Smart
 
 This is the machine-readable integration surface for Nexa solvers, indexers, and intent frameworks. It publishes verified on-chain Discovery Facade, Registry, and Router bindings, alongside signed Feed and complete OpenAPI surface.
 
+**Wallet users:** [Open Nexa DEX to swap or bridge](https://dex.vsnexa.com/).
+
 ## Public entry points
 
-- [Nexa DEX](https://dex.vsnexa.com) - request and execute supported quotes from a connected wallet ([guide](https://docs.vsnexa.com/dex/)).
+- [Nexa DEX](https://dex.vsnexa.com/) - public wallet interface for supported swaps and cross-network transfers ([guide](https://docs.vsnexa.com/dex/)).
 - [Aggregator API](https://api.vsnexa.com) - public quote, build, status, network, and token endpoints ([guide](https://docs.vsnexa.com/aggregator-api/)).
 - [Aggregator OpenAPI](https://api.vsnexa.com/openapi.json) - machine-readable API contract.
 - [Solver API](https://solver.vsnexa.com) - signed route discovery and execution integration.

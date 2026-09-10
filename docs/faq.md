@@ -4,6 +4,12 @@
 
 Nexa V6 is a public cross-chain solver integration surface with machine-readable discovery, verified onchain identities, signed live route terms, execution permits, SDKs, and external indexing support.
 
+## Where can I swap or bridge?
+
+Use the public [Nexa DEX](https://dex.vsnexa.com/) from a connected wallet.
+The [Swap & Bridge guide](https://docs.vsnexa.com/dex/) explains quotes,
+approvals, expiry, fees, and transfer tracking.
+
 ## Which networks are supported?
 
 - Base — chain ID 8453

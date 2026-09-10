@@ -2,9 +2,12 @@
 
 Nexa V6 is a public cross-chain solver integration surface for **Base**, **BNB Smart Chain**, and **HyperEVM**. It exposes machine-readable discovery, verified onchain identities, a signed live route feed, execution permits, ERC-7683 compatibility, OIF discovery metadata, SDKs, and external indexing packages.
 
+**Want to swap or bridge from a wallet?** Open the public
+[Nexa DEX](https://dex.vsnexa.com/).
+
 ## Public entry points
 
-- Direct web interface: https://dex.vsnexa.com ([guide](https://docs.vsnexa.com/dex/))
+- Public wallet interface: https://dex.vsnexa.com/ ([guide](https://docs.vsnexa.com/dex/))
 - Aggregator API: https://api.vsnexa.com ([guide](https://docs.vsnexa.com/aggregator-api/))
 - Aggregator OpenAPI: https://api.vsnexa.com/openapi.json
 - Solver API: https://solver.vsnexa.com

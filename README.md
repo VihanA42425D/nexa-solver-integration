@@ -11,8 +11,8 @@
 
 ## Public entry points
 
-- [Nexa DEX](https://dex.vsnexa.com) - direct wallet interface for supported quotes and execution.
-- [Aggregator API](https://api.vsnexa.com) - public quote, build, status, network, and token API.
+- [Nexa DEX](https://dex.vsnexa.com) - direct wallet interface for supported quotes and execution ([guide](https://docs.vsnexa.com/dex/)).
+- [Aggregator API](https://api.vsnexa.com) - public quote, build, status, network, and token API ([guide](https://docs.vsnexa.com/aggregator-api/)).
 - [Aggregator OpenAPI](https://api.vsnexa.com/openapi.json) - machine-readable integration contract.
 - [Solver API](https://solver.vsnexa.com) - signed Feed, permit, status, and discovery surface.
 

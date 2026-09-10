@@ -14,6 +14,8 @@ const INDEXNOW_KEY_FILE = indexNowConfig.keyFile;
 const requiredRoutes = [
   ["/", "index.html"],
   ["/use-nexa/", "use-nexa/index.html"],
+  ["/dex/", "dex/index.html"],
+  ["/aggregator-api/", "aggregator-api/index.html"],
   ["/quick-start/", "quick-start/index.html"],
   ["/solver-integration/", "solver-integration/index.html"],
   ["/api/", "api/index.html"],

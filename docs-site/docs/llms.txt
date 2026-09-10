@@ -6,6 +6,8 @@
 
 - [Documentation overview](https://docs.vsnexa.com/): Scope, authority, and integration map
 - [Use Nexa](https://docs.vsnexa.com/use-nexa/): Direct DEX, Aggregator API, and solver integration entry points
+- [Swap & Bridge](https://docs.vsnexa.com/dex/): Wallet transfers, live routes, exact payouts, fees and tracking
+- [Aggregator API](https://docs.vsnexa.com/aggregator-api/): Quote/build integration, raw amounts, status, expiry and external fees
 - [Quick start](https://docs.vsnexa.com/quick-start/): Minimal safe solver workflow
 - [Solver integration](https://docs.vsnexa.com/solver-integration/): Discovery-to-settlement lifecycle
 - [API](https://docs.vsnexa.com/api/): HTTP and SSE surface

@@ -8,8 +8,8 @@ This is the machine-readable integration surface for Nexa solvers, indexers, and
 
 ## Public entry points
 
-- [Nexa DEX](https://dex.vsnexa.com) - request and execute supported quotes from a connected wallet.
-- [Aggregator API](https://api.vsnexa.com) - public quote, build, status, network, and token endpoints.
+- [Nexa DEX](https://dex.vsnexa.com) - request and execute supported quotes from a connected wallet ([guide](https://docs.vsnexa.com/dex/)).
+- [Aggregator API](https://api.vsnexa.com) - public quote, build, status, network, and token endpoints ([guide](https://docs.vsnexa.com/aggregator-api/)).
 - [Aggregator OpenAPI](https://api.vsnexa.com/openapi.json) - machine-readable API contract.
 - [Solver API](https://solver.vsnexa.com) - signed route discovery and execution integration.
 - [Documentation](https://docs.vsnexa.com) - guides, references, and verification resources.

@@ -10,7 +10,9 @@ description: Canonical machine endpoints, source packages, examples, verificatio
 | Resource | URL |
 | --- | --- |
 | Nexa DEX | [dex.vsnexa.com](https://dex.vsnexa.com) |
+| Swap & Bridge guide | [docs.vsnexa.com/dex](dex.md) |
 | Aggregator API | [api.vsnexa.com](https://api.vsnexa.com) |
+| Aggregator API guide | [docs.vsnexa.com/aggregator-api](aggregator-api.md) |
 | Aggregator discovery | [`/.well-known/nexa-aggregator.json`](https://api.vsnexa.com/.well-known/nexa-aggregator.json) |
 | Aggregator OpenAPI | [`/openapi.json`](https://api.vsnexa.com/openapi.json) |
 | Solver API | [solver.vsnexa.com](https://solver.vsnexa.com) |

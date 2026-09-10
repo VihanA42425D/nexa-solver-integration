@@ -57,6 +57,8 @@ Chain, and HyperEVM.
 
 ## Reference entry points
 
+- [Swap & Bridge guide](dex.md)
+- [Aggregator API guide](aggregator-api.md)
 - [Nexa DEX](https://dex.vsnexa.com)
 - [Aggregator API](https://api.vsnexa.com)
 - [Aggregator OpenAPI](https://api.vsnexa.com/openapi.json)

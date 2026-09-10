@@ -10,6 +10,8 @@ Authority is layered. The on-chain Registry and Router define deployment identit
 
 - https://docs.vsnexa.com/
 - https://docs.vsnexa.com/use-nexa/
+- https://docs.vsnexa.com/dex/
+- https://docs.vsnexa.com/aggregator-api/
 - https://docs.vsnexa.com/quick-start/
 - https://docs.vsnexa.com/solver-integration/
 - https://docs.vsnexa.com/api/

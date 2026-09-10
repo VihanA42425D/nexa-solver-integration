@@ -4,8 +4,8 @@ Nexa V6 is a public cross-chain solver integration surface for **Base**, **BNB S
 
 ## Public entry points
 
-- Direct web interface: https://dex.vsnexa.com
-- Aggregator API: https://api.vsnexa.com
+- Direct web interface: https://dex.vsnexa.com ([guide](https://docs.vsnexa.com/dex/))
+- Aggregator API: https://api.vsnexa.com ([guide](https://docs.vsnexa.com/aggregator-api/))
 - Aggregator OpenAPI: https://api.vsnexa.com/openapi.json
 - Solver API: https://solver.vsnexa.com
 - Documentation: https://docs.vsnexa.com
